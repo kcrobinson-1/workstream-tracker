@@ -17,6 +17,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/kcrobinson-1/workstream-tracker/internal/api"
+	"github.com/kcrobinson-1/workstream-tracker/internal/db"
 	"github.com/kcrobinson-1/workstream-tracker/internal/site"
 )
 
@@ -27,11 +28,31 @@ func main() {
 	}
 	addr := ":" + port
 
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "workstream-tracker.db"
+	}
+
+	database, err := db.Open(dbPath)
+	if err != nil {
+		log.Fatalf("open db: %v", err)
+	}
+	defer database.Close()
+
+	initCtx, initCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	if err := db.Init(initCtx, database); err != nil {
+		initCancel()
+		log.Fatalf("init db: %v", err)
+	}
+	initCancel()
+
+	apiServer := api.New(database)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Route("/work-instances", api.MountRoutes)
+	r.Route("/work-instances", apiServer.MountRoutes)
 	r.Mount("/", site.Router())
 
 	srv := &http.Server{
@@ -50,7 +71,7 @@ func main() {
 		_ = srv.Shutdown(ctx)
 	}()
 
-	log.Printf("workstream-tracker listening on %s", addr)
+	log.Printf("workstream-tracker listening on %s (db: %s)", addr, dbPath)
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}

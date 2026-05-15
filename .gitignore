@@ -6,3 +6,6 @@
 *.test
 *.out
 /bin/
+
+# Local DB (created at runtime)
+workstream-tracker.db*
