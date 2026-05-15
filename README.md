@@ -59,10 +59,26 @@ go test ./...
 
 ## Status
 
-v0.0 — spec is drafted; tool skeleton boots and exposes the API
-endpoint shapes (currently 501 stubs) plus a placeholder index
-page. SQLite schema (events + work_instances) is applied on
-startup. The actual API logic, plan-tree walk, and visualization
-land in subsequent milestones; see
-[design/v0.1-design.md](design/v0.1-design.md) for the full v0.1
-target.
+v0.1 core loop is functionally complete:
+
+- The local server reads plan-tree docs from
+  `docs/plans/<root-slug>/`, parses YAML frontmatter for `slug`
+  and `Status`, builds the tree from the slug hierarchy, and
+  renders the forest as HTML with Status-colored badges and
+  active-actor markers.
+- The API accepts agent registration calls (root or descendant,
+  with server-generated descendant slugs) and event recording
+  (heartbeat or terminal state transitions to `completed` /
+  `abandoned`). Each handler runs the event-log append +
+  current-state update inside a single transaction.
+- SQLite schema (`events`, `work_instances`) is applied on
+  startup via idempotent CREATE-IF-NOT-EXISTS.
+- `slog`-structured logging with per-request IDs; `/health`
+  endpoint; graceful shutdown on SIGINT/SIGTERM.
+
+Out of scope for v0.1 (deferred to later versions): intent
+layer UI, sub-stage cells, triage zone, tier-based sorting,
+actor lineage, multi-repository or multi-contributor support,
+server-to-agent push. See
+[design/v0.1-design.md](design/v0.1-design.md) Section 9 for
+the full deferred list.
