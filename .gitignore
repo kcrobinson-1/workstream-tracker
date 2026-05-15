@@ -1,2 +1,8 @@
 .DS_Store
 .claude/settings.local.json
+
+# Go build artifacts
+*.exe
+*.test
+*.out
+/bin/
