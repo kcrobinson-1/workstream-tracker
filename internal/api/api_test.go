@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/go-chi/chi/v5"
@@ -206,6 +207,77 @@ func TestRegisterDescendants(t *testing.T) {
 	})
 	if t1OfM2Body["slug"] != "epic-x-m2-t1" {
 		t.Errorf("m2-t1 slug = %v, want epic-x-m2-t1", t1OfM2Body["slug"])
+	}
+}
+
+func TestRegisterDescendantsConcurrent(t *testing.T) {
+	ts, _ := newTestServer(t)
+
+	rootStatus, _ := post(t, ts, "/work-instances", map[string]any{
+		"root_slug": "epic-concurrent",
+		"node_type": "epic",
+		"actor":     "root-agent",
+	})
+	if rootStatus != http.StatusCreated {
+		t.Fatalf("root: status %d", rootStatus)
+	}
+
+	const registrations = 10
+	emptyParent := ""
+	slugs := make(chan string, registrations)
+	errs := make(chan string, registrations)
+
+	var wg sync.WaitGroup
+	for i := 0; i < registrations; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			status, body := post(t, ts, "/work-instances", map[string]any{
+				"root_slug":   "epic-concurrent",
+				"parent_path": emptyParent,
+				"node_type":   "milestone",
+				"actor":       fmt.Sprintf("agent-%d", i),
+			})
+			if status != http.StatusCreated {
+				errs <- fmt.Sprintf("status = %d, body = %+v", status, body)
+				return
+			}
+			slug, ok := body["slug"].(string)
+			if !ok {
+				errs <- fmt.Sprintf("slug missing or not string: %+v", body)
+				return
+			}
+			slugs <- slug
+		}(i)
+	}
+	wg.Wait()
+	close(slugs)
+	close(errs)
+
+	for err := range errs {
+		t.Error(err)
+	}
+	if t.Failed() {
+		t.FailNow()
+	}
+
+	got := make([]string, 0, registrations)
+	for slug := range slugs {
+		got = append(got, slug)
+	}
+
+	seen := map[string]bool{}
+	for _, slug := range got {
+		if seen[slug] {
+			t.Fatalf("duplicate slug %q in %v", slug, got)
+		}
+		seen[slug] = true
+	}
+	for i := 1; i <= registrations; i++ {
+		want := fmt.Sprintf("epic-concurrent-m%d", i)
+		if !seen[want] {
+			t.Fatalf("slugs = %v, missing %q", got, want)
+		}
 	}
 }
 

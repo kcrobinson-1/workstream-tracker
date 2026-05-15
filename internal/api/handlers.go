@@ -12,8 +12,16 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 
 	"github.com/kcrobinson-1/workstream-tracker/internal/models"
+	"github.com/kcrobinson-1/workstream-tracker/internal/slugs"
+)
+
+var (
+	errRootNotRegistered = errors.New("root not registered")
+	errSlugConflict      = errors.New("slug conflict")
 )
 
 // registerWorkInstance handles POST /work-instances.
@@ -35,11 +43,11 @@ func (s *Server) registerWorkInstance(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "root_slug is required")
 		return
 	}
-	if !rootSlugPattern.MatchString(req.RootSlug) {
+	if !slugs.IsValidRoot(req.RootSlug) {
 		writeError(w, http.StatusBadRequest, "root_slug must be kebab-case (lowercase letters, digits, hyphens between segments)")
 		return
 	}
-	if !validNodeType(req.NodeType) {
+	if !slugs.ValidNodeType(req.NodeType) {
 		writeError(w, http.StatusBadRequest, "node_type must be one of: epic, milestone, task, phase")
 		return
 	}
@@ -50,73 +58,33 @@ func (s *Server) registerWorkInstance(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	var slug string
 	if req.ParentPath == nil {
-		// Root case.
 		if req.NodeType != "epic" && req.NodeType != "task" {
 			writeError(w, http.StatusBadRequest, "root case requires node_type epic or task")
 			return
 		}
-		exists, err := rootExists(ctx, s.db, req.RootSlug)
-		if err != nil {
-			slog.Error("check root existence", "err", err)
-			writeError(w, http.StatusInternalServerError, "internal error")
-			return
-		}
-		if exists {
-			writeError(w, http.StatusConflict, "slug %q is already registered", req.RootSlug)
-			return
-		}
-		slug = req.RootSlug
 	} else {
-		// Descendant case.
 		if req.NodeType == "epic" {
 			writeError(w, http.StatusBadRequest, "epics cannot be descendants")
 			return
 		}
-		exists, err := rootExists(ctx, s.db, req.RootSlug)
-		if err != nil {
-			slog.Error("check root existence", "err", err)
-			writeError(w, http.StatusInternalServerError, "internal error")
-			return
-		}
-		if !exists {
-			writeError(w, http.StatusBadRequest, "root %q has not been registered", req.RootSlug)
-			return
-		}
-		generated, err := generateDescendantSlug(ctx, s.db, req.RootSlug, *req.ParentPath, req.NodeType)
-		if err != nil {
-			slog.Error("generate descendant slug", "err", err)
-			writeError(w, http.StatusInternalServerError, "internal error")
-			return
-		}
-		slug = generated
 	}
 
 	wid := uuid.NewString()
 	eid := uuid.NewString()
 	now := time.Now().UTC()
 
-	parentPath := ""
-	if req.ParentPath != nil {
-		parentPath = *req.ParentPath
-	}
-	payload, err := json.Marshal(map[string]string{
-		"root_slug":   req.RootSlug,
-		"parent_path": parentPath,
-		"node_type":   req.NodeType,
-		"actor":       req.Actor,
-		"slug":        slug,
-	})
+	slug, err := insertRegister(ctx, s.db, eid, wid, req, now)
 	if err != nil {
-		slog.Error("marshal register payload", "err", err)
-		writeError(w, http.StatusInternalServerError, "internal error")
-		return
-	}
-
-	if err := insertRegister(ctx, s.db, eid, wid, slug, req.Actor, payload, req.Metadata, now); err != nil {
-		slog.Error("insert register", "err", err)
-		writeError(w, http.StatusInternalServerError, "internal error")
+		switch {
+		case errors.Is(err, errSlugConflict):
+			writeError(w, http.StatusConflict, "slug %q is already registered", req.RootSlug)
+		case errors.Is(err, errRootNotRegistered):
+			writeError(w, http.StatusBadRequest, "root %q has not been registered", req.RootSlug)
+		default:
+			slog.Error("insert register", "err", err)
+			writeError(w, http.StatusInternalServerError, "internal error")
+		}
 		return
 	}
 
@@ -185,34 +153,79 @@ func (s *Server) recordEvent(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, EventResponse{ID: eid})
 }
 
-// insertRegister inserts the register event and the initial
-// work_instance row in a single transaction.
-func insertRegister(ctx context.Context, db *sql.DB, eid, wid, slug, actor string, payload, metadata json.RawMessage, now time.Time) error {
+// insertRegister generates any descendant slug and inserts the
+// register event + initial work_instance row in one write
+// transaction. db.Open configures SQLite transactions as BEGIN
+// IMMEDIATE, so the allocation read and insert are serialized.
+func insertRegister(ctx context.Context, db *sql.DB, eid, wid string, req RegisterRequest, now time.Time) (string, error) {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer tx.Rollback()
+
+	slug := req.RootSlug
+	parentPath := ""
+	if req.ParentPath != nil {
+		parentPath = *req.ParentPath
+		exists, err := rootExists(ctx, tx, req.RootSlug)
+		if err != nil {
+			return "", err
+		}
+		if !exists {
+			return "", errRootNotRegistered
+		}
+		generated, err := generateDescendantSlug(ctx, tx, req.RootSlug, parentPath, req.NodeType)
+		if err != nil {
+			return "", err
+		}
+		slug = generated
+	} else {
+		exists, err := rootExists(ctx, tx, req.RootSlug)
+		if err != nil {
+			return "", err
+		}
+		if exists {
+			return "", errSlugConflict
+		}
+	}
+
+	payload, err := json.Marshal(map[string]string{
+		"root_slug":   req.RootSlug,
+		"parent_path": parentPath,
+		"node_type":   req.NodeType,
+		"actor":       req.Actor,
+		"slug":        slug,
+	})
+	if err != nil {
+		return "", err
+	}
 
 	_, err = tx.ExecContext(ctx,
 		`INSERT INTO events (id, work_instance_id, type, payload, metadata, received_at)
 		 VALUES (?, ?, ?, ?, ?, ?)`,
-		eid, wid, models.EventRegister, payload, nullableJSON(metadata), now.UnixNano(),
+		eid, wid, models.EventRegister, payload, nullableJSON(req.Metadata), now.UnixNano(),
 	)
 	if err != nil {
-		return fmt.Errorf("insert event: %w", err)
+		return "", fmt.Errorf("insert event: %w", err)
 	}
 
 	_, err = tx.ExecContext(ctx,
 		`INSERT INTO work_instances (id, slug, actor, state, created_at, last_updated_at, terminal_at)
 		 VALUES (?, ?, ?, ?, ?, ?, NULL)`,
-		wid, slug, actor, models.StateActive, now.UnixNano(), now.UnixNano(),
+		wid, slug, req.Actor, models.StateActive, now.UnixNano(), now.UnixNano(),
 	)
 	if err != nil {
-		return fmt.Errorf("insert work_instance: %w", err)
+		if isUniqueConstraint(err) {
+			return "", errSlugConflict
+		}
+		return "", fmt.Errorf("insert work_instance: %w", err)
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return "", err
+	}
+	return slug, nil
 }
 
 // insertHeartbeat appends a heartbeat event and bumps the
@@ -286,6 +299,15 @@ func workInstanceExists(ctx context.Context, db *sql.DB, id string) (bool, error
 		return false, err
 	}
 	return exists, nil
+}
+
+func isUniqueConstraint(err error) bool {
+	var sqliteErr *sqlite.Error
+	if !errors.As(err, &sqliteErr) {
+		return false
+	}
+	code := sqliteErr.Code()
+	return code == sqlite3.SQLITE_CONSTRAINT_UNIQUE || code&0xff == sqlite3.SQLITE_CONSTRAINT
 }
 
 // nullableJSON returns nil if the raw message is empty, otherwise

@@ -10,6 +10,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -17,7 +18,7 @@ import (
 // Open opens (or creates) the workstream-tracker SQLite database
 // at path and verifies the connection.
 func Open(path string) (*sql.DB, error) {
-	conn, err := sql.Open("sqlite", path)
+	conn, err := sql.Open("sqlite", sqliteDSN(path))
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite at %q: %w", path, err)
 	}
@@ -26,4 +27,12 @@ func Open(path string) (*sql.DB, error) {
 		return nil, fmt.Errorf("ping sqlite at %q: %w", path, err)
 	}
 	return conn, nil
+}
+
+func sqliteDSN(path string) string {
+	separator := "?"
+	if strings.Contains(path, "?") {
+		separator = "&"
+	}
+	return path + separator + "_pragma=busy_timeout(5000)&_txlock=immediate"
 }

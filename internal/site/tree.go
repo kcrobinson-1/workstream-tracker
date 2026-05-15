@@ -1,9 +1,9 @@
 package site
 
 import (
-	"regexp"
 	"sort"
-	"strings"
+
+	"github.com/kcrobinson-1/workstream-tracker/internal/slugs"
 )
 
 // PlanNode is one node in the rendered plan tree. The tree is
@@ -22,53 +22,6 @@ type PlanNode struct {
 // terminal-state work-instances are filtered out before render.
 type ActiveWorkInstance struct {
 	Actor string
-}
-
-// segmentPattern matches a position-prefix segment (m1, t2, p3,
-// etc.) used in descendant slugs. See spec/planning/shared.md
-// "Plan-doc identity (slug)".
-var segmentPattern = regexp.MustCompile(`^[mtp]\d+$`)
-
-// nodeTypeFromSlug returns the node type for slug given the
-// known root slug. The last hyphen-separated segment determines
-// the type when it matches the m/t/p position-prefix pattern;
-// otherwise the slug is the root.
-func nodeTypeFromSlug(slug, rootSlug string) string {
-	if slug == rootSlug {
-		return "root"
-	}
-	suffix := strings.TrimPrefix(slug, rootSlug+"-")
-	parts := strings.Split(suffix, "-")
-	last := parts[len(parts)-1]
-	if !segmentPattern.MatchString(last) {
-		return "root" // can't classify; treat as root for safety
-	}
-	switch last[0] {
-	case 'm':
-		return "milestone"
-	case 't':
-		return "task"
-	case 'p':
-		return "phase"
-	}
-	return "root"
-}
-
-// parentSlug returns the parent slug for a descendant slug, or
-// "" if the slug is a root or the parent can't be determined.
-func parentSlug(slug, rootSlug string) string {
-	if slug == rootSlug {
-		return ""
-	}
-	suffix := strings.TrimPrefix(slug, rootSlug+"-")
-	parts := strings.Split(suffix, "-")
-	if !segmentPattern.MatchString(parts[len(parts)-1]) {
-		return ""
-	}
-	if len(parts) == 1 {
-		return rootSlug
-	}
-	return rootSlug + "-" + strings.Join(parts[:len(parts)-1], "-")
 }
 
 // buildTree groups parsed docs by their root and assembles each
@@ -100,7 +53,7 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 	// the slug matches m/t/p.
 	rootSlugs := map[string]bool{}
 	for _, d := range docs {
-		if isRootSlug(d.Slug) {
+		if slugs.IsStructuralRoot(d.Slug) {
 			rootSlugs[d.Slug] = true
 		}
 	}
@@ -108,11 +61,16 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 	// Build nodes, indexed by slug.
 	nodesBySlug := map[string]*PlanNode{}
 	for _, d := range docs {
-		root := findRootSlugFor(d.Slug, rootSlugs)
+		root := slugs.FindRoot(d.Slug, rootSlugs)
+		parsed, err := slugs.Parse(d.Slug, root)
+		nodeType := string(slugs.NodeTypeRoot)
+		if err == nil {
+			nodeType = string(parsed.NodeType())
+		}
 		nodesBySlug[d.Slug] = &PlanNode{
 			Slug:          d.Slug,
 			Status:        d.Status,
-			NodeType:      nodeTypeFromSlug(d.Slug, root),
+			NodeType:      nodeType,
 			WorkInstances: active[d.Slug],
 		}
 	}
@@ -121,12 +79,16 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 	var roots []*PlanNode
 	for _, d := range docs {
 		node := nodesBySlug[d.Slug]
-		root := findRootSlugFor(d.Slug, rootSlugs)
+		root := slugs.FindRoot(d.Slug, rootSlugs)
 		if d.Slug == root {
 			roots = append(roots, node)
 			continue
 		}
-		parent := parentSlug(d.Slug, root)
+		parsed, err := slugs.Parse(d.Slug, root)
+		if err != nil {
+			continue
+		}
+		parent := parsed.Parent()
 		if parentNode, ok := nodesBySlug[parent]; ok {
 			parentNode.Children = append(parentNode.Children, node)
 		}
@@ -143,39 +105,4 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 	}
 
 	return roots
-}
-
-// isRootSlug reports whether a slug looks like a root (no
-// position-prefix segments anywhere in its structure).
-//
-// This works because root slugs are kebab-case and don't contain
-// segments matching the m\d+ / t\d+ / p\d+ pattern at any
-// boundary. False positive risk: a project with a root slug
-// containing a literal "m1" segment (e.g., "model-1-plan") would
-// be incorrectly classified as a descendant. The four-segment
-// slug cap and noun discipline reduce this risk in practice.
-func isRootSlug(slug string) bool {
-	for _, seg := range strings.Split(slug, "-") {
-		if segmentPattern.MatchString(seg) {
-			return false
-		}
-	}
-	return true
-}
-
-// findRootSlugFor returns the root slug whose prefix matches the
-// given slug, or the slug itself if it IS a root. Falls back to
-// the slug itself if no root is found in the known set.
-func findRootSlugFor(slug string, rootSlugs map[string]bool) string {
-	if rootSlugs[slug] {
-		return slug
-	}
-	parts := strings.Split(slug, "-")
-	for i := len(parts) - 1; i > 0; i-- {
-		candidate := strings.Join(parts[:i], "-")
-		if rootSlugs[candidate] {
-			return candidate
-		}
-	}
-	return slug
 }

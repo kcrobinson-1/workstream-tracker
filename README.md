@@ -20,7 +20,7 @@ happening across their parallel work.
   [spec/planning/shared.md](spec/planning/shared.md) for the
   cross-level rules and [spec/backlog.md](spec/backlog.md) for the
   backlog format.
-- **[`cmd/tool/`](cmd/tool/)** — entry point for the local server.
+- **[`cmd/workstream-tracker/`](cmd/workstream-tracker/)** — entry point for the local server.
 - **[`internal/`](internal/)** — server packages: `api/` (HTTP API
   for agents), `site/` (HTML rendering), `db/` (SQLite access),
   `models/` (shared types).
@@ -30,7 +30,7 @@ happening across their parallel work.
 Requires Go 1.21 or later (tested on 1.26).
 
 ```sh
-go run ./cmd/tool
+go run ./cmd/workstream-tracker
 ```
 
 The server listens on `:8080` by default and creates a SQLite
@@ -41,14 +41,14 @@ placeholder index page; check `/health` for liveness.
 Both are configurable via env vars:
 
 ```sh
-PORT=9000 DB_PATH=/tmp/wst.db go run ./cmd/tool
+PORT=9000 DB_PATH=/tmp/wst.db go run ./cmd/workstream-tracker
 ```
 
 To build a standalone binary:
 
 ```sh
-go build -o wst ./cmd/tool
-./wst
+go build -o workstream-tracker ./cmd/workstream-tracker
+./workstream-tracker
 ```
 
 To run the test suite:

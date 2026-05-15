@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS work_instances (
     terminal_at     INTEGER
 );
 
-CREATE INDEX IF NOT EXISTS idx_work_instances_slug
+CREATE UNIQUE INDEX IF NOT EXISTS ux_work_instances_slug
     ON work_instances(slug);
 `
 

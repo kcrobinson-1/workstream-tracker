@@ -4,61 +4,6 @@ import (
 	"testing"
 )
 
-func TestIsRootSlug(t *testing.T) {
-	cases := []struct {
-		slug string
-		want bool
-	}{
-		{"madrona-feedback", true},
-		{"docs-canonical-corrections", true},
-		{"madrona-feedback-m1", false},
-		{"madrona-feedback-m1-t2", false},
-		{"madrona-feedback-m1-t2-p3", false},
-		{"single", true},
-	}
-	for _, c := range cases {
-		if got := isRootSlug(c.slug); got != c.want {
-			t.Errorf("isRootSlug(%q) = %v, want %v", c.slug, got, c.want)
-		}
-	}
-}
-
-func TestNodeTypeFromSlug(t *testing.T) {
-	root := "madrona-feedback"
-	cases := []struct {
-		slug string
-		want string
-	}{
-		{"madrona-feedback", "root"},
-		{"madrona-feedback-m1", "milestone"},
-		{"madrona-feedback-m1-t2", "task"},
-		{"madrona-feedback-m1-t2-p3", "phase"},
-	}
-	for _, c := range cases {
-		if got := nodeTypeFromSlug(c.slug, root); got != c.want {
-			t.Errorf("nodeTypeFromSlug(%q, %q) = %q, want %q", c.slug, root, got, c.want)
-		}
-	}
-}
-
-func TestParentSlug(t *testing.T) {
-	root := "madrona-feedback"
-	cases := []struct {
-		slug string
-		want string
-	}{
-		{"madrona-feedback", ""},
-		{"madrona-feedback-m1", "madrona-feedback"},
-		{"madrona-feedback-m1-t2", "madrona-feedback-m1"},
-		{"madrona-feedback-m1-t2-p3", "madrona-feedback-m1-t2"},
-	}
-	for _, c := range cases {
-		if got := parentSlug(c.slug, root); got != c.want {
-			t.Errorf("parentSlug(%q, %q) = %q, want %q", c.slug, root, got, c.want)
-		}
-	}
-}
-
 func TestBuildTreeBasic(t *testing.T) {
 	docs := []parsedDoc{
 		{Slug: "alpha", Status: "In progress"},
@@ -105,9 +50,9 @@ func TestBuildTreeAttachesActiveWorkInstances(t *testing.T) {
 		{Slug: "alpha-m1", Status: "Proposed"},
 	}
 	active := map[string][]*ActiveWorkInstance{
-		"alpha":         {{Actor: "agent-1"}},
-		"alpha-m1":      {{Actor: "agent-2"}, {Actor: "agent-3"}},
-		"unknown-slug":  {{Actor: "orphan"}}, // dropped: no matching node
+		"alpha":        {{Actor: "agent-1"}},
+		"alpha-m1":     {{Actor: "agent-2"}, {Actor: "agent-3"}},
+		"unknown-slug": {{Actor: "orphan"}}, // dropped: no matching node
 	}
 	roots := buildTree(docs, active)
 
