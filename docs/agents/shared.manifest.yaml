@@ -1,0 +1,79 @@
+# docs/agents/shared.manifest.yaml in a consuming repo.
+#
+# Read by scripts/assemble.sh. Names which shared modules to
+# vendor, what version of the shared library to pin to, and
+# where the per-repo overlay lives.
+
+shared_agent_rules:
+  source: github.com/kcrobinson-1/shared-agent-rules
+  version: 2026-05-15            # CalVer tag from the shared repo
+
+# This repo is the origin of spec/, not a consumer of it. The
+# block is kept for manifest-shape parity with downstream
+# consumers; the assemble script does not act on it.
+workstream_tracker_spec:
+  source: (this repo)
+  version: HEAD
+
+# Relative path from a vendored shared file at
+# docs/agents/shared/<topic>/<file>.md to the consumer's vendored
+# workstream-tracker/spec/ root. The assemble script substitutes
+# `{spec_root}` placeholders in cross-references with this value so
+# they resolve correctly under the consumer's layout.
+#
+# This repo owns spec/ at the repo root, so the path from a
+# vendored shared file at docs/agents/shared/<topic>/<file>.md
+# to spec/ is four `..` segments up.
+spec_root_relpath: ../../../../spec
+
+modules:
+  # Core (recommended — opt out only with a specific reason)
+  - core/pre-edit-gate
+  - core/scope-and-stop
+  - core/change-boundaries
+  - core/anti-patterns
+
+  # Delegation
+  - delegation/sub-agent-delegation
+
+  # Workflows — opt in only what the repo uses
+  - workflows/implementation
+  - workflows/debugging
+  - workflows/review-fixes
+  - workflows/ui-review
+
+  # Self-review (catalog mechanism + general checklist + seed audits)
+  - self-review/mechanism
+  - self-review/how-to-use
+  - self-review/seed-audits/effect-cleanup
+  - self-review/seed-audits/error-surfacing-user-mutations
+  - self-review/seed-audits/validation-honesty
+  - self-review/seed-audits/rename-aware-diff-classification
+  - self-review/seed-audits/readiness-gate-truthfulness
+  - self-review/seed-audits/trigger-map-currency
+
+  # Validation, PR conventions, doc-currency, code-docs, testing
+  - validation/philosophy
+  - pr-conventions/commits
+  - pr-conventions/pr-body-shape
+  # - pr-conventions/examples/feature-pr    # optional illustration
+  # - pr-conventions/examples/refactor-pr   # optional illustration
+  - doc-currency/currency
+  - doc-currency/ephemeral-identifiers
+  - code-docs/code-comments
+  - testing/principles
+
+  # Meta (deep meta-rules ship; shallow meta-rules are read-when-authoring)
+  - meta/router-pattern
+  - meta/rule-additions
+  - meta/compound-noun-discipline
+  - meta/light-vs-full-thresholds
+  - meta/reality-check-examples-as-footnotes
+  # - meta/doc-ownership-table   # opt in if your repo uses the convention
+
+# Per-repo overlay root.
+# For each shared file at docs/agents/shared/<path>.md, the
+# assemble script looks for a matching overlay at
+# docs/agents/local/overlays/<path>.md and, if present,
+# appends it under a `## Local additions` header.
+overlay_root: docs/agents/local/overlays/
