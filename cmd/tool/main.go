@@ -36,6 +36,11 @@ func main() {
 		dbPath = "workstream-tracker.db"
 	}
 
+	plansPath := os.Getenv("PLANS_PATH")
+	if plansPath == "" {
+		plansPath = "docs/plans"
+	}
+
 	database, err := db.Open(dbPath)
 	if err != nil {
 		slog.Error("open db", "path", dbPath, "err", err)
@@ -52,6 +57,7 @@ func main() {
 	initCancel()
 
 	apiServer := api.New(database)
+	siteServer := site.New(database, plansPath)
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -60,7 +66,7 @@ func main() {
 
 	r.Get("/health", health)
 	r.Route("/work-instances", apiServer.MountRoutes)
-	r.Mount("/", site.Router())
+	r.Mount("/", siteServer.Router())
 
 	srv := &http.Server{
 		Addr:              addr,
@@ -78,7 +84,7 @@ func main() {
 		_ = srv.Shutdown(ctx)
 	}()
 
-	slog.Info("listening", "addr", addr, "db", dbPath)
+	slog.Info("listening", "addr", addr, "db", dbPath, "plans", plansPath)
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("listen and serve", "err", err)
 		os.Exit(1)

@@ -1,0 +1,117 @@
+package site
+
+import (
+	"os"
+	"path/filepath"
+	"sort"
+	"testing"
+)
+
+// writeDoc writes a markdown file with the given frontmatter.
+func writeDoc(t *testing.T, path, slug, status string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	body := "---\nslug: " + slug + "\n"
+	if status != "" {
+		body += "Status: " + status + "\n"
+	}
+	body += "---\n# placeholder\n"
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+}
+
+func TestWalkPlansEmpty(t *testing.T) {
+	dir := t.TempDir()
+	docs, err := walkPlans(dir)
+	if err != nil {
+		t.Fatalf("walkPlans: %v", err)
+	}
+	if len(docs) != 0 {
+		t.Errorf("docs = %v, want empty", docs)
+	}
+}
+
+func TestWalkPlansNonExistent(t *testing.T) {
+	docs, err := walkPlans(filepath.Join(t.TempDir(), "does-not-exist"))
+	if err != nil {
+		t.Fatalf("walkPlans: %v", err)
+	}
+	if len(docs) != 0 {
+		t.Errorf("docs = %v, want empty", docs)
+	}
+}
+
+func TestWalkPlansFindsRootAndDescendants(t *testing.T) {
+	dir := t.TempDir()
+	writeDoc(t, filepath.Join(dir, "epic-a", "README.md"), "epic-a", "In progress")
+	writeDoc(t, filepath.Join(dir, "epic-a", "m1.md"), "epic-a-m1", "Proposed")
+	writeDoc(t, filepath.Join(dir, "epic-a", "m1-t1.md"), "epic-a-m1-t1", "In draft")
+	writeDoc(t, filepath.Join(dir, "task-b", "README.md"), "task-b", "Landed")
+
+	docs, err := walkPlans(dir)
+	if err != nil {
+		t.Fatalf("walkPlans: %v", err)
+	}
+
+	got := []string{}
+	for _, d := range docs {
+		got = append(got, d.Slug)
+	}
+	sort.Strings(got)
+
+	want := []string{"epic-a", "epic-a-m1", "epic-a-m1-t1", "task-b"}
+	if len(got) != len(want) {
+		t.Fatalf("got %v, want %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("docs[%d] = %q, want %q", i, got[i], want[i])
+		}
+	}
+}
+
+func TestWalkPlansSkipsScopingFolder(t *testing.T) {
+	dir := t.TempDir()
+	writeDoc(t, filepath.Join(dir, "epic-a", "README.md"), "epic-a", "")
+	writeDoc(t, filepath.Join(dir, "epic-a", "scoping", "m1-t1.md"), "scoping-doc-should-not-render", "")
+
+	docs, err := walkPlans(dir)
+	if err != nil {
+		t.Fatalf("walkPlans: %v", err)
+	}
+	if len(docs) != 1 {
+		t.Fatalf("docs = %v, want only the README", docs)
+	}
+	if docs[0].Slug != "epic-a" {
+		t.Errorf("docs[0].Slug = %q, want epic-a", docs[0].Slug)
+	}
+}
+
+func TestWalkPlansSkipsTopLevelFiles(t *testing.T) {
+	dir := t.TempDir()
+	writeDoc(t, filepath.Join(dir, "stray.md"), "stray", "")
+	writeDoc(t, filepath.Join(dir, "epic-a", "README.md"), "epic-a", "")
+
+	docs, err := walkPlans(dir)
+	if err != nil {
+		t.Fatalf("walkPlans: %v", err)
+	}
+	if len(docs) != 1 {
+		t.Errorf("docs = %v, want only epic-a", docs)
+	}
+}
+
+func TestParsePlanDocMissingSlug(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "no-slug.md")
+	if err := os.WriteFile(path, []byte("---\nStatus: Proposed\n---\n# x\n"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	_, err := parsePlanDoc(path)
+	if err == nil {
+		t.Error("expected error for missing slug, got nil")
+	}
+}
