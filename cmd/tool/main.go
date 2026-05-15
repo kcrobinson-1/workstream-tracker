@@ -6,7 +6,7 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -22,6 +22,9 @@ import (
 )
 
 func main() {
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	slog.SetDefault(logger)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -35,23 +38,27 @@ func main() {
 
 	database, err := db.Open(dbPath)
 	if err != nil {
-		log.Fatalf("open db: %v", err)
+		slog.Error("open db", "path", dbPath, "err", err)
+		os.Exit(1)
 	}
 	defer database.Close()
 
 	initCtx, initCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	if err := db.Init(initCtx, database); err != nil {
 		initCancel()
-		log.Fatalf("init db: %v", err)
+		slog.Error("init db", "path", dbPath, "err", err)
+		os.Exit(1)
 	}
 	initCancel()
 
 	apiServer := api.New(database)
 
 	r := chi.NewRouter()
+	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	r.Get("/health", health)
 	r.Route("/work-instances", apiServer.MountRoutes)
 	r.Mount("/", site.Router())
 
@@ -65,14 +72,20 @@ func main() {
 		stop := make(chan os.Signal, 1)
 		signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 		<-stop
-		log.Println("shutting down")
+		slog.Info("shutting down")
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		_ = srv.Shutdown(ctx)
 	}()
 
-	log.Printf("workstream-tracker listening on %s (db: %s)", addr, dbPath)
+	slog.Info("listening", "addr", addr, "db", dbPath)
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+		slog.Error("listen and serve", "err", err)
+		os.Exit(1)
 	}
+}
+
+func health(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write([]byte(`{"status":"ok"}`))
 }
