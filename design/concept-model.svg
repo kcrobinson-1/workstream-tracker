@@ -1,0 +1,103 @@
+<svg viewBox="0 0 700 490" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowhead-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+  <style>
+    .title { font-size: 16px; font-weight: 600; fill: #0f172a; }
+    .layer-label { font-size: 10px; font-weight: 700; fill: #64748b; letter-spacing: 1px; }
+    .nodelabel { font-size: 12px; font-weight: 500; fill: #0f172a; }
+    .sublabel { font-size: 10px; fill: #64748b; }
+    .arrow-label { font-size: 10px; fill: #475569; font-style: italic; }
+    .stagelabel { font-size: 9px; fill: #64748b; text-anchor: middle; font-weight: 600; }
+    .panel { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1; }
+    .node { fill: white; stroke: #cbd5e1; stroke-width: 1; }
+    .cell-none { fill: #f1f5f9; stroke: #cbd5e1; }
+    .cell-active { fill: #dbeafe; stroke: #3b82f6; }
+    .cell-complete { fill: #dcfce7; stroke: #22c55e; }
+    .actor { fill: #3b82f6; stroke: white; stroke-width: 2; }
+    .actor-bg { fill: white; stroke: #cbd5e1; stroke-width: 1; }
+    .arrow { stroke: #94a3b8; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+    .lineage { stroke: #f59e0b; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-orange); stroke-dasharray: 3 2; }
+  </style>
+
+  <text x="20" y="22" class="title">Conceptual Model — how the layers connect</text>
+
+  <text x="20" y="60" class="layer-label">INTENT LAYER</text>
+  <text x="20" y="74" class="sublabel">proposals, backlog items, feature ideas —</text>
+  <text x="20" y="86" class="sublabel">written before scoping begins</text>
+  <g transform="translate(280, 52)">
+    <rect x="0" y="0" width="220" height="44" class="node" rx="4"/>
+    <text x="12" y="18" class="nodelabel">"newsletter unsubscribe"</text>
+    <text x="12" y="34" class="sublabel">backlog item · ready to graduate</text>
+  </g>
+
+  <path d="M 390 100 L 390 130" class="arrow"/>
+  <text x="400" y="118" class="arrow-label">graduates into a plan-tree node</text>
+
+  <text x="20" y="148" class="layer-label">PLAN TREE</text>
+  <text x="20" y="162" class="sublabel">the project's planning hierarchy —</text>
+  <text x="20" y="174" class="sublabel">read from the project's files</text>
+  <g transform="translate(220, 138)">
+    <rect x="0" y="0" width="340" height="98" class="node" rx="4"/>
+    <text x="12" y="18" class="nodelabel">Task: newsletter-unsubscribe</text>
+    <text x="12" y="32" class="sublabel">Status: in draft · standalone task root</text>
+    <rect x="12" y="42" width="316" height="44" class="panel" rx="3"/>
+    <text x="20" y="58" class="sublabel">Phase 1 · sub-stage cells</text>
+    <text x="20" y="72" class="sublabel">(plan dictates how many cells per stage)</text>
+    <g transform="translate(180, 50)">
+      <rect x="0" y="0" width="28" height="22" class="cell-complete"/>
+      <text x="14" y="14" class="stagelabel">D</text>
+      <rect x="32" y="0" width="28" height="22" class="cell-complete"/>
+      <text x="46" y="14" class="stagelabel">P</text>
+      <rect x="64" y="0" width="28" height="22" class="cell-active"/>
+      <text x="78" y="14" class="stagelabel">I</text>
+      <rect x="96" y="0" width="28" height="22" class="cell-none"/>
+      <text x="110" y="14" class="stagelabel">V</text>
+    </g>
+  </g>
+
+  <path d="M 390 246 L 390 276" class="arrow"/>
+  <text x="400" y="264" class="arrow-label">work attaches at a specific sub-stage cell</text>
+
+  <text x="20" y="294" class="layer-label">WORK-INSTANCE</text>
+  <text x="20" y="308" class="sublabel">a discrete unit of attributed work</text>
+  <g transform="translate(280, 284)">
+    <rect x="0" y="0" width="220" height="44" class="node" rx="4"/>
+    <text x="12" y="18" class="nodelabel">work-instance: implement P1</text>
+    <text x="12" y="34" class="sublabel">state: active · attached at I cell</text>
+  </g>
+
+  <path d="M 390 332 L 390 362" class="arrow"/>
+  <text x="400" y="350" class="arrow-label">performed by one or more actors</text>
+
+  <text x="20" y="380" class="layer-label">ACTORS</text>
+  <text x="20" y="394" class="sublabel">things doing work — agents, chats,</text>
+  <text x="20" y="406" class="sublabel">scheduled jobs — register themselves</text>
+  <g transform="translate(220, 370)">
+    <rect x="0" y="0" width="200" height="44" class="node" rx="4"/>
+    <circle cx="22" cy="22" r="10" class="actor-bg"/>
+    <circle cx="22" cy="22" r="7" class="actor"/>
+    <text x="22" y="26" class="stagelabel" fill="white">A</text>
+    <text x="42" y="18" class="nodelabel">Actor A · Live</text>
+    <text x="42" y="34" class="sublabel">producing "implement P1"</text>
+  </g>
+  <g transform="translate(450, 370)">
+    <rect x="0" y="0" width="200" height="44" class="node" rx="4"/>
+    <circle cx="22" cy="22" r="10" class="actor-bg"/>
+    <circle cx="22" cy="22" r="7" class="actor"/>
+    <text x="22" y="26" class="stagelabel" fill="white">B</text>
+    <text x="42" y="18" class="nodelabel">Actor B · Live</text>
+    <text x="42" y="34" class="sublabel">exploring a side question</text>
+  </g>
+  <path d="M 420 392 L 448 392" class="lineage"/>
+  <text x="434" y="408" class="arrow-label" fill="#a16207" text-anchor="middle">spawned</text>
+
+  <text x="20" y="450" class="sublabel">Lineage exists at two layers: actor → actor (shown above, orange dashed)</text>
+  <text x="20" y="464" class="sublabel">and work-instance → work-instance (digressions between pieces of work, not shown here).</text>
+  <text x="20" y="478" class="sublabel">A work-instance can have multiple actors over its lifetime; one actor can produce multiple work-instances.</text>
+</svg>

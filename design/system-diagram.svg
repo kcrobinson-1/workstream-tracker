@@ -1,0 +1,95 @@
+<svg viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+  <style>
+    .title { font-size: 16px; font-weight: 600; fill: #0f172a; }
+    .legend-label { font-size: 10px; fill: #64748b; }
+    .box-label { font-size: 13px; font-weight: 600; fill: #0f172a; text-anchor: middle; }
+    .box-sublabel { font-size: 10px; fill: #64748b; text-anchor: middle; }
+    .arrow-label { font-size: 10px; fill: #475569; font-style: italic; }
+    .service-box { fill: white; stroke: #3b82f6; stroke-width: 2; rx: 6; }
+    .datastore-box { fill: #f0f9ff; stroke: #0ea5e9; stroke-width: 1.5; rx: 4; }
+    .external-box { fill: #fafbfc; stroke: #64748b; stroke-width: 1.5; rx: 6; stroke-dasharray: 5 3; }
+    .arrow { stroke: #64748b; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+    .datastore-stripe { stroke: #0ea5e9; stroke-width: 1; opacity: 0.4; }
+  </style>
+
+  <text x="20" y="22" class="title">v0.1 System Diagram</text>
+
+  <g transform="translate(560, 14)">
+    <rect x="0" y="0" width="14" height="10" class="service-box"/>
+    <text x="20" y="9" class="legend-label">service</text>
+    <rect x="65" y="0" width="14" height="10" class="datastore-box"/>
+    <text x="85" y="9" class="legend-label">data store</text>
+    <rect x="145" y="0" width="14" height="10" class="external-box"/>
+    <text x="165" y="9" class="legend-label">external actor</text>
+  </g>
+  <line x1="20" y1="32" x2="780" y2="32" stroke="#e2e8f0"/>
+
+  <g transform="translate(40, 60)">
+    <rect x="0" y="0" width="160" height="70" class="external-box"/>
+    <text x="80" y="28" class="box-label">Agents</text>
+    <text x="80" y="48" class="box-sublabel">draft plan files;</text>
+    <text x="80" y="60" class="box-sublabel">register work via server</text>
+  </g>
+
+  <g transform="translate(600, 60)">
+    <rect x="0" y="0" width="160" height="70" class="datastore-box"/>
+    <line x1="0" y1="10" x2="160" y2="10" class="datastore-stripe"/>
+    <line x1="0" y1="18" x2="160" y2="18" class="datastore-stripe"/>
+    <text x="80" y="40" class="box-label">Repo</text>
+    <text x="80" y="56" class="box-sublabel">plan files</text>
+    <text x="80" y="68" class="box-sublabel">(with stable slugs)</text>
+  </g>
+
+  <g transform="translate(40, 220)">
+    <rect x="0" y="0" width="160" height="70" class="service-box"/>
+    <text x="80" y="28" class="box-label">Server</text>
+    <text x="80" y="48" class="box-sublabel">POST /work-instances</text>
+    <text x="80" y="60" class="box-sublabel">POST .../events</text>
+  </g>
+
+  <g transform="translate(310, 220)">
+    <rect x="0" y="0" width="180" height="70" class="datastore-box"/>
+    <line x1="0" y1="10" x2="180" y2="10" class="datastore-stripe"/>
+    <line x1="0" y1="18" x2="180" y2="18" class="datastore-stripe"/>
+    <text x="90" y="40" class="box-label">Work-Instance DB</text>
+    <text x="90" y="56" class="box-sublabel">events log +</text>
+    <text x="90" y="68" class="box-sublabel">current state</text>
+  </g>
+
+  <g transform="translate(600, 220)">
+    <rect x="0" y="0" width="160" height="70" class="service-box"/>
+    <text x="80" y="28" class="box-label">Website</text>
+    <text x="80" y="48" class="box-sublabel">server-renders HTML</text>
+    <text x="80" y="60" class="box-sublabel">from repo + DB</text>
+  </g>
+
+  <g transform="translate(600, 380)">
+    <rect x="0" y="0" width="160" height="60" class="external-box"/>
+    <text x="80" y="28" class="box-label">Browser</text>
+    <text x="80" y="46" class="box-sublabel">contributor's view</text>
+  </g>
+
+  <path d="M 200 95 L 598 95" class="arrow"/>
+  <text x="400" y="88" class="arrow-label" text-anchor="middle">reads &amp; writes plan files</text>
+
+  <path d="M 120 130 L 120 218" class="arrow"/>
+  <text x="125" y="180" class="arrow-label">POST registrations &amp; events</text>
+
+  <path d="M 200 255 L 308 255" class="arrow"/>
+  <text x="254" y="248" class="arrow-label" text-anchor="middle">appends events,</text>
+  <text x="254" y="270" class="arrow-label" text-anchor="middle">folds into state</text>
+
+  <path d="M 680 130 L 680 218" class="arrow"/>
+  <text x="685" y="180" class="arrow-label">reads plan tree</text>
+
+  <path d="M 490 255 L 598 255" class="arrow"/>
+  <text x="544" y="248" class="arrow-label" text-anchor="middle">reads current state</text>
+
+  <path d="M 680 290 L 680 378" class="arrow"/>
+  <text x="685" y="338" class="arrow-label">serves HTML</text>
+</svg>
