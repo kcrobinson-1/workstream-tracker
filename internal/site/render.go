@@ -33,7 +33,7 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
     .status-deferred    { background: #e5e7eb; color: #374151; }
     .status-unknown     { background: #f3f4f6; color: #6b7280; }
     .actor-marker { display: inline-block; background: #fef9c3; color: #713f12; padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.75em; margin-left: 0.4rem; }
-    .slug { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95em; }
+    .label { font-weight: 500; cursor: help; }
     .empty { color: #6b7280; font-style: italic; }
   </style>
 </head>
@@ -52,7 +52,7 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
 </html>
 
 {{define "node"}}
-<span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span><span class="slug">{{.Slug}}</span>
+<span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span><span class="label" title="{{.Slug}}">{{.Label}}</span>
 {{- range .WorkInstances }} <span class="actor-marker">{{.Actor}}</span>{{end}}
 {{- if .Children}}
 <ul>

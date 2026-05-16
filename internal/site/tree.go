@@ -1,20 +1,26 @@
 package site
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/kcrobinson-1/workstream-tracker/internal/slugs"
 )
 
 // PlanNode is one node in the rendered plan tree. The tree is
-// built by joining frontmatter-derived facts (slug, Status) with
-// runtime work-instance state queried from the DB.
+// built by joining frontmatter-derived facts (slug, Status,
+// descriptions) with runtime work-instance state queried from the
+// DB.
 type PlanNode struct {
-	Slug          string
-	Status        string
-	NodeType      string // root | milestone | task | phase
-	Children      []*PlanNode
-	WorkInstances []*ActiveWorkInstance
+	Slug             string
+	Status           string
+	NodeType         string // root | milestone | task | phase
+	Label            string // computed display string; see buildLabel
+	ShortDescription string
+	LongDescription  string
+	Children         []*PlanNode
+	WorkInstances    []*ActiveWorkInstance
 }
 
 // ActiveWorkInstance is one currently-active work-instance
@@ -22,6 +28,52 @@ type PlanNode struct {
 // terminal-state work-instances are filtered out before render.
 type ActiveWorkInstance struct {
 	Actor string
+}
+
+// buildLabel computes a node's display label per the t3 grammar:
+//
+//   - Descendant with short_description:
+//     "<Type> <ordinal>: <short_description>".
+//   - Root with short_description: the short_description alone (a
+//     root has no position segment).
+//   - Any node without short_description: the slug suffix — the
+//     slug text after the root, or the full slug for a root.
+//
+// parsed/parseErr are buildTree's slugs.Parse result for d.Slug;
+// an unparseable slug is treated like a root (no ordinal).
+func buildLabel(d parsedDoc, root string, parsed slugs.Slug, parseErr error) string {
+	if d.ShortDescription == "" {
+		if d.Slug == root {
+			return d.Slug
+		}
+		return strings.TrimPrefix(d.Slug, root+"-")
+	}
+	if parseErr != nil {
+		return d.ShortDescription
+	}
+	pos, ok := parsed.Position()
+	if !ok {
+		return d.ShortDescription
+	}
+	return fmt.Sprintf("%s %d: %s", nodeTypeDisplay(parsed.NodeType()), pos, d.ShortDescription)
+}
+
+// nodeTypeDisplay maps a slug node type to its title-case display
+// word for labels (milestone -> "Milestone", task -> "Task",
+// phase -> "Phase", epic -> "Epic", root -> "Root").
+func nodeTypeDisplay(nt slugs.NodeType) string {
+	switch nt {
+	case slugs.NodeTypeEpic:
+		return "Epic"
+	case slugs.NodeTypeMilestone:
+		return "Milestone"
+	case slugs.NodeTypeTask:
+		return "Task"
+	case slugs.NodeTypePhase:
+		return "Phase"
+	default:
+		return "Root"
+	}
 }
 
 // buildTree groups parsed docs by their root and assembles each
@@ -68,10 +120,13 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 			nodeType = string(parsed.NodeType())
 		}
 		nodesBySlug[d.Slug] = &PlanNode{
-			Slug:          d.Slug,
-			Status:        d.Status,
-			NodeType:      nodeType,
-			WorkInstances: active[d.Slug],
+			Slug:             d.Slug,
+			Status:           d.Status,
+			NodeType:         nodeType,
+			Label:            buildLabel(d, root, parsed, err),
+			ShortDescription: d.ShortDescription,
+			LongDescription:  d.LongDescription,
+			WorkInstances:    active[d.Slug],
 		}
 	}
 

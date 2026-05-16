@@ -65,6 +65,47 @@ func TestBuildTreeAttachesActiveWorkInstances(t *testing.T) {
 	}
 }
 
+func TestBuildTreeLabel(t *testing.T) {
+	docs := []parsedDoc{
+		{Slug: "alpha", ShortDescription: "Workstream tracker"},
+		{Slug: "alpha-m1", ShortDescription: "Read experience"},
+		{Slug: "alpha-m1-t3", ShortDescription: "Descriptive tree labels"},
+		{Slug: "alpha-m1-t3-p2", ShortDescription: "Render"},
+		{Slug: "beta"},
+		{Slug: "beta-m2"},
+		{Slug: "beta-m2-t4"},
+	}
+	roots := buildTree(docs, nil)
+
+	want := map[string]string{
+		"alpha":          "Workstream tracker",
+		"alpha-m1":       "Milestone 1: Read experience",
+		"alpha-m1-t3":    "Task 3: Descriptive tree labels",
+		"alpha-m1-t3-p2": "Phase 2: Render",
+		"beta":           "beta",
+		"beta-m2":        "m2",
+		"beta-m2-t4":     "m2-t4",
+	}
+
+	var walk func(n *PlanNode)
+	seen := map[string]string{}
+	walk = func(n *PlanNode) {
+		seen[n.Slug] = n.Label
+		for _, c := range n.Children {
+			walk(c)
+		}
+	}
+	for _, r := range roots {
+		walk(r)
+	}
+
+	for slug, wantLabel := range want {
+		if seen[slug] != wantLabel {
+			t.Errorf("Label[%q] = %q, want %q", slug, seen[slug], wantLabel)
+		}
+	}
+}
+
 func TestStatusClass(t *testing.T) {
 	cases := []struct {
 		status, want string

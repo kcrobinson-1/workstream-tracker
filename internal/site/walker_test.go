@@ -104,6 +104,44 @@ func TestWalkPlansSkipsTopLevelFiles(t *testing.T) {
 	}
 }
 
+func TestParsePlanDocShortDescriptionAndBody(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	content := "---\nslug: epic-a-m1-t3\nStatus: Proposed\nshort_description: Descriptive tree labels\n---\n\n# t3 — Descriptive tree labels\n\nThe long description body.\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	if doc.ShortDescription != "Descriptive tree labels" {
+		t.Errorf("ShortDescription = %q, want %q", doc.ShortDescription, "Descriptive tree labels")
+	}
+	want := "# t3 — Descriptive tree labels\n\nThe long description body."
+	if doc.LongDescription != want {
+		t.Errorf("LongDescription = %q, want %q", doc.LongDescription, want)
+	}
+}
+
+func TestParsePlanDocNoShortDescriptionNoBody(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	if err := os.WriteFile(path, []byte("---\nslug: epic-a\nStatus: Landed\n---\n"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	if doc.ShortDescription != "" {
+		t.Errorf("ShortDescription = %q, want empty", doc.ShortDescription)
+	}
+	if doc.LongDescription != "" {
+		t.Errorf("LongDescription = %q, want empty", doc.LongDescription)
+	}
+}
+
 func TestParsePlanDocMissingSlug(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "no-slug.md")

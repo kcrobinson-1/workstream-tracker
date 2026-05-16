@@ -17,12 +17,15 @@ import (
 
 // parsedDoc carries the per-file outputs of the walker: the slug
 // (frontmatter authoritative, per spec/planning/shared.md
-// "Plan-doc identity (slug)"), the Status value if present, and
-// the path the doc was found at (for diagnostics).
+// "Plan-doc identity (slug)"), the Status value if present, the
+// optional short/long descriptions, and the path the doc was found
+// at (for diagnostics).
 type parsedDoc struct {
-	Slug   string
-	Status string
-	Path   string
+	Slug             string
+	Status           string
+	ShortDescription string
+	LongDescription  string
+	Path             string
 }
 
 // walkPlans walks plansPath as a per-root-folder layout per
@@ -114,10 +117,32 @@ func parsePlanDoc(path string) (parsedDoc, error) {
 		return parsedDoc{}, errors.New("missing or empty `slug` in frontmatter")
 	}
 	status, _ := metaData["Status"].(string)
+	shortDescription, _ := metaData["short_description"].(string)
 
 	return parsedDoc{
-		Slug:   slug,
-		Status: status,
-		Path:   path,
+		Slug:             slug,
+		Status:           status,
+		ShortDescription: shortDescription,
+		LongDescription:  markdownBody(source),
+		Path:             path,
 	}, nil
+}
+
+// markdownBody returns the document body — the content following
+// the leading YAML frontmatter block — with surrounding whitespace
+// trimmed. An absent or empty body yields an empty string. This
+// only runs after the slug check, so a file with no leading
+// frontmatter block has already been rejected upstream and never
+// reaches here.
+func markdownBody(source []byte) string {
+	lines := strings.Split(string(source), "\n")
+	if len(lines) == 0 || strings.TrimRight(lines[0], "\r") != "---" {
+		return ""
+	}
+	for i := 1; i < len(lines); i++ {
+		if strings.TrimRight(lines[i], "\r") == "---" {
+			return strings.TrimSpace(strings.Join(lines[i+1:], "\n"))
+		}
+	}
+	return ""
 }
