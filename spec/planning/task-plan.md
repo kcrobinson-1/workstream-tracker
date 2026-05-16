@@ -484,6 +484,23 @@ natural moment for a comprehensive self-review pass:
   shapes, and other inputs that drift from scoping →
   plan-drafting are reflected in the plan; stale references are
   updated.
+- **Confirm the always-on authoring rules, explicitly.** The
+  four steps above are gate-specific; three further obligations
+  bind the plan continuously through always-on rules and get
+  their final explicit confirmation here — the same way the
+  `Verified by:` step applies an always-on rule universally at
+  the flip rather than to whichever claims happened to feel
+  technical during drafting: (1) every required section is
+  present and any divergence is disclosed, per "Required and
+  optional sections" above and [`shared.md`](./shared.md)
+  "Section variance disclosure"; (2) no content has descended to
+  implementation prescription, per [`shared.md`](./shared.md)
+  "Plans describe contracts, not implementation"; (3) the plan
+  otherwise conforms to the broader always-on spec — the
+  cross-level rules indexed in [`shared.md`](./shared.md) and
+  this file's own per-level rules. These are not new gate-only
+  requirements — naming them here makes the gate self-contained
+  so the runner need not recall them from outside it.
 
 Failures surface either as resolutions (apply edits before
 flipping) or as plan-blockers that the user must triage before

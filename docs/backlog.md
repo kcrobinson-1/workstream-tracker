@@ -91,7 +91,9 @@ path rather than replacing it.
 
 ### promotion-gate-explicit-checklist
 
-**Status:** Open
+**Status:** Graduated — promotion-gate-explicit-checklist
+
+**Plan:** [`docs/plans/promotion-gate-explicit-checklist/README.md`](plans/promotion-gate-explicit-checklist/README.md)
 
 The `In draft` → `Proposed` promotion gate under-specifies
 its minimum checks.

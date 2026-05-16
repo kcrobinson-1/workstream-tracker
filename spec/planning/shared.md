@@ -242,8 +242,10 @@ State transitions out of `Deferred`:
 
 - **`Deferred` → `In draft` (resumption).** When the work becomes
   next-up, the resuming planner flips Status back to `In draft` and
-  re-runs the `` `In draft` → `Proposed` `` promotion gate from
-  scratch (see [`task-plan.md`](./task-plan.md)). The previous deliberation
+  re-runs its `` `In draft` → `Proposed` `` promotion gate from
+  scratch (for task and phase plans, the gate in
+  [`task-plan.md`](./task-plan.md); for epic and milestone docs,
+  the parent-doc gate below). The previous deliberation
   becomes input to consider, not contract to respect.
 - **`Deferred` → (deletion).** If the work is cancelled outright
   (epic re-scoped to drop it, or absorbed by a different epic), the
@@ -302,6 +304,21 @@ Before the flip:
   level" below).
 - **Re-confirm reality-check inputs** the parent doc rests on
   against current code; stale references are updated.
+- **Confirm the always-on authoring rules, explicitly.** Three
+  further obligations bind the parent doc continuously through
+  always-on rules and get their final explicit confirmation here,
+  mirroring how the `Verified by:` step applies an always-on rule
+  universally at the flip: (1) every required section is present
+  and any divergence is disclosed, per the "Required and optional
+  sections" rule in this doc's applicable per-level file and
+  "Section variance disclosure" below; (2) no content has
+  descended to implementation prescription, per "Plans describe
+  contracts, not implementation" below; (3) the parent doc
+  otherwise conforms to the broader always-on spec — the
+  cross-level rules indexed above and its per-level file's rules.
+  Naming them here makes the gate self-contained — not a new
+  gate-only requirement; the task/phase gate in
+  [`task-plan.md`](./task-plan.md) carries the symmetric step.
 
 Failures surface either as resolutions (apply edits before
 flipping) or as blockers the user triages before the flip. A
@@ -542,11 +559,11 @@ and the per-level files reference it rather than restating it.
   scope is still open carries the child names without contracts
   until the locking session fills them.
 
-The recurring trap this closes: the anti-scope rules in
-[`epic.md`](./epic.md) and [`milestone.md`](./milestone.md) bar
-the parent from scoping a child's HOW and were read as also
-barring the child's WHAT — leaving a scope-locked parent doc able
-to name its children but not contract them. WHAT-contracting is
+The recurring trap this closes: the parent-doc anti-scope rule
+in the applicable per-level file bars the parent from scoping a
+child's HOW and was read as also barring the child's WHAT —
+leaving a scope-locked parent doc able to name its children but
+not contract them. WHAT-contracting is
 required; HOW-scoping stays barred. The companion phrasing lives
 in those per-level anti-scope rules.
 
