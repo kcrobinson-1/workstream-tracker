@@ -1,5 +1,9 @@
 .DS_Store
+
+# Claude Code machine-local state (shared .claude config is still committable)
 .claude/settings.local.json
+.claude/shell-snapshots/
+.claude/worktrees/
 
 # Go build artifacts
 *.exe
