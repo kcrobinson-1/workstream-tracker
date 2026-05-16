@@ -105,6 +105,30 @@ func TestParse(t *testing.T) {
 	}
 }
 
+func TestPosition(t *testing.T) {
+	cases := []struct {
+		raw          string
+		wantPosition int
+		wantOK       bool
+	}{
+		{"madrona-feedback", 0, false},
+		{"madrona-feedback-m1", 1, true},
+		{"madrona-feedback-m2-t3", 3, true},
+		{"madrona-feedback-m1-t2-p7", 7, true},
+	}
+
+	for _, c := range cases {
+		got, err := Parse(c.raw, "madrona-feedback")
+		if err != nil {
+			t.Fatalf("Parse(%q): %v", c.raw, err)
+		}
+		pos, ok := got.Position()
+		if pos != c.wantPosition || ok != c.wantOK {
+			t.Errorf("Position(%q) = (%d, %v), want (%d, %v)", c.raw, pos, ok, c.wantPosition, c.wantOK)
+		}
+	}
+}
+
 func TestParseRejectsMalformedDescendant(t *testing.T) {
 	cases := []string{
 		"madrona-feedback-mx",

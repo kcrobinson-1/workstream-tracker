@@ -200,6 +200,17 @@ func (s Slug) NodeType() NodeType {
 	return s.segments[len(s.segments)-1].NodeType
 }
 
+// Position returns the terminal descendant segment's position and
+// true; for a root slug (no descendant segments) it returns 0 and
+// false. Mirrors the NodeType accessor shape so callers can read
+// the ordinal without re-implementing the slug grammar.
+func (s Slug) Position() (int, bool) {
+	if len(s.segments) == 0 {
+		return 0, false
+	}
+	return s.segments[len(s.segments)-1].Position, true
+}
+
 // Parent returns the parent slug for a descendant, or an empty
 // string for a root slug.
 func (s Slug) Parent() string {

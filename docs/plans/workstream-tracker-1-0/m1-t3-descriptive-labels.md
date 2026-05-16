@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t3
-Status: Proposed
+Status: Landed
 ---
 
 # t3 — Descriptive tree labels
@@ -219,7 +219,9 @@ structural call requires it; deviations are reported per
   `buildTree` (uses `slugs.Slug.Position()`); `nodeTypeDisplay`
   helper.
 - `internal/site/render.go` — `node` template: display `.Label`,
-  add `title="{{.Slug}}"`.
+  add `title="{{.Slug}}"`; the `.slug` monospace CSS rule is
+  renamed to `.label` (prose, not slug text) so no dead/misnamed
+  rule is left behind.
 - `spec/planning/shared.md` — document optional
   `short_description` field (additive).
 - `docs/plans/workstream-tracker-1-0/m1-v0-2.md` — the t3 row
