@@ -1,6 +1,6 @@
 ---
 slug: promotion-gate-explicit-checklist
-Status: In draft
+Status: Proposed
 ---
 
 # Promotion-Gate Explicit Checklist
