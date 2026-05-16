@@ -132,6 +132,27 @@ creation time the slug determines the initial path; after that, the
 slug is immutable and the path can change freely without touching the
 slug.
 
+**Optional `short_description` field.** A plan-tree doc may carry an
+optional `short_description` string in frontmatter, alongside `slug`
+and `Status`:
+
+```yaml
+---
+slug: <slug>
+Status: <status>
+short_description: <one-line human-readable summary>
+---
+```
+
+It is a short human-readable summary used to render the doc's
+plan-tree node as `<Type> <ordinal>: <short_description>` (e.g.,
+`Task 3: Descriptive tree labels`) instead of the raw slug chain.
+The field is **optional and additive**: a doc that omits it remains
+valid and renders with no warning, error, or skip (the node falls
+back to its slug suffix, with the full slug always reachable via the
+node's tooltip). Pre-existing docs and vendored spec consumers are
+unaffected by its absence.
+
 ## Plan-doc Status
 
 Every plan-tree doc carries a `Status` field in frontmatter, alongside
