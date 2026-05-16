@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t4-p1
-Status: In draft
+Status: Proposed
 short_description: Inline per-node detail render
 ---
 
@@ -37,16 +37,14 @@ reality-check inputs live in the sibling scoping doc
 which this plan does not restate.
 
 P1 has no pending input from a prior task: t3's
-`LongDescription` carry is **Landed** (recorded in the scoping
-reality-check), and t1/t2 are the independent foundation track
-P1 does not touch. The `In draft → Proposed` promotion-gate
-self-review per
+`LongDescription` carry is **Landed** (re-confirmed against
+current code in the scoping reality-check), and t1/t2 are the
+independent foundation track P1 does not touch. The
+`In draft → Proposed` promotion-gate self-review per
 [`task-plan.md`](../../../spec/planning/task-plan.md)
 (end-to-end coherence, contract decision-completeness, universal
-`Verified by:` walk, reality-check re-confirmation) has **not
-yet been run**; Status is `In draft` pending that pass. No open
-inputs from prior tasks remain, so the gate can run without
-external blockers.
+`Verified by:` walk, reality-check re-confirmation) has been run;
+no open inputs remained, so Status is `Proposed`.
 
 ## Goal
 
@@ -113,12 +111,16 @@ non-binding guidance under Execution Steps.
   (`status, _ := metaData["Status"].(string)`); the list field
   uses the same `, _ :=` posture element-wise via `stringList`.
 - A YAML block sequence decodes from goldmark-meta as
-  `[]interface{}` whose elements are `string`. **Tagged
-  assumption** (scoping reality-check): re-confirm against the
-  `goldmark-meta v1.1.0` pin in [`go.mod`](../../../go.mod) at
-  the promotion gate before flipping to `Proposed`. `stringList`
-  type-asserts each element and drops non-strings rather than
-  assuming `.([]string)` works.
+  `[]interface{}` whose elements are `string`. `Verified by:`
+  `goldmark-meta v1.1.0` (pinned in
+  [`go.mod`](../../../go.mod)) imports `gopkg.in/yaml.v2 v2.3.0`
+  and unmarshals frontmatter into `map[string]interface{}`
+  (`goldmark-meta@v1.1.0/meta.go:18,140-141`); under yaml.v2 a
+  block sequence into `interface{}` is `[]interface{}` of
+  `string` — confirmed at this plan's promotion gate, recorded
+  in scoping reality-check. `stringList` type-asserts each
+  element and drops non-strings; a direct `.([]string)`
+  assertion would fail and is not used.
 
 ### Tree contract (`internal/site/tree.go`)
 
@@ -339,16 +341,15 @@ trigger-map-currency (no directory restructure).
 
 ## Risk Register
 
-- **goldmark-meta list decoding differs from the tagged
-  assumption.** If a YAML block sequence does not decode to
-  `[]interface{}` of `string` under the pinned
-  `goldmark-meta v1.1.0`, `stringList` would silently yield an
-  empty list. Mitigation: the promotion-gate reality-check
-  re-confirms the decode shape against the pin before the
-  `Proposed` flip, and the walker test with a populated
-  `related_prs` list fails loudly if the shape is wrong (it
-  asserts the parsed slice, so a wrong shape is caught at
-  `go test`, not in production).
+- **goldmark-meta list decoding (confirmed; regression
+  guard).** The decode shape (`[]interface{}` of `string` via
+  `gopkg.in/yaml.v2 v2.3.0`) was verified against the pinned
+  `goldmark-meta v1.1.0` at this plan's promotion gate, so it
+  is not an open risk. Residual risk is a future dependency
+  bump changing the shape: the walker test with a populated
+  `related_prs` list asserts the parsed slice, so a shape
+  change is caught at `go test` (not in production) — the test
+  is the durable regression guard.
 - **Long body inflates the page (scoping D1 consequence).**
   Intended, not a regression: the current corpus has short
   bodies and density/ordering work is milestone Out of Scope.

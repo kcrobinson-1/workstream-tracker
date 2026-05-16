@@ -65,8 +65,7 @@ conventions.
 
 - **P1 — Inline per-node detail render.**
   [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
-  (Status `In draft` — promotion gate not yet run). Renders
-  `LongDescription` inline; adds
+  (Status `Proposed`). Renders `LongDescription` inline; adds
   the optional `related_prs` frontmatter field, parses it, and
   renders author-curated PRs inline. Pure read-path, no external
   dependency. Independently shippable: the page surfaces

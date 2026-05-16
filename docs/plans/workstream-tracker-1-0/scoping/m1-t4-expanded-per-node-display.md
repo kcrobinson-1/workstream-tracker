@@ -60,10 +60,16 @@ the plans must verify").
   read needs an element-wise string assertion — a shape
   difference from the scalar fields, called out so the P1
   contract specifies it rather than assuming `.([]string)`
-  works. **Assumption (tagged):** goldmark-meta decodes a YAML
-  block sequence to `[]interface{}` of `string`; the P1 plan's
-  reality-check re-confirms this against the `goldmark-meta`
-  version pinned in `go.mod` before promotion.
+  works. **Confirmed at P1 promotion (was a tagged
+  assumption):** `goldmark-meta v1.1.0`
+  (`$GOMODCACHE/.../goldmark-meta@v1.1.0/meta.go:18,140-141`)
+  imports `gopkg.in/yaml.v2 v2.3.0` and `yaml.Unmarshal`s
+  frontmatter into `map[string]interface{}`; under yaml.v2 a
+  YAML block sequence decoded into `interface{}` is
+  `[]interface{}` with scalar string elements typed `string`.
+  So `metaData["related_prs"]` is `[]interface{}`, a direct
+  `.([]string)` assertion fails, and the element-wise
+  `stringList` assertion is required — verified, not assumed.
 - **The render path is a single static `html/template` with no
   JavaScript and no client state.** `render.go:14-64` is one
   `template.Must` with an inline `<style>` block and no
@@ -359,8 +365,11 @@ aids; the symbolic anchors are load-bearing):
   (D1's "inline, no panel" depends on this; if a script/route
   appeared, D1 re-opens).
 - `goldmark-meta` version pinned in `go.mod` — a YAML block
-  sequence still decodes to `[]interface{}` of `string` (the
-  tagged assumption behind P1's list-field read).
+  sequence decodes to `[]interface{}` of `string`. **Confirmed
+  at P1 promotion** (yaml.v2 v2.3.0 →
+  `map[string]interface{}`); re-verify only on a future
+  `goldmark-meta`/`yaml` bump (the walker test is the durable
+  guard).
 - `spec/planning/shared.md` lines ~135-154 — the optional
   `short_description` block is still the adjacency point for
   the additive `related_prs` documentation (D3).
