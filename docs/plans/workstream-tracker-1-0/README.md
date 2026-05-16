@@ -122,10 +122,10 @@ registration time.
 Per-milestone **WHAT** contracts — end result, sibling
 interfaces, preserves. The **HOW** for each milestone lives in
 the milestone doc (and its constituent task plans) when it
-drafts. Section added as a variance from
-[`epic.md`](../../../spec/planning/epic.md)'s required+optional
-list per the cross-level "child contracts at parent levels"
-pattern; see PR body for the shared-spec edit backlog entry.
+drafts. Required section per
+[`epic.md`](../../../spec/planning/epic.md) "Required and
+optional sections" and [`shared.md`](../../../spec/planning/shared.md)
+"Parent-doc child contracts."
 
 ### m1 — v0.2 Read-experience improvements
 

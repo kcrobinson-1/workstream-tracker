@@ -233,6 +233,61 @@ applied to the Status lifecycle: `Deferred` is the canonical token,
 and adjacent descriptive variants break queryability the same way
 paraphrased Status strings do.
 
+## Parent-doc `In draft` → `Proposed` promotion gate
+
+Epic docs and milestone docs carry the same `Status` lifecycle as
+task and phase plans (see "Plan-doc Status" above), but the
+`` `In draft` → `Proposed` `` promotion gate in
+[`task-plan.md`](./task-plan.md) binds task and phase plans only —
+epic and milestone docs do not load that file. This is the
+symmetric gate for parent docs. It lives here (not in
+[`task-plan.md`](./task-plan.md), not duplicated into
+[`epic.md`](./epic.md) and [`milestone.md`](./milestone.md))
+because it binds two doc-types and the layering discipline keeps a
+two-or-more-level rule here once.
+
+A parent doc's drafting need not be a single pass. A multi-pass
+session can lay out the milestone or task structure with explicit
+deferrals, then resolve them, then flip Status. While resolution
+is pending the doc carries Status `In draft`; flipping to
+`Proposed` claims the parent doc is ready for its children's
+planning sessions to consume — the child set is locked and each
+child's WHAT contract (see "Parent-doc child contracts" below) is
+decision-complete.
+
+The flip fires on the PR that locks the parent doc's scope.
+Before the flip:
+
+- **Read end-to-end as a coherent whole.** Re-read the full
+  parent doc. Look for contradictions between sections (a child
+  WHAT contract that conflicts with a Risk Register mitigation, a
+  sequencing-rationale claim a child contract contradicts, an
+  Out-of-Scope deferral a child contract silently re-includes).
+- **Decision-completeness on child contracts.** Walk the
+  `Milestone Contracts` / `Task Contracts` section for deferral
+  phrases that name the parent-doc drafting session itself as the
+  resolver. Each child's WHAT is either resolved concretely or
+  the child is explicitly marked scope-not-yet-locked (carrying
+  its name without a contract) — not deferred to a moment that
+  has already passed.
+- **Walk the `Verified by:` rule against every load-bearing
+  claim** at this level's interpretation (see "`Verified by:`
+  annotations on load-bearing claims" → "What this means at each
+  level" below).
+- **Re-confirm reality-check inputs** the parent doc rests on
+  against current code; stale references are updated.
+
+Failures surface either as resolutions (apply edits before
+flipping) or as blockers the user triages before the flip. A
+parent doc flipped to `Proposed` without this walk is the same
+drift shape as a task plan flipped to `Proposed` without its
+promotion-gate walk — the Status claim is wrong. The `In draft`
+and `Proposed` tokens are matched by exact string per "Plan-doc
+Status" above. Transitions out of `Proposed` for parent docs are
+not gated here — a parent doc has no implementing PR of its own;
+its terminal state follows from its children per the per-level
+files.
+
 ## Plans describe contracts, not implementation
 
 A plan describes what the implementation must achieve — the
@@ -425,6 +480,58 @@ every phase must preserve, or a coordination rule that binds the
 phase set. At plan level, the invariants thread across files
 within the plan's implementing PR(s) — the original framing of
 this rule.
+
+## Parent-doc child contracts
+
+A parent doc (epic, milestone) and a task plan with N ≥ 2 phases
+states, for each direct child, that child's **WHAT** contract;
+the child's **HOW** stays in the child's own doc. This binds
+three doc-types at once (epic → milestone, milestone → task,
+task → phase), so per the layering discipline it lives here once
+and the per-level files reference it rather than restating it.
+
+- **WHAT the parent states per child:** the child's end result
+  (what is true when the child is done), the sibling interfaces
+  it produces or consumes (what later siblings build on or feed
+  it), and what it preserves (existing behavior that must still
+  hold after the child lands). One short block per child, on the
+  order of 2–4 lines.
+- **HOW the parent does NOT state:** the child's file inventory,
+  function or signature shapes, specific commands, validation-
+  gate specifics, execution-step ordering, or risk register.
+  Those are scoped against actually-merged code at the child's
+  own planning session and live in the child's doc.
+- **Per-level section name.** This rule's realization is a
+  required-when-applicable section in each parent doc-type:
+  `Milestone Contracts` in an epic doc, `Task Contracts` in a
+  milestone doc, `Phase Contracts` in a task plan when N ≥ 2.
+  The per-level files ([`epic.md`](./epic.md),
+  [`milestone.md`](./milestone.md),
+  [`task-plan.md`](./task-plan.md)) carry the section in their
+  "Required and optional sections" list and cite this rule as
+  the authority rather than restating the WHAT/HOW split.
+- **When required.** The section is required once the parent doc
+  locks the child's scope (the child set is fixed and each
+  child's WHAT is decision-complete). A parent doc whose child
+  scope is still open carries the child names without contracts
+  until the locking session fills them.
+
+The recurring trap this closes: the anti-scope rules in
+[`epic.md`](./epic.md) and [`milestone.md`](./milestone.md) bar
+the parent from scoping a child's HOW and were read as also
+barring the child's WHAT — leaving a scope-locked parent doc able
+to name its children but not contract them. WHAT-contracting is
+required; HOW-scoping stays barred. The companion phrasing lives
+in those per-level anti-scope rules.
+
+**What this means at each level.** At epic level the children are
+milestones and the WHAT is milestone-granular (end result,
+cross-milestone interfaces, what the milestone preserves). At
+milestone level the children are tasks. At task level (N ≥ 2)
+the children are phases; because phases are sequence-steps toward
+one task outcome rather than independent-value units, the WHAT is
+thinner — chiefly the sibling-interface handoff and preserved
+behavior, since a phase has no independent end result of its own.
 
 ## Section variance disclosure
 
