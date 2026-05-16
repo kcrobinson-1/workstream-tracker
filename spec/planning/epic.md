@@ -15,20 +15,25 @@ contract — end result, sibling interfaces, what it preserves —
 in its `Milestone Contracts` section per
 [`shared.md`](./shared.md) "Parent-doc child contracts". That
 per-milestone WHAT is required, not barred. What an epic should
-*not* prescribe is the milestone's **HOW**: per-milestone phase
-counts, per-phase content, per-phase PR counts, validation-gate
-specifics, documentation lists, or self-review audit sets. Those
-HOW details belong to the milestone planning session for each
-milestone, against actually-merged code at milestone-start.
+*not* prescribe is the milestone's **HOW**: per-milestone task
+counts, per-task content, per-task PR counts, and anything below
+the task level (per-phase decomposition), plus validation-gate
+specifics, documentation lists, or self-review audit sets. A
+milestone's direct child is a task, not a phase (the level
+picker is epic → milestone → task → phase); barring only
+phase-level detail would wrongly leave task-level decomposition
+in-scope for the epic. Those HOW details belong to the milestone
+planning session for each milestone, against actually-merged
+code at milestone-start.
 
 When an epic does name per-milestone details (during initial
 epic drafting, before the milestone planning sessions have run),
 tag them explicitly as estimates pending milestone planning, not
 as binding specs. Sizing summaries in epics carry the same
-caveat: per-milestone phase and PR counts are early estimates,
+caveat: per-milestone task and PR counts are early estimates,
 not commitments.
 
-The milestone planning session re-derives the actual phase
+The milestone planning session re-derives the actual task
 shape and the milestone doc supersedes the epic's estimates.
 The milestone doc PR also reconciles the epic's prescriptive
 paragraphs — either rewriting them to match the milestone-doc
@@ -79,9 +84,10 @@ or a required section genuinely doesn't apply — follows the
 
 An epic gets its own folder at `docs/plans/<epic-slug>/`, with
 the epic doc at `docs/plans/<epic-slug>/README.md` and
-per-milestone / per-phase docs as siblings inside the same
-folder (filename patterns named in [`milestone.md`](./milestone.md)
-and [`task-plan.md`](./task-plan.md)). The full layout convention is in
+per-milestone / per-task / per-phase docs as siblings inside the
+same folder (filename patterns named in
+[`milestone.md`](./milestone.md) and
+[`task-plan.md`](./task-plan.md)). The full layout convention is in
 [`planning-doc-location.md`](../planning-doc-location.md).
 
 Per-epic milestone numbering is canonical: each epic counts from
