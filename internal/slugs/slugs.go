@@ -1,11 +1,14 @@
 // Package slugs defines the plan-doc slug grammar shared by the
 // API and site packages.
 //
-// A root slug is kebab-case text such as "madrona-feedback". A
-// descendant appends position segments to the root: "-mN" for a
-// milestone, "-tN" for a task, and "-pN" for a phase. For
-// example, "madrona-feedback-m1-t2-p1" is phase 1 under task 2
-// under milestone 1 of the "madrona-feedback" root.
+// A root slug is kebab-case descriptive text such as
+// "madrona-feedback"; no kebab-delimited token of a root may be a
+// bare position segment ("m1" is never a root). A descendant
+// appends position segments to the root in strict, contiguous
+// order — at most one "-mN" (milestone), then at most one "-tN"
+// (task), then at most one "-pN" (phase). For example,
+// "madrona-feedback-m1-t2-p1" is phase 1 under task 2 under
+// milestone 1 of the "madrona-feedback" root.
 package slugs
 
 import (
@@ -48,8 +51,69 @@ type Segment struct {
 }
 
 // IsValidRoot reports whether slug is valid kebab-case root text.
+// Root slugs are descriptive names: kebab-case (lowercase letters,
+// digits, hyphens) and no kebab-delimited token may be a bare
+// position segment (`mN`/`tN`/`pN`), so "m1" and "m1-foo" are not
+// valid roots. This matches what IsStructuralRoot already assumes
+// and the IsWellFormed root-portion grammar.
 func IsValidRoot(slug string) bool {
-	return rootPattern.MatchString(slug)
+	if !rootPattern.MatchString(slug) {
+		return false
+	}
+	for _, token := range strings.Split(slug, "-") {
+		if segmentPattern.MatchString(token) {
+			return false
+		}
+	}
+	return true
+}
+
+var wordPattern = regexp.MustCompile(`^[a-z0-9]+$`)
+
+// IsWellFormed reports whether slug is a grammatically valid
+// plan-doc slug standalone (without a known root): a kebab-case root
+// (no token of which is a bare position segment), optionally
+// followed by ordered position segments — at most one "mN", then at
+// most one "tN", then at most one "pN", in that order and nothing
+// else. It does not verify the slug names a real plan-tree doc — the
+// server is repo-blind — only that it parses under the grammar. Used
+// by the create-or-attach exact-slug flow, which honors a
+// caller-supplied slug verbatim.
+func IsWellFormed(slug string) bool {
+	if slug == "" {
+		return false
+	}
+	parts := strings.Split(slug, "-")
+
+	// Consume the root: one or more kebab words, none of which may
+	// be a bare position segment.
+	i := 0
+	for i < len(parts) && wordPattern.MatchString(parts[i]) && !segmentPattern.MatchString(parts[i]) {
+		i++
+	}
+	if i == 0 {
+		// No valid root word before the first position segment.
+		return false
+	}
+
+	// Consume position segments as a contiguous prefix of the
+	// sequence [m, t, p], at most one of each and in that exact
+	// order. A slug encodes a full path from the root, so "tN"
+	// requires a preceding "mN" and "pN" requires a preceding "tN"
+	// — "root-p1" and "root-t1" are not well-formed.
+	order := []byte{'m', 't', 'p'}
+	oi := 0
+	for ; i < len(parts); i++ {
+		if !segmentPattern.MatchString(parts[i]) {
+			return false
+		}
+		if oi >= len(order) || parts[i][0] != order[oi] {
+			// Out of order, repeated, or non-contiguous.
+			return false
+		}
+		oi++
+	}
+	return true
 }
 
 // ValidNodeType reports whether nodeType is a recognized API node

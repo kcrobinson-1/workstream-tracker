@@ -29,16 +29,23 @@ func (s *Server) MountRoutes(r chi.Router) {
 
 // RegisterRequest is the body of POST /work-instances.
 //
-// ParentPath distinguishes the two flows:
+// ParentPath distinguishes the two slug-derivation flows; ExactSlug
+// selects a third flow that bypasses both:
 //   - nil (field omitted from JSON): root case. RootSlug names a
 //     new root; node_type must be "epic" or "task".
 //   - non-nil (field present, possibly empty string): descendant
 //     case. ParentPath is the slug-suffix of the parent (empty
 //     when the parent is the root). The server generates the
 //     descendant slug.
+//   - ExactSlug non-empty: create-or-attach. The server registers a
+//     work-instance at exactly that slug — no derivation, no
+//     descendant generation, no root-conflict check. ParentPath and
+//     RootSlug-derived generation are not consulted. Omitted by
+//     v0.1 callers, whose behavior is unchanged.
 type RegisterRequest struct {
 	RootSlug   string          `json:"root_slug"`
 	ParentPath *string         `json:"parent_path,omitempty"`
+	ExactSlug  string          `json:"exact_slug,omitempty"`
 	NodeType   string          `json:"node_type"`
 	Actor      string          `json:"actor"`
 	Metadata   json.RawMessage `json:"metadata,omitempty"`

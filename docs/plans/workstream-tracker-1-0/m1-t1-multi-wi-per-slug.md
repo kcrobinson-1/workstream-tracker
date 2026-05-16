@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t1
-Status: Proposed
+Status: Landed
 ---
 
 # Task — Multi-work-instance per slug
@@ -241,19 +241,51 @@ additions; no new source files.
   (create-or-attach) branch to
   `registerWorkInstance`/`insertRegister`; add the
   `(slug, actor, active)` idempotency check before WI insert.
+- `internal/slugs/slugs.go` — add `IsWellFormed`, a standalone
+  full-slug grammar validator, and harmonize the existing
+  `IsValidRoot`/`IsStructuralRoot` validators with it. Scope grew
+  beyond the original `IsWellFormed` addition in response to two
+  Codex P2 review comments: `IsWellFormed` now enforces *ordered,
+  contiguous, at-most-one* `mN→tN→pN` segments after the root
+  (previously each trailing part was only checked individually),
+  and the root-portion grammar now forbids any kebab-delimited
+  token that is a bare position segment (`mN`/`tN`/`pN`).
+  `IsValidRoot` was deliberately narrowed to match — `m1` and
+  `m1-foo` are no longer valid roots — bringing it into agreement
+  with the pre-existing stricter `IsStructuralRoot`. The
+  exact-slug flow's "well-formed under the existing slug grammar"
+  contract needs root-independent validation; `slugs.Parse`
+  requires a known root the exact-slug flow does not have, so a
+  new pure validator was added rather than reusing `Parse`. This
+  is an estimate deviation from the original "intentionally not
+  touched: `internal/slugs/slugs.go`" line (recorded in the
+  implementing PR's Estimate Deviations).
 - `internal/api/api_test.go` — exact-slug create, exact-slug
-  attach, idempotency, multi-actor, malformed-slug, and
-  v0.1-unaffected cases.
-- `internal/db/db_test.go` — relaxation against a database that
-  already has the unique index.
+  attach (multi-actor), idempotency (id + no-new-event
+  discriminator), serial resume, malformed-slug,
+  root-conflict-bypass, and v0.1-unaffected cases.
+- `internal/db/db_test.go` — relaxation on a fresh DB and
+  relaxation against a database that already has the legacy
+  unique index (drop-and-recreate path).
+- `internal/slugs/slugs_test.go` — `IsWellFormed` unit cases
+  (added alongside the new validator above; same estimate
+  deviation), plus expanded `IsValidRoot`/`IsWellFormed` cases
+  asserting segment-order enforcement and rejection of
+  segment-pattern root tokens (review-driven).
 
-**Intentionally not touched** (estimate; verified at scoping):
+**Intentionally not touched** (verified at scoping and at
+implementation):
 
 - `internal/site/site.go`, `internal/site/render.go` — read
-  path already multi-WI-safe.
-- `internal/slugs/slugs.go`, `internal/api/slugs.go` — max-based
-  allocation and EXISTS-based `rootExists` stay correct under
-  relaxation; `rootExists` is not split (Decision 5 in scoping).
+  path already multi-WI-safe (re-confirmed:
+  `loadActiveWorkInstances` filters by state and buckets per
+  slug in memory).
+- `internal/api/slugs.go` — EXISTS-based `rootExists` stays
+  correct under relaxation; `rootExists` is not split
+  (Decision 5 in scoping). `generateDescendantSlug`'s max-based
+  allocation in `internal/slugs/slugs.go` (`NextDescendant`) is
+  unchanged; only the additive `IsWellFormed` was added to that
+  file.
 
 ## Validation Gate
 
@@ -310,6 +342,15 @@ Run at commit boundary, drawn from
 - [`design/v0.1-design.md`](../../../design/v0.1-design.md) §5
   (data model) — record that `work_instances.slug` is no longer
   unique. Both updated in the implementing PR.
+- [`spec/planning/shared.md`](../../../spec/planning/shared.md)
+  "Plan-doc identity (slug)" — slug-grammar clarification added
+  in this PR (review-driven): root slugs may not contain a bare
+  position-segment token (`m1` is never a root), and after the
+  root, position segments must appear in order and at most once
+  each (`mN`, then `tN`, then `pN`). This codifies what
+  `IsStructuralRoot` already assumed and what the exact-slug
+  "well-formed under the existing slug grammar" contract now
+  upholds.
 
 ## Risk Register
 

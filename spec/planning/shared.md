@@ -101,9 +101,14 @@ Descendants append their position to the parent:
 - `madrona-feedback-m1-t2-p3` — phase 3 of that task
 
 Segment prefixes are `m` for milestone, `t` for task, `p` for phase.
-Root slugs use kebab-case (lowercase letters, digits, hyphens).
-Maximum four segments end-to-end (root + m + t + p); the four-segment
-cap is the forcing function described under "Taxonomy" above.
+Root slugs use kebab-case (lowercase letters, digits, hyphens), and no
+kebab-delimited token of a root slug may be a bare position segment
+(`mN`/`tN`/`pN`) — roots are descriptive names, so `m1` is never a
+valid root. After the root, position segments must appear in order and
+at most once each: optional `mN`, then optional `tN`, then optional
+`pN`. Maximum four segments end-to-end (root + m + t + p); the
+four-segment cap is the forcing function described under "Taxonomy"
+above.
 
 **The slug encodes position at creation time, NOT current position.**
 If the plan tree is later reorganized — a phase becomes a different
