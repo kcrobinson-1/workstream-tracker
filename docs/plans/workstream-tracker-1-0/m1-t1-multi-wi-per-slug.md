@@ -242,13 +242,22 @@ additions; no new source files.
   `registerWorkInstance`/`insertRegister`; add the
   `(slug, actor, active)` idempotency check before WI insert.
 - `internal/slugs/slugs.go` — add `IsWellFormed`, a standalone
-  full-slug grammar validator (kebab-case root, optionally
-  followed by ordered `mN`/`tN`/`pN` segments). The exact-slug
-  flow's "well-formed under the existing slug grammar" contract
-  needs root-independent validation; `slugs.Parse` requires a
-  known root the exact-slug flow does not have, so a new pure
-  validator was added rather than reusing `Parse`. This is an
-  estimate deviation from the original "intentionally not
+  full-slug grammar validator, and harmonize the existing
+  `IsValidRoot`/`IsStructuralRoot` validators with it. Scope grew
+  beyond the original `IsWellFormed` addition in response to two
+  Codex P2 review comments: `IsWellFormed` now enforces *ordered,
+  contiguous, at-most-one* `mN→tN→pN` segments after the root
+  (previously each trailing part was only checked individually),
+  and the root-portion grammar now forbids any kebab-delimited
+  token that is a bare position segment (`mN`/`tN`/`pN`).
+  `IsValidRoot` was deliberately narrowed to match — `m1` and
+  `m1-foo` are no longer valid roots — bringing it into agreement
+  with the pre-existing stricter `IsStructuralRoot`. The
+  exact-slug flow's "well-formed under the existing slug grammar"
+  contract needs root-independent validation; `slugs.Parse`
+  requires a known root the exact-slug flow does not have, so a
+  new pure validator was added rather than reusing `Parse`. This
+  is an estimate deviation from the original "intentionally not
   touched: `internal/slugs/slugs.go`" line (recorded in the
   implementing PR's Estimate Deviations).
 - `internal/api/api_test.go` — exact-slug create, exact-slug
@@ -260,7 +269,9 @@ additions; no new source files.
   unique index (drop-and-recreate path).
 - `internal/slugs/slugs_test.go` — `IsWellFormed` unit cases
   (added alongside the new validator above; same estimate
-  deviation).
+  deviation), plus expanded `IsValidRoot`/`IsWellFormed` cases
+  asserting segment-order enforcement and rejection of
+  segment-pattern root tokens (review-driven).
 
 **Intentionally not touched** (verified at scoping and at
 implementation):
@@ -331,6 +342,15 @@ Run at commit boundary, drawn from
 - [`design/v0.1-design.md`](../../../design/v0.1-design.md) §5
   (data model) — record that `work_instances.slug` is no longer
   unique. Both updated in the implementing PR.
+- [`spec/planning/shared.md`](../../../spec/planning/shared.md)
+  "Plan-doc identity (slug)" — slug-grammar clarification added
+  in this PR (review-driven): root slugs may not contain a bare
+  position-segment token (`m1` is never a root), and after the
+  root, position segments must appear in order and at most once
+  each (`mN`, then `tN`, then `pN`). This codifies what
+  `IsStructuralRoot` already assumed and what the exact-slug
+  "well-formed under the existing slug grammar" contract now
+  upholds.
 
 ## Risk Register
 
