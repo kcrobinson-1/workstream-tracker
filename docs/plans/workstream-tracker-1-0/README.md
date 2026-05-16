@@ -117,6 +117,75 @@ registration time.
   against the tracker, close gaps surfaced by real use. Gates
   the claim that 1.0 is real rather than aspirational.
 
+## Milestone Contracts
+
+Per-milestone **WHAT** contracts — end result, sibling
+interfaces, preserves. The **HOW** for each milestone lives in
+the milestone doc (and its constituent task plans) when it
+drafts. Section added as a variance from
+[`epic.md`](../../../spec/planning/epic.md)'s required+optional
+list per the cross-level "child contracts at parent levels"
+pattern; see PR body for the shared-spec edit backlog entry.
+
+### m1 — v0.2 Read-experience improvements
+
+- **End result.** v0.1's bare-bones render lifts to a tree
+  that's scannable per node (descriptive labels, frontmatter
+  `short_description`, expanded per-node detail) and an agent
+  dogfood loop that's trustworthy (multi-work-instance support
+  per slug, automatic registration). Task-level breakdown in
+  [`m1-v0-2.md`](m1-v0-2.md).
+- **Interfaces.** Establishes the `short_description`
+  frontmatter field and parsed body that m3's cell rendering
+  consumes. Produces a render path that supports multi-WI per
+  slug (consumed by m2's tier classification and m3's per-cell
+  actor positioning).
+- **Preserves.** v0.1's bare-bones render path remains as the
+  fallback shape; spec changes are additive (no breaking
+  changes to vendored consumers).
+
+### m2 — Activity-first ordering
+
+- **End result.** The forest renders with tier-based sorting:
+  active surfaces top, in-flight middle, landed/abandoned
+  compressed. Active-work paths inside active roots expand by
+  default; inactive branches collapse.
+- **Interfaces.** Consumes work-instance state from m1's
+  multi-WI schema. Provides the visual ordering context that
+  m3's per-cell rendering sits within.
+- **Preserves.** m1's labels and detail rendering. The
+  alphabetical ordering m1 ships with remains the fallback
+  when no work-instance state distinguishes roots.
+
+### m3 — Sub-stage cells and richer actor presence
+
+- **End result.** Each leaf renders `D`/`P`/`I`/`V` cells
+  colored by state (none / active / in-review / complete).
+  Actor icons sit on specific cells. The work-instance state
+  vocabulary expands to include `awaiting-user`,
+  `awaiting-external`, and `backgrounded`.
+- **Interfaces.** Consumes m1's multi-WI schema and m2's tier
+  ordering. Adds richer work-instance states to the API and
+  DB; agent rules from m1's t2 carry the new state-transition
+  surface.
+- **Preserves.** Existing render path for nodes without cell
+  data; v0.1's actor-marker chip shape remains as the
+  fallback when cells aren't populated.
+
+### Final integration milestone — Neighborly-events integration
+
+- **End result.** neighborly-events successfully vendors
+  `spec/` and shared agent rules, populates its plan tree,
+  and runs real sessions against the workstream-tracker
+  without local patches or workarounds. Gaps surfaced by real
+  use close before 1.0 ships.
+- **Interfaces.** Consumes the entire stack assembled across
+  m1, m2, and m3. Exposes the contract surface (spec, agent
+  rules, API, render layer) to a real external consumer.
+- **Preserves.** All earlier milestone deliverables. The
+  integration is additive — a new consumer adopting the
+  existing system, not a rework.
+
 ## Open Questions Newly Opened
 
 Calls deferred until m1-m3 are sized — the answers may shift
