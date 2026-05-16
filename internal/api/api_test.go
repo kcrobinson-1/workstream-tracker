@@ -392,6 +392,251 @@ func TestEventOnUnknownWorkInstance(t *testing.T) {
 	}
 }
 
+// eventCount returns the number of events for a work-instance id.
+func eventCount(t *testing.T, conn *sql.DB, wid string) int {
+	t.Helper()
+	var n int
+	if err := conn.QueryRow(`SELECT COUNT(*) FROM events WHERE work_instance_id = ?`, wid).Scan(&n); err != nil {
+		t.Fatalf("count events: %v", err)
+	}
+	return n
+}
+
+// TestExactSlugCreatesFirstWorkInstance is t2's first-registration
+// case: an exact-slug register against a slug with no prior
+// work-instance creates the slug's first one. No prior root-create
+// is required.
+func TestExactSlugCreatesFirstWorkInstance(t *testing.T) {
+	ts, conn := newTestServer(t)
+
+	status, body := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "workstream-tracker-1-0-m1-t1",
+		"actor":      "impl-agent",
+	})
+	if status != http.StatusCreated {
+		t.Fatalf("status = %d, want 201; body = %+v", status, body)
+	}
+	if body["slug"] != "workstream-tracker-1-0-m1-t1" {
+		t.Errorf("slug = %v, want workstream-tracker-1-0-m1-t1", body["slug"])
+	}
+	wid, ok := body["id"].(string)
+	if !ok || wid == "" {
+		t.Fatalf("id missing or not a string: %+v", body)
+	}
+
+	var count int
+	if err := conn.QueryRow(
+		`SELECT COUNT(*) FROM work_instances WHERE slug = ?`,
+		"workstream-tracker-1-0-m1-t1",
+	).Scan(&count); err != nil {
+		t.Fatalf("count work_instances: %v", err)
+	}
+	if count != 1 {
+		t.Errorf("work_instances at slug = %d, want 1", count)
+	}
+}
+
+// TestExactSlugAttachesAdditionalWorkInstance: two different actors
+// at one slug both get active work-instances.
+func TestExactSlugMultiActorAttach(t *testing.T) {
+	ts, conn := newTestServer(t)
+
+	s1, b1 := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "epic-shared-m1",
+		"actor":      "actor-one",
+	})
+	s2, b2 := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "epic-shared-m1",
+		"actor":      "actor-two",
+	})
+	if s1 != http.StatusCreated || s2 != http.StatusCreated {
+		t.Fatalf("statuses = %d, %d; want 201, 201; bodies = %+v %+v", s1, s2, b1, b2)
+	}
+	if b1["id"] == b2["id"] {
+		t.Errorf("two actors got the same work-instance id %v", b1["id"])
+	}
+
+	var active int
+	if err := conn.QueryRow(
+		`SELECT COUNT(*) FROM work_instances WHERE slug = ? AND state = 'active'`,
+		"epic-shared-m1",
+	).Scan(&active); err != nil {
+		t.Fatalf("count active: %v", err)
+	}
+	if active != 2 {
+		t.Errorf("active work_instances at slug = %d, want 2", active)
+	}
+}
+
+// TestExactSlugIdempotent: the same actor registering twice against
+// one active slug gets one work-instance. The discriminator is the
+// returned id equality AND no new event row — a second row created
+// but the test only checking 201 would not slip through.
+func TestExactSlugIdempotent(t *testing.T) {
+	ts, conn := newTestServer(t)
+
+	s1, b1 := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "epic-idem-m1",
+		"actor":      "same-actor",
+	})
+	if s1 != http.StatusCreated {
+		t.Fatalf("first register: status %d, body %+v", s1, b1)
+	}
+	firstID := b1["id"].(string)
+	if got := eventCount(t, conn, firstID); got != 1 {
+		t.Fatalf("after first register, event count = %d, want 1", got)
+	}
+
+	s2, b2 := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "epic-idem-m1",
+		"actor":      "same-actor",
+	})
+	if s2 != http.StatusCreated {
+		t.Fatalf("second register: status %d, body %+v", s2, b2)
+	}
+	if b2["id"] != firstID {
+		t.Errorf("idempotent register returned id %v, want first id %v", b2["id"], firstID)
+	}
+
+	var rowCount int
+	if err := conn.QueryRow(
+		`SELECT COUNT(*) FROM work_instances WHERE slug = ? AND actor = ?`,
+		"epic-idem-m1", "same-actor",
+	).Scan(&rowCount); err != nil {
+		t.Fatalf("count rows: %v", err)
+	}
+	if rowCount != 1 {
+		t.Errorf("work_instances for (slug, actor) = %d, want 1 (idempotent)", rowCount)
+	}
+	if got := eventCount(t, conn, firstID); got != 1 {
+		t.Errorf("event count after idempotent re-register = %d, want 1 (no new register event)", got)
+	}
+}
+
+// TestExactSlugSerialResume: once the prior work-instance for a
+// (slug, actor) pair is terminal, a fresh register for that pair is
+// permitted (serial reuse after pause/resume) and mints a new row.
+func TestExactSlugSerialResume(t *testing.T) {
+	ts, conn := newTestServer(t)
+
+	_, b1 := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "epic-resume-m1",
+		"actor":      "resume-actor",
+	})
+	firstID := b1["id"].(string)
+
+	// Drive the first work-instance to a terminal state.
+	st, _ := post(t, ts, "/work-instances/"+firstID+"/events", map[string]any{"state": "completed"})
+	if st != http.StatusCreated {
+		t.Fatalf("complete first WI: status %d", st)
+	}
+
+	s2, b2 := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "epic-resume-m1",
+		"actor":      "resume-actor",
+	})
+	if s2 != http.StatusCreated {
+		t.Fatalf("resume register: status %d, body %+v", s2, b2)
+	}
+	if b2["id"] == firstID {
+		t.Errorf("serial resume returned the terminal WI id %v; want a new work-instance", firstID)
+	}
+
+	var rowCount int
+	if err := conn.QueryRow(
+		`SELECT COUNT(*) FROM work_instances WHERE slug = ? AND actor = ?`,
+		"epic-resume-m1", "resume-actor",
+	).Scan(&rowCount); err != nil {
+		t.Fatalf("count rows: %v", err)
+	}
+	if rowCount != 2 {
+		t.Errorf("work_instances for (slug, actor) = %d, want 2 (serial resume)", rowCount)
+	}
+}
+
+// TestExactSlugMalformed: a malformed exact_slug is a 400 and
+// creates no row. The rejection surfaces as an explicit API error,
+// matching the existing register error shape.
+func TestExactSlugMalformed(t *testing.T) {
+	ts, conn := newTestServer(t)
+
+	cases := []string{
+		"Foo-Bar",        // uppercase
+		"foo_bar",        // underscore
+		"foo bar",        // space
+		"-leading",       // leading hyphen
+		"trailing-",      // trailing hyphen
+		"foo--double",    // double hyphen
+		"m1",          // bare position segment, no root word
+		"epic-m1-x9",  // trailing non-position segment after a position segment
+		"epic-m1-foo", // non-position word after a position segment
+	}
+	for _, slug := range cases {
+		t.Run(fmt.Sprintf("slug=%q", slug), func(t *testing.T) {
+			status, body := post(t, ts, "/work-instances", map[string]any{
+				"exact_slug": slug,
+				"actor":      "a",
+			})
+			if status != http.StatusBadRequest {
+				t.Errorf("status = %d, want 400 for exact_slug %q", status, slug)
+			}
+			if _, ok := body["error"].(string); !ok {
+				t.Errorf("malformed exact_slug %q: expected an error field, got %+v", slug, body)
+			}
+		})
+	}
+
+	var total int
+	if err := conn.QueryRow(`SELECT COUNT(*) FROM work_instances`).Scan(&total); err != nil {
+		t.Fatalf("count work_instances: %v", err)
+	}
+	if total != 0 {
+		t.Errorf("malformed exact_slug requests created %d rows, want 0", total)
+	}
+}
+
+// TestExactSlugBypassesRootConflict: exact-slug registers at a slug
+// that already has a root work-instance attach instead of 409. Bare
+// root-create still 409s (asserted by TestRegisterRootCollision).
+func TestExactSlugBypassesRootConflict(t *testing.T) {
+	ts, _ := newTestServer(t)
+
+	s1, _ := post(t, ts, "/work-instances", map[string]any{
+		"root_slug": "conflict-root",
+		"node_type": "epic",
+		"actor":     "a1",
+	})
+	if s1 != http.StatusCreated {
+		t.Fatalf("root create: status %d", s1)
+	}
+
+	s2, b2 := post(t, ts, "/work-instances", map[string]any{
+		"exact_slug": "conflict-root",
+		"actor":      "a2",
+	})
+	if s2 != http.StatusCreated {
+		t.Errorf("exact-slug at existing root: status = %d, want 201 (bypasses root-conflict); body = %+v", s2, b2)
+	}
+}
+
+// TestV01CallersUnaffected: a request with no exact_slug behaves
+// exactly as v0.1 — root-create returns 201 with the supplied slug.
+func TestV01CallersUnaffected(t *testing.T) {
+	ts, _ := newTestServer(t)
+
+	status, body := post(t, ts, "/work-instances", map[string]any{
+		"root_slug": "v01-root",
+		"node_type": "task",
+		"actor":     "legacy-agent",
+	})
+	if status != http.StatusCreated {
+		t.Fatalf("status = %d, want 201; body = %+v", status, body)
+	}
+	if body["slug"] != "v01-root" {
+		t.Errorf("slug = %v, want v01-root", body["slug"])
+	}
+}
+
 func TestEventLogPersists(t *testing.T) {
 	ts, conn := newTestServer(t)
 

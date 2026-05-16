@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t1
-Status: Proposed
+Status: Landed
 ---
 
 # Task — Multi-work-instance per slug
@@ -241,19 +241,40 @@ additions; no new source files.
   (create-or-attach) branch to
   `registerWorkInstance`/`insertRegister`; add the
   `(slug, actor, active)` idempotency check before WI insert.
+- `internal/slugs/slugs.go` — add `IsWellFormed`, a standalone
+  full-slug grammar validator (kebab-case root, optionally
+  followed by ordered `mN`/`tN`/`pN` segments). The exact-slug
+  flow's "well-formed under the existing slug grammar" contract
+  needs root-independent validation; `slugs.Parse` requires a
+  known root the exact-slug flow does not have, so a new pure
+  validator was added rather than reusing `Parse`. This is an
+  estimate deviation from the original "intentionally not
+  touched: `internal/slugs/slugs.go`" line (recorded in the
+  implementing PR's Estimate Deviations).
 - `internal/api/api_test.go` — exact-slug create, exact-slug
-  attach, idempotency, multi-actor, malformed-slug, and
-  v0.1-unaffected cases.
-- `internal/db/db_test.go` — relaxation against a database that
-  already has the unique index.
+  attach (multi-actor), idempotency (id + no-new-event
+  discriminator), serial resume, malformed-slug,
+  root-conflict-bypass, and v0.1-unaffected cases.
+- `internal/db/db_test.go` — relaxation on a fresh DB and
+  relaxation against a database that already has the legacy
+  unique index (drop-and-recreate path).
+- `internal/slugs/slugs_test.go` — `IsWellFormed` unit cases
+  (added alongside the new validator above; same estimate
+  deviation).
 
-**Intentionally not touched** (estimate; verified at scoping):
+**Intentionally not touched** (verified at scoping and at
+implementation):
 
 - `internal/site/site.go`, `internal/site/render.go` — read
-  path already multi-WI-safe.
-- `internal/slugs/slugs.go`, `internal/api/slugs.go` — max-based
-  allocation and EXISTS-based `rootExists` stay correct under
-  relaxation; `rootExists` is not split (Decision 5 in scoping).
+  path already multi-WI-safe (re-confirmed:
+  `loadActiveWorkInstances` filters by state and buckets per
+  slug in memory).
+- `internal/api/slugs.go` — EXISTS-based `rootExists` stays
+  correct under relaxation; `rootExists` is not split
+  (Decision 5 in scoping). `generateDescendantSlug`'s max-based
+  allocation in `internal/slugs/slugs.go` (`NextDescendant`) is
+  unchanged; only the additive `IsWellFormed` was added to that
+  file.
 
 ## Validation Gate
 

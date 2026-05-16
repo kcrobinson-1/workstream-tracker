@@ -52,6 +52,36 @@ func IsValidRoot(slug string) bool {
 	return rootPattern.MatchString(slug)
 }
 
+var wordPattern = regexp.MustCompile(`^[a-z0-9]+$`)
+
+// IsWellFormed reports whether slug is a grammatically valid
+// plan-doc slug standalone (without a known root): kebab-case root
+// text optionally followed by ordered "mN"/"tN"/"pN" position
+// segments. It does not verify the slug names a real plan-tree doc
+// — the server is repo-blind — only that it parses under the
+// grammar. Used by the create-or-attach exact-slug flow, which
+// honors a caller-supplied slug verbatim.
+func IsWellFormed(slug string) bool {
+	if slug == "" {
+		return false
+	}
+	parts := strings.Split(slug, "-")
+	i := 0
+	for i < len(parts) && wordPattern.MatchString(parts[i]) && !segmentPattern.MatchString(parts[i]) {
+		i++
+	}
+	if i == 0 {
+		// No valid root word before the first position segment.
+		return false
+	}
+	for ; i < len(parts); i++ {
+		if !segmentPattern.MatchString(parts[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 // ValidNodeType reports whether nodeType is a recognized API node
 // type.
 func ValidNodeType(nodeType string) bool {

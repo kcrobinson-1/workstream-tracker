@@ -26,6 +26,36 @@ func TestIsValidRoot(t *testing.T) {
 	}
 }
 
+func TestIsWellFormed(t *testing.T) {
+	cases := []struct {
+		slug string
+		want bool
+	}{
+		{"madrona-feedback", true},
+		{"single", true},
+		{"workstream-tracker-1-0-m1-t1", true},
+		{"epic-m1", true},
+		{"epic-m1-t2-p3", true},
+		{"", false},
+		{"Foo", false},
+		{"foo_bar", false},
+		{"foo bar", false},
+		{"-leading", false},
+		{"trailing-", false},
+		{"foo--double", false},
+		{"m1", false},             // bare position segment, no root word
+		{"epic-m1-x9", false},     // non-position segment after position segment
+		{"epic-m1-foo", false},    // non-position word after position segment
+		{"epic-m1-t2-foo", false}, // trailing non-position word
+	}
+
+	for _, c := range cases {
+		if got := IsWellFormed(c.slug); got != c.want {
+			t.Errorf("IsWellFormed(%q) = %v, want %v", c.slug, got, c.want)
+		}
+	}
+}
+
 func TestValidNodeType(t *testing.T) {
 	for _, nodeType := range []string{"epic", "milestone", "task", "phase"} {
 		if !ValidNodeType(nodeType) {

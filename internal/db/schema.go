@@ -36,7 +36,17 @@ CREATE TABLE IF NOT EXISTS work_instances (
     terminal_at     INTEGER
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS ux_work_instances_slug
+-- A slug carries N>=1 work-instances over its lifetime (serial
+-- resume after pause, concurrent co-working actors). The slug
+-- column is no longer unique. Drop the legacy unique index if it
+-- exists (a no-op on a fresh DB; relaxes the constraint on an
+-- existing dogfood DB where create-if-not-exists alone would not),
+-- then create a non-unique replacement so the registration paths
+-- that query by slug (descendant-allocation prefix scan,
+-- rootExists equality lookup) stay indexed.
+DROP INDEX IF EXISTS ux_work_instances_slug;
+
+CREATE INDEX IF NOT EXISTS idx_work_instances_slug
     ON work_instances(slug);
 `
 
