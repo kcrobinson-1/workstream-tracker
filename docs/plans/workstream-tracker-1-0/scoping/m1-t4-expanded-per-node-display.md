@@ -105,7 +105,7 @@ the plans must verify").
   page, not a hosted multi-user request rate. **Load-bearing
   for D4's "per-request is acceptable" call.**
 - **`spec/planning/shared.md` has an optional-field block t3
-  established.** `shared.md:135-154` documents
+  established.** `shared.md:140-153` documents
   `short_description` as "optional and additive." `related_prs`
   documents adjacent to it with the identical posture (D3),
   mirroring t3 scoping D2.
@@ -273,7 +273,7 @@ separate spec-only PR.
   over-building a normaliser with no consumer.
 - `Verified by:`
   [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
-  lines 135-154 (the optional-field block `short_description`
+  lines 140-153 (the optional-field block `short_description`
   established; `related_prs` documents adjacent with identical
   additive posture);
   [`m1-t3-descriptive-labels.md` scoping D2](m1-t3-descriptive-labels.md)
@@ -379,7 +379,7 @@ aids; the symbolic anchors are load-bearing):
   `map[string]interface{}`); re-verify only on a future
   `goldmark-meta`/`yaml` bump (the walker test is the durable
   guard).
-- `spec/planning/shared.md` lines ~135-154 — the optional
+- `spec/planning/shared.md` lines ~140-153 — the optional
   `short_description` block is still the adjacency point for
   the additive `related_prs` documentation (D3).
 - (P2, at P2 drafting) `grep -rn "os/exec"` is still empty and

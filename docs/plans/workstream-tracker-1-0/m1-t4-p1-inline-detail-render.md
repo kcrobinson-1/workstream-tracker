@@ -105,7 +105,7 @@ non-binding guidance under Execution Steps.
   field of absolute-URL strings that pre-existing docs and
   vendored consumers remain valid without. `Verified by:`
   [`spec/planning/shared.md` "Plan-doc identity (slug)"](../../../spec/planning/shared.md)
-  lines ~135-154 carry the `short_description` optional-field
+  lines ~140-153 carry the `short_description` optional-field
   block; `related_prs` documents adjacent with identical
   posture.
 
