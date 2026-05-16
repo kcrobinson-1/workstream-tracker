@@ -447,10 +447,10 @@ Plan- and scoping-doc PRs include the `## Review Stance` section.
 **What this means at each level.** The same Review Stance binds every level;
 what shifts is the load-bearing surface the stance protects. At
 epic level the stance keeps reviewers from prescribing
-per-milestone scope or per-phase technique that hasn't been planned
-yet. At milestone level the stance keeps reviewers from prescribing
-per-phase trajectory or per-PR contracts that belong to the
-per-phase plan. At plan level the stance keeps reviewers from
+per-milestone scope or per-task / per-phase technique that hasn't
+been planned yet. At milestone level the stance keeps reviewers
+from prescribing per-task trajectory or per-PR contracts that
+belong to the task plan. At plan level the stance keeps reviewers from
 prescribing per-file technique or implementation sequencing that
 belongs to the implementing PR.
 
@@ -475,9 +475,9 @@ name the rule once so self-review can walk every site against it.
 **What this means at each level.** At epic level, the invariants thread
 across milestones — a capability constraint multiple milestones
 must respect, or a posture decision that binds the whole arc. At
-milestone level, the invariants thread across phases — a contract
-every phase must preserve, or a coordination rule that binds the
-phase set. At plan level, the invariants thread across files
+milestone level, the invariants thread across tasks — a contract
+every task must preserve, or a coordination rule that binds the
+task set. At plan level, the invariants thread across files
 within the plan's implementing PR(s) — the original framing of
 this rule.
 
@@ -644,7 +644,7 @@ with line numbers all stay valid uses.
 capability framing and external constraints (vendor docs that
 define the capability surface, prior-art product decisions, the
 upstream policies the epic depends on). At milestone level,
-citations target cross-phase coordination decisions and the
+citations target cross-task coordination decisions and the
 upstream/downstream contracts the milestone locks. At plan level,
 citations target code, generated test output, or vendor docs for
 the specific contracts the plan binds — the original framing of
@@ -708,8 +708,8 @@ discriminating check.
 capability and constraint claims ("would shipping milestone 2
 alone surface this constraint?" "would the named upstream
 dependency remove this capability?"). At milestone level, the
-falsifier targets claims about cross-phase coupling and sequencing
-rationale ("can phase X actually consume what phase Y produces?").
+falsifier targets claims about cross-task coupling and sequencing
+rationale ("can task X actually consume what task Y produces?").
 At plan level, the falsifier targets validation procedures and
 per-contract claims as the rule body's examples illustrate — the
 original framing of this rule.
