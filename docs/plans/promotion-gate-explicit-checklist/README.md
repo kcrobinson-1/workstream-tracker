@@ -1,6 +1,6 @@
 ---
 slug: promotion-gate-explicit-checklist
-Status: Proposed
+Status: Landed
 ---
 
 # Promotion-Gate Explicit Checklist
@@ -282,9 +282,10 @@ splits, or shifts. Verified by:
 
 ## Related Docs
 
-- [`scoping/README.md`](scoping/README.md) — the transient
-  scoping deliberation (decisions D1–D5 with rejected
-  alternatives); deletes at this task's terminal PR.
+- The transient scoping deliberation (decisions D1–D5 with
+  rejected alternatives) was deleted at this task's terminal PR
+  per [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+  "Scoping owns / plan owns"; it survives in git history.
 - [`../spec-updates-contracts-and-gates/README.md`](../spec-updates-contracts-and-gates/README.md)
   — the prior spec task whose C4 built the parent-doc gate
   symmetric to the task/phase gate; this task preserves that

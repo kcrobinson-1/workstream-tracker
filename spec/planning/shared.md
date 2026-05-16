@@ -297,6 +297,22 @@ Before the flip:
   level" below).
 - **Re-confirm reality-check inputs** the parent doc rests on
   against current code; stale references are updated.
+- **Confirm the always-on authoring rules, explicitly.** As with
+  the task/phase gate in [`task-plan.md`](./task-plan.md), three
+  further obligations bind the parent doc continuously through
+  always-on rules and get their final explicit confirmation here,
+  mirroring how the `Verified by:` step applies an always-on rule
+  universally at the flip: (1) every required section is present
+  and any divergence is disclosed, per the "Required and optional
+  sections" rule in [`epic.md`](./epic.md) /
+  [`milestone.md`](./milestone.md) and "Section variance
+  disclosure" below; (2) no content has descended to
+  implementation prescription, per "Plans describe contracts, not
+  implementation" below; (3) the parent doc otherwise conforms to
+  the broader always-on spec — the cross-level rules indexed above
+  and the per-level rules in [`epic.md`](./epic.md) /
+  [`milestone.md`](./milestone.md). Naming them here makes the
+  gate self-contained — not a new gate-only requirement.
 
 Failures surface either as resolutions (apply edits before
 flipping) or as blockers the user triages before the flip. A
