@@ -101,9 +101,13 @@ contracts."
   bans-on-surface consequence).
 - **Interfaces.** Consumes t3's `PlanNode.LongDescription`
   (Landed). Introduces the optional `related_prs` frontmatter
-  field and a `parsedDoc`/`PlanNode` `RelatedPRs` carry that P2
-  reads and augments. Documents `related_prs` in
-  `spec/planning/shared.md` as optional/additive.
+  field — a sequence of **absolute-URL strings** — and a
+  `parsedDoc`/`PlanNode` `RelatedPRs` carry that P2 reads and
+  augments. The absolute-URL entry shape is the P1↔P2 contract:
+  P2's `gh`-discovered PRs are already absolute URLs, so both
+  phases share one shape and P1 carries no canonicalization.
+  Documents `related_prs` in `spec/planning/shared.md` as
+  optional/additive.
 - **Preserves.** Existing badge, label, slug tooltip,
   work-instance markers, child nesting, and the empty-state path
   are unchanged. A doc without `related_prs` or a body renders
@@ -138,9 +142,11 @@ rejected alternatives are in the scoping doc and not restated.
   the same inline `node`-template block P1 establishes. Resolves
   the milestone's deferred "Long-description rendering location
   (t4)."
-- **`related_prs` is one optional, additive frontmatter field;
-  its spec change ships in P1's PR (scoping D3).** P2 adds no
-  new field.
+- **`related_prs` is one optional, additive frontmatter field
+  of absolute-URL strings; its spec change ships in P1's PR
+  (scoping D3).** P2 adds no new field and inherits the
+  absolute-URL entry shape (no PR-syntax canonicalization in
+  either phase; `gh`'s `url` output is already this shape).
 - **Frontmatter PRs are authoritative; `gh` discovery is
   best-effort and additive (scoping D4).** The P1↔P2 boundary:
   P1 owns the frontmatter source and the render block; P2 owns

@@ -243,26 +243,34 @@ its own phase plan file.
 ### D3 — `related_prs` is a new optional frontmatter field; additive spec change ships in P1's PR
 
 `related_prs` is an **optional** frontmatter field: a YAML
-block sequence of PR references. A doc omitting it renders with
-no warning, error, or skip — identical absence-tolerance to
-`short_description`. The `spec/planning/shared.md` documentation
-of the field lands in the same implementing PR as P1's parser/
-render change, not as a separate spec-only PR.
+block sequence of **absolute-URL strings** identifying PRs. A
+doc omitting it renders with no warning, error, or skip —
+identical absence-tolerance to `short_description`. The
+`spec/planning/shared.md` documentation of the field lands in
+the same implementing PR as P1's parser/render change, not as a
+separate spec-only PR.
 
 - **Rejected: separate spec-only PR landing first.** Rejected
   for the same reason t3 rejected it (t3 scoping D2): it opens
   a window where the vendored spec documents a field no code
   reads, and the field plus its sole reader are one contract.
 - **PR-reference value shape — RESOLVED for P1.** Each entry is
-  a string. P1 accepts and renders entries verbatim as the
-  link/label; it does **not** parse, validate, or canonicalize
-  PR-reference syntax. Canonical-identity normalisation (needed
-  only to dedupe frontmatter entries against `gh`-discovered
-  ones) is **P2's** contract, resolved at P2 drafting after the
-  spike (D5) establishes the `gh --json` shape. P1 has no `gh`
-  source to dedupe against, so it needs no canonical key —
-  recording this split here prevents P1 from over-building a
-  normaliser with no consumer.
+  an absolute-URL string. P1 renders a well-formed absolute-URL
+  entry as a hyperlink (href and visible text both the URL) and
+  a non-URL entry as escaped plain text — never a broken
+  in-page anchor, error, or skip (P1 contract "Render
+  contract"). P1 does **not** accept `#NNN`/`owner/repo#NNN`
+  shorthand (P1 "Out Of Scope") and does **not** canonicalize
+  PR-reference syntax. The url-vs-text split is a render-safety
+  decision, not parsing: P1 derives no URL from shorthand.
+  Canonical-identity normalisation (needed only to dedupe
+  frontmatter entries against `gh`-discovered ones) is **P2's**
+  contract, resolved at P2 drafting after the spike (D5)
+  establishes the `gh --json` shape; `gh`'s `url` field is
+  already absolute, so both phases share one entry shape. P1
+  has no `gh` source to dedupe against, so it needs no
+  canonical key — recording this split here prevents P1 from
+  over-building a normaliser with no consumer.
 - `Verified by:`
   [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
   lines 135-154 (the optional-field block `short_description`

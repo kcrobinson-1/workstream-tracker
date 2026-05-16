@@ -88,13 +88,22 @@ non-binding guidance under Execution Steps.
   a doc omitting it renders with no warning, error, or skip —
   absence is a valid, common state. A present-but-empty list
   behaves identically to absence.
-- Each entry is rendered verbatim as the PR link text/target.
-  P1 does **not** parse, validate, or canonicalize PR-reference
-  syntax — canonical-identity normalisation is P2's contract
-  (scoping D3), and P1 has no second source to dedupe against.
+- Each entry is an **absolute-URL string** identifying a PR
+  (an `https://`/`http://` URL, e.g. a `…/pull/N` link). The
+  spec documents `related_prs` entries as absolute URLs. P1
+  does **not** accept or expand `#NNN` / `owner/repo#NNN`
+  shorthand and does **not** canonicalize PR-reference syntax:
+  shorthand support is out of scope (see Out Of Scope below),
+  and canonical-identity normalisation (needed only to dedupe
+  frontmatter entries against `gh`-discovered ones) is P2's
+  contract (scoping D3). P1 has no second source to dedupe
+  against, so it needs no canonical key. A `gh`-discovered PR
+  is already an absolute URL (P2's `gh … --json url`), so the
+  two phases share one entry shape and no P1 canonicalization
+  is implied.
 - The spec documents `related_prs` as an optional, additive
-  field pre-existing docs and vendored consumers remain valid
-  without. `Verified by:`
+  field of absolute-URL strings that pre-existing docs and
+  vendored consumers remain valid without. `Verified by:`
   [`spec/planning/shared.md` "Plan-doc identity (slug)"](../../../spec/planning/shared.md)
   lines ~135-154 carry the `short_description` optional-field
   block; `related_prs` documents adjacent with identical
@@ -149,6 +158,16 @@ non-binding guidance under Execution Steps.
   injection-safe without manual escaping; the existing block
   already conditionally emits `.WorkInstances` and `.Children`,
   establishing the conditional-emit pattern.
+- Each related-PR entry renders as a hyperlink whose href and
+  visible text are both the entry URL, in the `html/template`
+  auto-escaped attribute and text contexts. An entry that is
+  **not** a well-formed absolute URL renders as escaped plain
+  text with no anchor — never an error, skip, or broken
+  in-page (`#…`) link. This url-vs-text classification is a
+  render-safety decision (do not emit a broken/anchor href),
+  not PR-reference parsing: P1 derives no URL from shorthand,
+  it only declines to linkify a non-URL. The list order is the
+  frontmatter order, unchanged.
 - The long description renders as plain text (whitespace/newline
   preserved via CSS, not parsed as HTML/markdown) — it is doc
   body text, emitted in `html/template` auto-escaped text
@@ -253,18 +272,24 @@ The canonical Go toolchain is the gate (per
     non-string element is dropped without error.
   - tree: `PlanNode.RelatedPRs` is carried from the parsed
     doc and is empty (not panicking) when absent.
-  - render: HTML contains the long description and PR entries
-    when set; a node with neither emits an unchanged
-    badge/label line.
+  - render: an absolute-URL `related_prs` entry emits an
+    anchor whose href and text are that URL; a non-URL entry
+    (e.g. `#123`) emits escaped plain text with no anchor and
+    no `href="#123"`; the long description renders when set; a
+    node with neither emits an unchanged badge/label line.
 - Manual: render a sample plan tree and confirm (a) a node with
   a body shows the long description inline; (b) a node with
-  `related_prs` shows the PR list inline; (c) a node with
-  **neither** shows exactly the prior single badge/label/markers
-  line with nothing extra — observe the no-field consequence
-  (scoping D1 bans-on-surface), do not assume it; (d) a node
-  with a deliberately long multi-paragraph body renders the
-  full body inline (the accepted D1 consequence — look at the
-  page length, confirm acceptable for the current corpus).
+  absolute-URL `related_prs` shows a clickable PR list inline;
+  (c) a node with **neither** shows exactly the prior single
+  badge/label/markers line with nothing extra — observe the
+  no-field consequence (scoping D1 bans-on-surface), do not
+  assume it; (d) a node with a deliberately long multi-paragraph
+  body renders the full body inline (the accepted D1
+  consequence — look at the page length, confirm acceptable for
+  the current corpus); (e) a node with a non-URL `related_prs`
+  entry shows that entry as plain text, not a link and not a
+  broken in-page anchor — observe the non-URL fallback
+  consequence, do not assume it.
 
 ## Execution Steps
 
@@ -342,6 +367,24 @@ is P2's `gh` surface), error-surfacing-user-mutations (P1 is
 read-path, no user mutation), rename-aware-diff-classification
 (no rename — purely additive fields/CSS),
 trigger-map-currency (no directory restructure).
+
+## Out Of Scope
+
+Final boundary calls (deliberation prose is in the scoping
+doc):
+
+- **`#NNN` / `owner/repo#NNN` shorthand in `related_prs`.** P1
+  accepts absolute URLs only; shorthand entries render as plain
+  text (the non-URL fallback), not as expanded links. Expanding
+  shorthand requires repo-context resolution that is
+  PR-reference canonicalization — deferred with P2's
+  canonical-identity work (scoping D3), and a candidate
+  follow-up if real plan docs accumulate shorthand entries.
+- **Dedupe / canonical PR identity.** P1 has a single
+  (frontmatter) source; the canonical key and merge belong to
+  P2 (scoping D3).
+- **`gh` auto-discovery.** P2's surface, deliberately absent
+  from P1.
 
 ## Risk Register
 
