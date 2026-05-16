@@ -106,13 +106,19 @@ The "Parent-doc `` `In draft` → `Proposed` `` promotion gate"
 step list in [`shared.md`](../../../spec/planning/shared.md)
 gains the equivalent final step, in the same cite-by-name shape,
 same always-on framing, restating no rule body. Its
-required-sections reference resolves to the parent-doc per-level
-realization — "Required and optional sections" in
+required-sections reference is phrased generically ("the
+applicable per-level file") rather than enumerating the sibling
+parent-doc files inline: it still resolves to "Required and
+optional sections" in
 [`epic.md`](../../../spec/planning/epic.md) /
-[`milestone.md`](../../../spec/planning/milestone.md) — while the
-"Section variance disclosure" and "Plans describe contracts, not
-implementation" references and the broader-conformance catch-all
-are the same cross-level rules C1 cites. After the edit the two
+[`milestone.md`](../../../spec/planning/milestone.md), but inline
+sibling enumeration reads as a false cross-level coupling signal
+to a reader working only one level, so the symmetric
+`task-plan.md` back-reference is positioned as closing rationale,
+not a prerequisite cross-read. The "Section variance disclosure"
+and "Plans describe contracts, not implementation" references
+and the broader-conformance catch-all are the same cross-level
+rules C1 cites. After the edit the two
 gates carry equivalent self-containment steps (allowing only for
 the per-level realization difference), preserving the symmetry
 the prior spec task established. Verified by:
