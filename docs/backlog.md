@@ -22,7 +22,7 @@ applied to in-repo docs at write time.
 
 ### plan-doc-child-contracts
 
-**Status:** Open
+**Status:** Graduated — spec-updates-contracts-and-gates
 
 Parent-level plan-doc governance: missing child contracts and
 missing promotion gates.
