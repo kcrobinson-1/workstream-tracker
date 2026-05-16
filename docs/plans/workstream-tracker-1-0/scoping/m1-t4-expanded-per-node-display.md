@@ -52,24 +52,24 @@ the plans must verify").
   P1 contract.**
 - **`related_prs` reads via the same tolerant frontmatter
   pattern as `short_description`.** `parsePlanDoc`
-  (`internal/site/walker.go:115-128`) already does
-  `metaData["slug"].(string)` and
-  `metaData["short_description"].(string)` with `, _ :=`
-  absence-tolerance. A list-valued field surfaces from
+  (`internal/site/walker.go:115-128`) already applies a
+  tolerant comma-ok string assertion to the `slug` and
+  `short_description` frontmatter keys (absence yields the zero
+  value, no error). A list-valued field surfaces from
   goldmark-meta as `[]interface{}`, not `[]string`, so the
   read needs an element-wise string assertion — a shape
   difference from the scalar fields, called out so the P1
-  contract specifies it rather than assuming `.([]string)`
-  works. **Confirmed at P1 promotion (was a tagged
+  contract specifies it rather than assuming the value is a
+  `[]string`. **Confirmed at P1 promotion (was a tagged
   assumption):** `goldmark-meta v1.1.0`
-  (`$GOMODCACHE/.../goldmark-meta@v1.1.0/meta.go:18,140-141`)
-  imports `gopkg.in/yaml.v2 v2.3.0` and `yaml.Unmarshal`s
-  frontmatter into `map[string]interface{}`; under yaml.v2 a
-  YAML block sequence decoded into `interface{}` is
-  `[]interface{}` with scalar string elements typed `string`.
-  So `metaData["related_prs"]` is `[]interface{}`, a direct
-  `.([]string)` assertion fails, and the element-wise
-  `stringList` assertion is required — verified, not assumed.
+  (`goldmark-meta@v1.1.0/meta.go:18,140-141`) imports
+  `gopkg.in/yaml.v2 v2.3.0` and unmarshals frontmatter into a
+  `map[string]interface{}`; under yaml.v2 a YAML block sequence
+  decoded into `interface{}` is `[]interface{}` with scalar
+  string elements typed `string`. So the `related_prs` value is
+  `[]interface{}`, asserting it as a `[]string` directly fails,
+  and the element-wise `stringList` assertion is required —
+  verified, not assumed.
 - **The render path is a single static `html/template` with no
   JavaScript and no client state.** `render.go:14-64` is one
   `template.Must` with an inline `<style>` block and no
@@ -351,9 +351,10 @@ Re-confirm at plan-draft time (line numbers are navigation
 aids; the symbolic anchors are load-bearing):
 
 - `internal/site/walker.go` `parsePlanDoc` / `parsedDoc` —
-  still reads frontmatter via the tolerant
-  `metaData[k].(T)`-with-`, _ :=` pattern, and
-  `LongDescription` is still set from `markdownBody(source)`
+  still reads frontmatter via the tolerant comma-ok
+  string-assertion pattern (absence yields the zero value, no
+  error), and `LongDescription` is still set from
+  `markdownBody(source)`
   (P1's `related_prs` read grafts onto this exact shape; P1's
   long-description render depends on the carry being live).
 - `internal/site/tree.go` `buildTree` / `PlanNode` — still

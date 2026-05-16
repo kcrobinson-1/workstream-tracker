@@ -182,6 +182,19 @@ Rules ≥ 2 sites must agree on, threading the phases.
   `html/template`; [`design/v0.1-design.md`](../../../design/v0.1-design.md)
   §7.
 
+## Section variance
+
+Per [`shared.md`](../../../spec/planning/shared.md) "Section
+variance disclosure": as an N ≥ 2 orchestrating task plan this
+doc skips the task-plan-required inline *Contracts (full final
+shape)*, *Files to touch*, and a concrete *Validation Gate* —
+those genuinely don't apply at the orchestration layer and are
+delegated to the phase plans, with the N ≥ 2-required *Phase
+Contracts* section substituting for inline Contracts per
+[`task-plan.md`](../../../spec/planning/task-plan.md) "Required
+and optional sections." The PR introducing this doc repeats
+this disclosure in its body's Documentation section.
+
 ## Validation Gate
 
 Per-phase Validation Gates live in each phase plan (the gates

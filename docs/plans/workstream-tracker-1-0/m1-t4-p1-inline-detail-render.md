@@ -67,9 +67,10 @@ No truncation, no JavaScript, no panel, no expand/collapse
   per-file struct.
 - `PlanNode.RelatedPRs` `[]string` — new field on the render
   node, copied from the matching `parsedDoc`.
-- `stringList` — unexported walker helper turning a tolerant
-  `metaData["related_prs"]` (`[]interface{}` from goldmark-meta,
-  or absent) into `[]string`, dropping non-string elements.
+- `stringList` — unexported walker helper turning the tolerant
+  `related_prs` frontmatter value (a goldmark-meta sequence
+  decoded as `[]interface{}`, or absent) into `[]string`,
+  dropping non-string elements.
 
 ## Contracts
 
@@ -102,14 +103,16 @@ non-binding guidance under Execution Steps.
 ### Walker contract (`internal/site/walker.go`)
 
 - `parsedDoc` gains `RelatedPRs []string`. `parsePlanDoc` reads
-  `metaData["related_prs"]` through the same tolerant pattern as
-  the scalar fields: a missing key, a non-sequence value, or a
-  sequence with non-string elements never errors or skips the
-  doc — it yields an empty (or partial) `[]string`. `Verified
-  by:` [`parsePlanDoc` in walker.go](../../../internal/site/walker.go)
-  already applies tolerant reads
-  (`status, _ := metaData["Status"].(string)`); the list field
-  uses the same `, _ :=` posture element-wise via `stringList`.
+  the `related_prs` frontmatter key through the same tolerant
+  pattern as the scalar fields: a missing key, a non-sequence
+  value, or a sequence with non-string elements never errors or
+  skips the doc — it yields an empty (or partial) `[]string`.
+  `Verified by:`
+  [`parsePlanDoc` in walker.go](../../../internal/site/walker.go)
+  already applies a tolerant comma-ok string assertion when
+  reading `Status` from frontmatter (absence yields the zero
+  value, never an error); the list field carries the same
+  absence-tolerance element-wise via `stringList`.
 - A YAML block sequence decodes from goldmark-meta as
   `[]interface{}` whose elements are `string`. `Verified by:`
   `goldmark-meta v1.1.0` (pinned in
@@ -118,9 +121,9 @@ non-binding guidance under Execution Steps.
   (`goldmark-meta@v1.1.0/meta.go:18,140-141`); under yaml.v2 a
   block sequence into `interface{}` is `[]interface{}` of
   `string` — confirmed at this plan's promotion gate, recorded
-  in scoping reality-check. `stringList` type-asserts each
-  element and drops non-strings; a direct `.([]string)`
-  assertion would fail and is not used.
+  in scoping reality-check. `stringList` asserts each element
+  to a string and drops non-strings; asserting the value as a
+  `[]string` directly would fail, so that shortcut is not used.
 
 ### Tree contract (`internal/site/tree.go`)
 
@@ -275,11 +278,12 @@ breach.
 2. **Branch hygiene.** Implement on a dedicated branch off
    current main; no unrelated changes ride along.
 3. **Walker.** Add `parsedDoc.RelatedPRs`, the `stringList`
-   helper, and the tolerant `related_prs` read. Add walker
-   tests (populated / absent / non-string-element). Suggested
-   (non-binding): read `metaData["related_prs"]`, type-switch
-   to `[]interface{}`, range with per-element `string`
-   assertion.
+   helper, and the tolerant `related_prs` read per the Walker
+   contract (absence, a non-sequence value, or a sequence with
+   non-string elements each yield an empty or partial slice,
+   never an error). Add walker tests (populated / absent /
+   non-string-element). Parsing technique is the implementer's
+   choice within that contract.
 4. **Tree.** Add `PlanNode.RelatedPRs`; copy it in the
    `buildTree` loop next to `LongDescription`. Add the tree
    carry test.
