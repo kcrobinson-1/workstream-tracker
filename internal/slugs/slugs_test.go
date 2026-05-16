@@ -9,7 +9,7 @@ func TestIsValidRoot(t *testing.T) {
 	}{
 		{"madrona-feedback", true},
 		{"single", true},
-		{"m1", true},
+		{"workstream-tracker-1-0", true},
 		{"", false},
 		{"Foo", false},
 		{"foo_bar", false},
@@ -17,6 +17,11 @@ func TestIsValidRoot(t *testing.T) {
 		{"-leading", false},
 		{"trailing-", false},
 		{"foo--double", false},
+		{"m1", false},     // bare position segment is never a root
+		{"m1-foo", false}, // position segment token within the root
+		{"t1", false},
+		{"p9", false},
+		{"foo-m1", false}, // position segment token within the root
 	}
 
 	for _, c := range cases {
@@ -34,6 +39,10 @@ func TestIsWellFormed(t *testing.T) {
 		{"madrona-feedback", true},
 		{"single", true},
 		{"workstream-tracker-1-0-m1-t1", true},
+		{"root", true},
+		{"root-m1", true},
+		{"root-m1-t2", true},
+		{"root-m1-t2-p3", true},
 		{"epic-m1", true},
 		{"epic-m1-t2-p3", true},
 		{"", false},
@@ -43,10 +52,18 @@ func TestIsWellFormed(t *testing.T) {
 		{"-leading", false},
 		{"trailing-", false},
 		{"foo--double", false},
-		{"m1", false},             // bare position segment, no root word
-		{"epic-m1-x9", false},     // non-position segment after position segment
-		{"epic-m1-foo", false},    // non-position word after position segment
-		{"epic-m1-t2-foo", false}, // trailing non-position word
+		{"m1", false},               // bare position segment, no root word
+		{"m1-foo", false},           // root token is a position segment
+		{"epic-m1-x9", false},       // non-position segment after position segment
+		{"epic-m1-foo", false},      // non-position word after position segment
+		{"epic-m1-t2-foo", false},   // trailing non-position word
+		{"root-t1-m2", false},       // out-of-order: t before m
+		{"root-m1-m2", false},       // repeated m segment
+		{"root-m1-p1-t1", false},    // out-of-order: t after p
+		{"root-p1", false},          // p without preceding m/t (non-contiguous)
+		{"root-t1", false},          // t without preceding m (non-contiguous)
+		{"root-m1-p1", false},       // p without preceding t (non-contiguous)
+		{"root-m1-t2-p3-x9", false}, // trailing non-position segment
 	}
 
 	for _, c := range cases {

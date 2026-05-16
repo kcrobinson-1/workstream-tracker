@@ -111,7 +111,7 @@ func TestRegisterRootCollision(t *testing.T) {
 }
 
 func TestRegisterRootInvalidSlug(t *testing.T) {
-	ts, _ := newTestServer(t)
+	ts, conn := newTestServer(t)
 
 	cases := []string{
 		"",            // empty
@@ -121,6 +121,9 @@ func TestRegisterRootInvalidSlug(t *testing.T) {
 		"-leading",    // leading hyphen
 		"trailing-",   // trailing hyphen
 		"foo--double", // double hyphen
+		"m1",          // bare position segment is never a root
+		"m1-foo",      // position-segment token within the root
+		"foo-t1",      // position-segment token within the root
 	}
 	for _, slug := range cases {
 		t.Run(fmt.Sprintf("slug=%q", slug), func(t *testing.T) {
@@ -133,6 +136,14 @@ func TestRegisterRootInvalidSlug(t *testing.T) {
 				t.Errorf("status = %d, want 400 for slug %q", status, slug)
 			}
 		})
+	}
+
+	var total int
+	if err := conn.QueryRow(`SELECT COUNT(*) FROM work_instances`).Scan(&total); err != nil {
+		t.Fatalf("count work_instances: %v", err)
+	}
+	if total != 0 {
+		t.Errorf("invalid root_slug requests created %d rows, want 0", total)
 	}
 }
 
@@ -561,15 +572,20 @@ func TestExactSlugMalformed(t *testing.T) {
 	ts, conn := newTestServer(t)
 
 	cases := []string{
-		"Foo-Bar",        // uppercase
-		"foo_bar",        // underscore
-		"foo bar",        // space
-		"-leading",       // leading hyphen
-		"trailing-",      // trailing hyphen
-		"foo--double",    // double hyphen
-		"m1",          // bare position segment, no root word
-		"epic-m1-x9",  // trailing non-position segment after a position segment
-		"epic-m1-foo", // non-position word after a position segment
+		"Foo-Bar",       // uppercase
+		"foo_bar",       // underscore
+		"foo bar",       // space
+		"-leading",      // leading hyphen
+		"trailing-",     // trailing hyphen
+		"foo--double",   // double hyphen
+		"m1",            // bare position segment, no root word
+		"m1-foo",        // root token is a bare position segment
+		"epic-m1-x9",    // trailing non-position segment after a position segment
+		"epic-m1-foo",   // non-position word after a position segment
+		"root-t1-m2",    // out-of-order: t before m
+		"root-m1-m2",    // repeated milestone segment
+		"root-m1-p1-t1", // out-of-order: t after p
+		"root-p1",       // phase without preceding milestone/task
 	}
 	for _, slug := range cases {
 		t.Run(fmt.Sprintf("slug=%q", slug), func(t *testing.T) {
