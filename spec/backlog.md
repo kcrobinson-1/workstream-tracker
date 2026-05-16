@@ -52,6 +52,25 @@ The `Status:` line carries one of:
   the slug, mirroring the `Deferred — <reason>` pattern in
   [`planning/shared.md`](./planning/shared.md) "Plan-doc Status."
 
+**Graduated-plan link.** A graduated entry carries an optional
+bold-labeled `**Plan:**` line — a separate line in the entry
+body, not part of the `Status:` line — whose value is a
+repo-relative path or markdown link to the graduated plan doc
+(for example, a link to `docs/plans/<root>/README.md`). It is
+**additional to**, never a replacement for, the
+`Graduated — <plan-slug>` Status line: the slug on that line
+stays a bare exact-match token and is **not** wrapped in
+markdown-link syntax, because status-tracking matches it by
+exact string (see [`planning/shared.md`](./planning/shared.md)
+"Quote labels whose enforcement depends on exact-match
+matching"). The line uses ordinary relative-path or
+markdown-link syntax that exists today; it does not depend on
+any repo-rooted-link mechanism. The slug remains the queryable
+identity; the `**Plan:**` line is a navigational convenience for
+a human reader. This is the one enumerated member of the
+"Optional fields" affordance above; projects still own any
+further optional fields.
+
 When work is no longer relevant — cancelled outright, absorbed
 into another entry, or otherwise resolved without a plan-tree
 node ever being created — the entry is **deleted** in a PR that

@@ -9,21 +9,31 @@ covers what is unique to the epic level.
 Epics scope the *what* and *why* of a multi-milestone arc:
 capability targets, cross-cutting invariants, milestone
 sequencing rationale, milestone-level risks, and the open
-questions the epic resolves or opens. Epics should *not*
-prescribe per-milestone phase counts, per-phase content,
-per-phase PR counts, validation-gate specifics, documentation
-lists, or self-review audit sets. Those details belong to the
-milestone planning session for each milestone, against
-actually-merged code at milestone-start.
+questions the epic resolves or opens. Once the epic locks a
+milestone's scope it also states that milestone's **WHAT**
+contract — end result, sibling interfaces, what it preserves —
+in its `Milestone Contracts` section per
+[`shared.md`](./shared.md) "Parent-doc child contracts". That
+per-milestone WHAT is required, not barred. What an epic should
+*not* prescribe is the milestone's **HOW**: per-milestone task
+counts, per-task content, per-task PR counts, and anything below
+the task level (per-phase decomposition), plus validation-gate
+specifics, documentation lists, or self-review audit sets. A
+milestone's direct child is a task, not a phase (the level
+picker is epic → milestone → task → phase); barring only
+phase-level detail would wrongly leave task-level decomposition
+in-scope for the epic. Those HOW details belong to the milestone
+planning session for each milestone, against actually-merged
+code at milestone-start.
 
 When an epic does name per-milestone details (during initial
 epic drafting, before the milestone planning sessions have run),
 tag them explicitly as estimates pending milestone planning, not
 as binding specs. Sizing summaries in epics carry the same
-caveat: per-milestone phase and PR counts are early estimates,
+caveat: per-milestone task and PR counts are early estimates,
 not commitments.
 
-The milestone planning session re-derives the actual phase
+The milestone planning session re-derives the actual task
 shape and the milestone doc supersedes the epic's estimates.
 The milestone doc PR also reconciles the epic's prescriptive
 paragraphs — either rewriting them to match the milestone-doc
@@ -43,6 +53,10 @@ An epic doc carries the following sections.
 - Cross-Cutting Invariants
 - Out Of Scope
 - Milestone Structure
+- Milestone Contracts — required once the epic locks any
+  milestone's scope; per [`shared.md`](./shared.md) "Parent-doc
+  child contracts" (the per-milestone WHAT contract; milestone
+  HOW stays in each milestone doc)
 - Backlog Impact (per [`backlog.md`](../backlog.md))
 - Risk Register
 - Related Docs
@@ -70,9 +84,10 @@ or a required section genuinely doesn't apply — follows the
 
 An epic gets its own folder at `docs/plans/<epic-slug>/`, with
 the epic doc at `docs/plans/<epic-slug>/README.md` and
-per-milestone / per-phase docs as siblings inside the same
-folder (filename patterns named in [`milestone.md`](./milestone.md)
-and [`task-plan.md`](./task-plan.md)). The full layout convention is in
+per-milestone / per-task / per-phase docs as siblings inside the
+same folder (filename patterns named in
+[`milestone.md`](./milestone.md) and
+[`task-plan.md`](./task-plan.md)). The full layout convention is in
 [`planning-doc-location.md`](../planning-doc-location.md).
 
 Per-epic milestone numbering is canonical: each epic counts from

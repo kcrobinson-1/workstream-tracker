@@ -24,6 +24,8 @@ applied to in-repo docs at write time.
 
 **Status:** Graduated — spec-updates-contracts-and-gates
 
+**Plan:** [`docs/plans/spec-updates-contracts-and-gates/README.md`](plans/spec-updates-contracts-and-gates/README.md)
+
 Parent-level plan-doc governance: missing child contracts and
 missing promotion gates.
 

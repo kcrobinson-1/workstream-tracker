@@ -187,6 +187,11 @@ A task plan or phase plan carries the following sections.
 - Cross-Cutting Invariants — when ≥ 2 sites must agree on a
   rule (per [`shared.md`](./shared.md) "Cross-Cutting
   Invariants section")
+- Phase Contracts — required when the task plan is N ≥ 2
+  (the per-phase WHAT contract; phase HOW stays in each phase
+  plan), per [`shared.md`](./shared.md) "Parent-doc child
+  contracts". Absorbed inline; an N = 1 task plan has no phase
+  children and omits it.
 - Naming — when the plan introduces new identifiers
 - Execution Steps — when implementer ordering beyond Commit
   Boundaries is needed
@@ -434,6 +439,12 @@ ship what's clearly right or escalate. Planning time should be
 a fraction of implementation time, not a parallel effort.
 
 ### `In draft` → `Proposed` promotion gate
+
+This gate binds task and phase plans only. Epic and milestone
+docs have a symmetric `` `In draft` → `Proposed` `` gate that
+lives in [`shared.md`](./shared.md) "Parent-doc `In draft` →
+`Proposed` promotion gate" — it is placed there, not duplicated
+here, because epic and milestone docs do not load this file.
 
 Plan-drafting is not required to be a single pass. A multi-pass
 session can lay out the plan's structure with explicit

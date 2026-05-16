@@ -1,6 +1,6 @@
 ---
 slug: spec-updates-contracts-and-gates
-Status: Proposed
+Status: Landed
 ---
 
 # Spec Updates: Contracts and Gates
@@ -260,12 +260,25 @@ require a variance disclosure after this lands. Verified by:
   `plan-doc-child-contracts` entry: add the path line pointing
   at this plan doc (the dogfood close-out for C5).
 - [`../workstream-tracker-1-0/README.md`](../workstream-tracker-1-0/README.md)
-  — remove the now-unnecessary Milestone Contracts variance
-  disclosure; flip Status if the new parent-doc gate (C4) is
-  satisfied at PR time (judged then, not pre-committed here).
+  — Milestone Contracts variance disclosure removed (now cites
+  the codified `epic.md` + `shared.md` rule). Status left
+  `In draft`: the new C4 gate was judged **not** satisfied at
+  PR time — the epic's child set is not locked (m2/m3 are
+  proposed-not-locked, the final-integration slug is
+  unallocated, and Open Questions remain open), so the gate's
+  "child set locked + each child WHAT decision-complete"
+  precondition fails.
 - [`../workstream-tracker-1-0/m1-v0-2.md`](../workstream-tracker-1-0/m1-v0-2.md)
-  — remove the Task Contracts, Cross-Task, and Out-of-Scope
-  variance disclosures the spec now covers.
+  — Task Contracts variance disclosure removed (now cites the
+  codified `milestone.md` + `shared.md` rule); the Task Status /
+  Cross-Task section naming now matches `milestone.md` after C6,
+  so it is no longer a variance. **Deviation from estimate:**
+  the Out-of-Scope variance disclosure is **retained** — this
+  task's contracts (C1–C6) never added an `Out Of Scope` section
+  to the milestone doc-type, and adding one would be the
+  retroactive scope creep this plan's own Out of Scope forbids.
+  It stays a legitimate, separately-disclosed variance outside
+  this task's surface.
 
 **Not touched (estimate):**
 
