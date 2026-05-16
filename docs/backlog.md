@@ -24,33 +24,35 @@ applied to in-repo docs at write time.
 
 **Status:** Open
 
-Codify child contracts as a required section at every parent
-plan-tree level.
+Parent-level plan-doc governance: missing child contracts and
+missing promotion gates.
 
-The current spec has Cross-Phase Invariants and Cross-Phase
-Decisions (rules binding multiple children, contracts between
-children) at the milestone level, but no section for per-child
-**WHAT** contracts — what each child delivers, sibling
-interfaces, preserves. The "Anti-goal: do not scope any phase"
-rule in `milestone.md` addresses HOW-scoping but inadvertently
-bars WHAT-contracting, leaving locked-scope milestone docs
-with only child names and titles. The same gap repeats at the
-epic level (Milestone Structure carries only brief titles, no
-contracts) and the task-plan level (no Phase Contracts when
-N≥2). One option among several: add a cross-level rule to
-[`spec/planning/shared.md`](../spec/planning/shared.md)
-describing the WHAT/HOW split, with matching
-required-section additions in
-[`spec/planning/epic.md`](../spec/planning/epic.md)
-(Milestone Contracts),
-[`spec/planning/milestone.md`](../spec/planning/milestone.md)
-(Task Contracts), and
+Parent docs (epic, milestone) are underspecified versus
+task/phase plans on two fronts. (1) No per-child WHAT-contract
+section — what each child delivers, sibling interfaces,
+preserves; the "Anti-goal: do not scope any phase" rule bars
+HOW-scoping but inadvertently bars WHAT-contracting too,
+leaving locked-scope docs with only child names. (2) No
+`In draft` → `Proposed` promotion gate — the gate in
+`task-plan.md` binds task/phase plans only, so a PR that locks
+a milestone's or epic's scope has no rule telling it to flip
+Status; this is why `m1-v0-2.md` sat at `In draft` after its
+scope-locking PR merged. Both gaps repeat at epic level
+(Milestone Structure carries only titles; no gate) and
+task-plan level (no Phase Contracts when N≥2). One option
+among several: a cross-level rule in
+[`spec/planning/shared.md`](../spec/planning/shared.md) for
+the WHAT/HOW split plus a parent-doc promotion gate, with
+matching section/gate additions in
+[`spec/planning/epic.md`](../spec/planning/epic.md),
+[`spec/planning/milestone.md`](../spec/planning/milestone.md),
+and
 [`spec/planning/task-plan.md`](../spec/planning/task-plan.md)
-(Phase Contracts when N≥2). The "Anti-goal: do not scope"
-rules get refined to forbid HOW-scoping while requiring
+(Phase Contracts when N≥2), and the "Anti-goal: do not scope"
+rules refined to forbid HOW-scoping while requiring
 WHAT-contracting.
 
 Also surfaced: milestone.md's required sections use "Phase"
-naming for the unit below the milestone, but the slug grammar
-calls that unit a task; see also the naming-vs-grammar
-question separately if it merits its own entry.
+naming for the milestone's child, but the slug grammar calls
+that unit a task; fold into the same spec edit or split into
+its own entry when this graduates.
