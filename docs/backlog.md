@@ -56,3 +56,59 @@ Also surfaced: milestone.md's required sections use "Phase"
 naming for the milestone's child, but the slug grammar calls
 that unit a task; fold into the same spec edit or split into
 its own entry when this graduates.
+
+### stub-children-on-parent-promotion
+
+**Status:** Open
+
+Seed skeleton child docs when a parent doc passes its
+promotion gate.
+
+When a parent (epic/milestone) locks scope and promotes, its
+children exist only as names in a table; the child slugs have
+no doc until each is drafted just-in-time. Seeding skeleton
+child docs (slug + Status frontmatter) in the parent's
+promoting PR would make planned-but-unstarted nodes render in
+the tree earlier and give auto-registration a frontmatter slug
+to derive from before any drafting session. The opportunity
+intersects two unsettled areas and should be deliberated with
+them, not in isolation: the deferred "Triage zone in 1.0?"
+question (a stub doc is not a work-instance row — orphan/
+unattached WIs still need a home) and the spec rule that
+descendant slugs are *server-generated* (convention-assigned
+stub slugs could diverge from the server's allocation counter;
+the milestone Task Status tables already name `-tN` slugs by
+convention, hardening that latent inconsistency). One option
+among several: a parent-promotion-gate rule in
+[`spec/planning/`](../spec/planning/) that emits child
+skeletons with a reconciliation story for server slug
+allocation. Note: this does not remove the need for an
+exact-slug create-or-attach registration path
+(workstream-tracker-1-0-m1-t1) — stub-seeding depends on that
+path rather than replacing it.
+
+### promotion-gate-explicit-checklist
+
+**Status:** Open
+
+The `In draft` → `Proposed` promotion gate under-specifies
+its minimum checks.
+
+The gate in
+[`spec/planning/task-plan.md`](../spec/planning/task-plan.md)
+enumerates four steps (end-to-end coherence, Contracts
+decision-completeness, universal `Verified by:` walk,
+reality-check reconfirmation) but does not name three checks a
+promoting agent is expected to perform at minimum:
+required-sections presence, no-implementation-prescription, and
+conformance to the broader guiding specs. Those are enforced by
+separate always-on rules ("Required and optional sections",
+"Plans describe contracts, not implementation", "Section
+variance disclosure", etc.), so a gate run can pass its four
+named steps without explicitly covering them — the gap surfaced
+when running the gate on
+`workstream-tracker-1-0-m1-t1` required ad-hoc augmentation.
+One option among several: extend the gate's step list to
+reference those rules by name (a superset checklist), so the
+gate is self-contained rather than relying on the runner to
+remember the adjacent always-on rules.
