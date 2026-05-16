@@ -34,9 +34,12 @@ to recur twice and trigger four separate codification PRs.
 The surfaces this touches are entirely documentation: the
 cross-level planning rule file, the three per-level planning rule
 files (epic, milestone, task-plan), and the backlog format spec.
-No product code, no schema, no API. Full scoping deliberation,
-rejected alternatives, and the reality-check inputs live in
-[`scoping/README.md`](scoping/README.md).
+No product code, no schema, no API. The scoping deliberation
+(six decisions D1–D6 with rejected alternatives and reality-check
+inputs) was transient and was deleted at this task's terminal PR
+per [`task-plan.md`](../../../spec/planning/task-plan.md) "Scoping
+owns / plan owns"; it survives in git history. Everything durable
+from it is carried in this plan's Contracts and Out of Scope.
 
 ## Goal
 
@@ -374,8 +377,8 @@ re-evaluated against the new C4 gate at PR time.
   format (named in the originating scaffold as "prior art to
   consult, not match") is in an external project not vendored
   here. C5 is decided from in-repo constraints; matching an
-  unseen format is explicitly not attempted. Recorded as a known
-  gap in [`scoping/README.md`](scoping/README.md), not a blocker.
+  unseen format is explicitly not attempted. This is a known,
+  accepted gap, not a blocker.
 - **Repo-rooted link syntax.** The `repo-rooted-doc-links`
   backlog entry stays Open / post-1.0. C5's affordance uses
   today's relative-path syntax and does not pre-empt that
@@ -408,9 +411,6 @@ entry is deliberately untouched (see Out of Scope). Verified by:
 
 ## Related Docs
 
-- [`scoping/README.md`](scoping/README.md) — scoping
-  deliberation, rejected alternatives, reality-check inputs
-  (transient; deletes at this task's terminal PR).
 - [`../../backlog.md`](../../backlog.md) — origin
   `plan-doc-child-contracts` entry.
 - [`../workstream-tracker-1-0/README.md`](../workstream-tracker-1-0/README.md)
