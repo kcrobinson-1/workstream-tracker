@@ -3,6 +3,7 @@ package site
 import (
 	"html/template"
 	"io"
+	"net/url"
 	"strings"
 )
 
@@ -13,6 +14,7 @@ import (
 // design/v0.1-design.md Section 7).
 var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
 	"statusClass": statusClass,
+	"isURL":       isAbsoluteURL,
 }).Parse(`<!doctype html>
 <html lang="en">
 <head>
@@ -35,6 +37,9 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
     .actor-marker { display: inline-block; background: #fef9c3; color: #713f12; padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.75em; margin-left: 0.4rem; }
     .label { font-weight: 500; cursor: help; }
     .empty { color: #6b7280; font-style: italic; }
+    .long-desc { white-space: pre-wrap; margin: 0.25rem 0 0.25rem 0; color: #374151; font-size: 0.9em; }
+    .related-prs { margin: 0.25rem 0 0.25rem 0; padding-left: 1.25rem; font-size: 0.85em; }
+    .related-prs li { padding: 0.1rem 0; }
   </style>
 </head>
 <body>
@@ -54,6 +59,15 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
 {{define "node"}}
 <span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span><span class="label" title="{{.Slug}}">{{.Label}}</span>
 {{- range .WorkInstances }} <span class="actor-marker">{{.Actor}}</span>{{end}}
+{{- if .LongDescription}}
+<div class="long-desc">{{.LongDescription}}</div>
+{{- end}}
+{{- if .RelatedPRs}}
+<ul class="related-prs">
+  {{range .RelatedPRs}}<li>{{if isURL .}}<a href="{{.}}">{{.}}</a>{{else}}{{.}}{{end}}</li>
+  {{end}}
+</ul>
+{{- end}}
 {{- if .Children}}
 <ul>
   {{range .Children}}<li>{{template "node" .}}</li>
@@ -72,6 +86,25 @@ type indexData struct {
 // renderIndex writes the rendered index page to w.
 func renderIndex(w io.Writer, data indexData) error {
 	return indexTmpl.ExecuteTemplate(w, "index", data)
+}
+
+// isAbsoluteURL reports whether s is a well-formed absolute URL
+// (an http/https URL with a host), so the related-PR renderer can
+// decide whether to emit an anchor. A non-URL entry (e.g. a
+// `#123` shorthand) renders as escaped plain text instead — never
+// a broken in-page anchor, an error, or a skip. This is a
+// render-safety classification, not PR-reference parsing: P1
+// derives no URL from shorthand, it only declines to linkify a
+// non-URL.
+func isAbsoluteURL(s string) bool {
+	u, err := url.Parse(s)
+	if err != nil {
+		return false
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return false
+	}
+	return u.Host != ""
 }
 
 // statusClass converts a Status string to a CSS class fragment.
