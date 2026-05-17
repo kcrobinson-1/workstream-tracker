@@ -18,13 +18,15 @@ import (
 // parsedDoc carries the per-file outputs of the walker: the slug
 // (frontmatter authoritative, per spec/planning/shared.md
 // "Plan-doc identity (slug)"), the Status value if present, the
-// optional short/long descriptions, and the path the doc was found
-// at (for diagnostics).
+// optional short/long descriptions, the optional author-curated
+// related-PR list, and the path the doc was found at (for
+// diagnostics).
 type parsedDoc struct {
 	Slug             string
 	Status           string
 	ShortDescription string
 	LongDescription  string
+	RelatedPRs       []string
 	Path             string
 }
 
@@ -124,8 +126,32 @@ func parsePlanDoc(path string) (parsedDoc, error) {
 		Status:           status,
 		ShortDescription: shortDescription,
 		LongDescription:  markdownBody(source),
+		RelatedPRs:       stringList(metaData["related_prs"]),
 		Path:             path,
 	}, nil
+}
+
+// stringList tolerantly turns a frontmatter value into a []string.
+// The optional `related_prs` key decodes from goldmark-meta as a
+// []interface{} of string (a YAML block sequence under
+// gopkg.in/yaml.v2 v2.3.0, pinned via goldmark-meta v1.1.0). This
+// follows the same absence-tolerance posture as the scalar
+// frontmatter reads: a nil/absent value, a non-sequence value, or
+// a sequence carrying non-string elements never errors or skips
+// the doc — it yields an empty (or partial) slice, with
+// non-string elements dropped. The slice order is preserved.
+func stringList(v interface{}) []string {
+	seq, ok := v.([]interface{})
+	if !ok {
+		return nil
+	}
+	var out []string
+	for _, e := range seq {
+		if s, ok := e.(string); ok {
+			out = append(out, s)
+		}
+	}
+	return out
 }
 
 // markdownBody returns the document body — the content following

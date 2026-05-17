@@ -106,6 +106,34 @@ func TestBuildTreeLabel(t *testing.T) {
 	}
 }
 
+func TestBuildTreeCarriesRelatedPRs(t *testing.T) {
+	docs := []parsedDoc{
+		{Slug: "alpha", Status: "In progress"},
+		{Slug: "alpha-m1", Status: "Proposed", RelatedPRs: []string{
+			"https://github.com/o/r/pull/1",
+			"https://github.com/o/r/pull/2",
+		}},
+	}
+	roots := buildTree(docs, nil)
+
+	// A node without related_prs carries an empty (non-panicking)
+	// slice, not a populated one.
+	if len(roots[0].RelatedPRs) != 0 {
+		t.Errorf("alpha RelatedPRs = %v, want empty", roots[0].RelatedPRs)
+	}
+
+	m1 := roots[0].Children[0]
+	want := []string{"https://github.com/o/r/pull/1", "https://github.com/o/r/pull/2"}
+	if len(m1.RelatedPRs) != len(want) {
+		t.Fatalf("alpha-m1 RelatedPRs = %v, want %v", m1.RelatedPRs, want)
+	}
+	for i := range want {
+		if m1.RelatedPRs[i] != want[i] {
+			t.Errorf("RelatedPRs[%d] = %q, want %q", i, m1.RelatedPRs[i], want[i])
+		}
+	}
+}
+
 func TestStatusClass(t *testing.T) {
 	cases := []struct {
 		status, want string
