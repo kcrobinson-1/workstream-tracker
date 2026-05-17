@@ -91,6 +91,30 @@ exact-slug create-or-attach registration path
 (workstream-tracker-1-0-m1-t1) — stub-seeding depends on that
 path rather than replacing it.
 
+### stale-skeleton-on-parent-reopen
+
+**Status:** Open
+
+What happens to a still-pristine seeded child skeleton when its
+parent is re-opened, its child contracts revised, and it is
+re-promoted.
+
+The stub-children-on-parent-promotion rule binds only that
+re-seeding never clobbers a child already seeded, drafted, or
+advanced. It deliberately leaves undecided what to do about a
+child that is *still a pristine skeleton* whose parent contract
+changed during a `Deferred → In draft` re-opening: such a
+skeleton can carry a contract that lags the re-locked parent, so
+the child's later drafting starts from stale requirements. This
+surfaced in review of the implementing PR and was deferred rather
+than decided reactively under bot pressure. Options among
+several: leave the stale skeleton as an accepted observable
+residual; auto-refresh inherited-contract text and
+`short_description` (never the immutable `slug`); or require an
+explicit per-child reconciliation step at re-promotion. It
+intersects the broader `Deferred`-resumption semantics and
+should be deliberated with them, not in isolation.
+
 ### promotion-gate-explicit-checklist
 
 **Status:** Graduated — promotion-gate-explicit-checklist

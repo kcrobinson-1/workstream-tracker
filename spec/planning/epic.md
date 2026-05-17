@@ -56,7 +56,10 @@ An epic doc carries the following sections.
 - Milestone Contracts — required once the epic locks any
   milestone's scope; per [`shared.md`](./shared.md) "Parent-doc
   child contracts" (the per-milestone WHAT contract; milestone
-  HOW stays in each milestone doc)
+  HOW stays in each milestone doc), which also governs the
+  per-child table presentation and the parent-promotion skeleton
+  seeding driven from this section when the epic passes its
+  promotion gate
 - Backlog Impact (per [`backlog.md`](../backlog.md))
 - Risk Register
 - Related Docs

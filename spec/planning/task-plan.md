@@ -190,8 +190,11 @@ A task plan or phase plan carries the following sections.
 - Phase Contracts — required when the task plan is N ≥ 2
   (the per-phase WHAT contract; phase HOW stays in each phase
   plan), per [`shared.md`](./shared.md) "Parent-doc child
-  contracts". Absorbed inline; an N = 1 task plan has no phase
-  children and omits it.
+  contracts" — which also governs the per-child table
+  presentation and the parent-promotion skeleton seeding driven
+  from this section at the task/phase promotion gate above.
+  Absorbed inline; an N = 1 task plan has no phase children and
+  omits it.
 - Naming — when the plan introduces new identifiers
 - Execution Steps — when implementer ordering beyond Commit
   Boundaries is needed
@@ -501,6 +504,22 @@ natural moment for a comprehensive self-review pass:
   this file's own per-level rules. These are not new gate-only
   requirements — naming them here makes the gate self-contained
   so the runner need not recall them from outside it.
+- **Seed phase skeleton docs (N ≥ 2 only).** When the task plan
+  is N ≥ 2, the PR that flips it to `Proposed` also seeds a
+  skeleton doc for every phase the locked `Phase Contracts`
+  section names, per [`shared.md`](./shared.md) "Parent-doc
+  child contracts" ("Parent-promotion stub seeding") — which
+  governs what a skeleton carries, the slug-declaration
+  mechanism, the skeleton exemption, and the best-effort,
+  observable, no-clobber-on-re-run framing this step inherits
+  rather than restates. This is the symmetric twin of the
+  parent-doc gate's seeding step in [`shared.md`](./shared.md)
+  "Parent-doc `In draft` → `Proposed` promotion gate"; the only
+  divergence is the child-contracts section it draws from
+  (`Phase Contracts` here vs. `Milestone Contracts` /
+  `Task Contracts` there). An N = 1 task plan absorbs its phase
+  content inline, has no separate phase children, and seeds
+  nothing.
 
 Failures surface either as resolutions (apply edits before
 flipping) or as plan-blockers that the user must triage before

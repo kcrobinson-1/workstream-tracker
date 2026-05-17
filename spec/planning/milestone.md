@@ -119,7 +119,9 @@ A milestone doc carries the following sections.
 - Task Contracts — required once the milestone locks any task's
   scope; per [`shared.md`](./shared.md) "Parent-doc child
   contracts" (the per-task WHAT contract; task HOW stays in each
-  task plan)
+  task plan), which also governs the per-child table
+  presentation and the parent-promotion skeleton seeding driven
+  from this section when the milestone passes its promotion gate
 - Cross-Task Invariants
 - Cross-Task Decisions
 - Cross-Task Risks

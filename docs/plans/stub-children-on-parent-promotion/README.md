@@ -1,6 +1,6 @@
 ---
 slug: stub-children-on-parent-promotion
-Status: Proposed
+Status: Landed
 short_description: Seed skeleton child docs when a parent doc promotes
 ---
 
@@ -32,9 +32,9 @@ slug-generation rule the reconciliation loosens. No product
 code, schema, API, or lifecycle token changes (a slug+Status
 stub is an already-supported render case).
 
-The one load-bearing decision — D1 in
-[`scoping/README.md`](scoping/README.md), loosening the
-"descendant slugs are server-generated" rule — was ratified
+The one load-bearing decision — D1 (loosening the
+"descendant slugs are server-generated" rule), recorded in the
+now-deleted scoping deliberation (in git history) — was ratified
 2026-05-17 (input I1 resolved): a seeded slug is *declared* in
 frontmatter with no server-side creation, *asserted* by the
 child session at registration, and server-generation stays as
@@ -131,8 +131,11 @@ A1/A2/A4 attach to; Phase Contracts is N≥2-only);
 
 The "Descendant slugs are server-generated" rule is **loosened,
 not replaced**. A parent-promotion-seeded slug is **declared in
-the stub's frontmatter** — author-supplied, format-validated,
-exactly as a root slug is. The file-write is declaration only:
+the stub's frontmatter** — author-supplied rather than
+server-generated, validated against the full *descendant*
+slug-grammar (root + ordered `mN`/`tN`/`pN` segments), not
+root-slug validation (which forbids those very segments). The
+file-write is declaration only:
 it performs **no server-side creation** (no node, work-instance,
 or allocation call). The child session **asserts** the declared
 slug to the server when it registers, via the exact-slug
@@ -257,11 +260,25 @@ Verified by:
   Contracts entries (cite-by-name, no restatement; C4). The
   task-plan.md edit covers both its gate step and its Phase
   Contracts reference.
-- [`../../backlog.md`](../../backlog.md) — flip the entry
-  to `Graduated` with the `**Plan:**` line (Backlog Impact).
+- The plan's own README Status flips `Proposed → Landed` in
+  this terminal PR per the Plan-to-PR Completion Gate.
 
-**Not touched (estimate):**
+**Delete (standalone task-terminal):**
 
+- `docs/plans/stub-children-on-parent-promotion/scoping/` — the
+  transient scoping deliberation deletes in this implementing PR
+  (the task-terminal PR for a standalone task plan), per
+  [`task-plan.md`](../../../spec/planning/task-plan.md) "Scoping
+  owns / plan owns"; it survives in git history.
+
+**Not touched:**
+
+- [`../../backlog.md`](../../backlog.md) — the entry was flipped
+  to `Graduated` with the `**Plan:**` line in the planning PR
+  (#21) at graduation, not here; the Backlog Impact section
+  always located that flip in the planning change. The original
+  Files-to-touch estimate listed it as a modify here — see the
+  PR body's Estimate Deviations.
 - Product code, `internal/site/*`, schema, API, lifecycle
   tokens — a slug+Status stub is an already-supported render
   case (scoping D4); spec-prose-only.
@@ -363,20 +380,29 @@ entry. That entry's Status is set to
 `Graduated — stub-children-on-parent-promotion` with the
 optional `**Plan:**` line pointing at this doc, in the planning
 change that creates this plan — this standalone task's only
-tracking surface (no parent epic/milestone row). No other
+tracking surface (no parent epic/milestone row). No existing
 backlog entry graduates, deletes, splits, or shifts; the
 `deterministic-interactive-registration` and triage-zone
 concerns are *referenced* as deliberated intersections, not
-shifted. Verified by:
+shifted. One new entry,
+[`stale-skeleton-on-parent-reopen`](../../backlog.md#stale-skeleton-on-parent-reopen),
+was captured during this task's implementing-PR review (a
+capture, not one of the four effects): the re-seeding behavior
+for a still-pristine skeleton on a `Deferred → In draft`
+parent re-opening is a deliberately open question, deferred
+rather than decided reactively; the spec carries only the
+no-clobber rule. Verified by:
 [`../../backlog.md`](../../backlog.md);
 [`../../../spec/backlog.md:43-72`](../../../spec/backlog.md)
 (graduation + `**Plan:**` line lifecycle).
 
 ## Related Docs
 
-- [`scoping/README.md`](scoping/README.md) — decisions D1–D6,
-  rejected alternatives, and open input I1; transient, deletes
-  at this task's terminal PR.
+- The transient scoping deliberation (decisions D1–D7 with
+  rejected alternatives, and resolved input I1) was deleted in
+  this task's terminal PR per
+  [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+  "Scoping owns / plan owns"; it survives in git history.
 - [`../promotion-gate-explicit-checklist/README.md`](../promotion-gate-explicit-checklist/README.md)
   — the spec-prose-only gate-edit precedent this plan mirrors in
   shape and cite-by-name discipline.
@@ -387,6 +413,7 @@ shifted. Verified by:
   — the epic carrying the deferred "Triage zone in 1.0?" open
   question this task intersects but does not resolve.
 - [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md),
+  [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md),
   [`../../../spec/planning/epic.md`](../../../spec/planning/epic.md),
   [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md)
   — the files this task contracts.
