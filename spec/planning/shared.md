@@ -143,7 +143,29 @@ create-or-attach registration path applies. Root-slug validation
 is **not** applied to it: a root slug forbids the very
 `mN`/`tN`/`pN` position segments a descendant slug requires, so
 validating a pre-declared child slug as a root would reject every
-well-formed descendant. Writing the slug into a file is a
+well-formed descendant.
+
+A parent-promotion stub's pre-declared slug additionally must be
+**parent-scoped**: it is the promoting parent's own slug extended
+by exactly one further position segment of the child's level
+(`mN` for an epic's milestone child, `tN` for a milestone's task
+child, `pN` for a task plan's phase child) — not merely
+globally-well-formed under "Slug format." A globally-well-formed
+slug that names a different root, or the parent's own slug
+unextended, is an invalid seed: the promoting PR's diff is
+checkable against this (the seeded slug starts with the
+promoting parent's slug plus one level-appropriate segment), and
+a seed that fails it is a seeding defect to fix before the flip.
+This is an authoring-time constraint on what a correct seed
+writes; it is distinct from — and does not add — any server-side
+parent-context check at assertion time. The exact-slug
+create-or-attach path still trusts the caller's slug and can
+attach to a typoed or non-existent node; that runtime
+trust-the-caller property is the orphan/unattached-work-instance
+residual already accepted and deferred to the epic's triage-zone
+concern (it is not re-litigated or closed here).
+
+Writing the slug into a file is a
 *declaration of identity only*: it
 performs no server-side creation — no node, no work-instance, no
 allocation call, no consumption of the server's position counter. The
@@ -658,9 +680,12 @@ plan with N ≥ 2 phases), the same PR that flips the parent to
 child-contracts section names. A seeded skeleton carries:
 
 - **Frontmatter:** a `slug` pre-declared per "Slug generation"
-  above (author-supplied, format-validated; the file-write
-  declares identity and performs no server-side creation), a
-  `Status` of `In draft`, and a `short_description`.
+  above — the promoting parent's own slug extended by exactly one
+  level-appropriate position segment for this child
+  (parent-scoped, author-supplied, format-validated; the
+  file-write declares identity and performs no server-side
+  creation) — a `Status` of `In draft`, and a
+  `short_description`.
 - **Inherited contract:** the parent's WHAT block for that child
   and any illustrative examples the parent states for it, copied
   into the skeleton so the child's own drafting session starts
@@ -693,10 +718,23 @@ tree's visibility of an un-seeded child, not through tool
 enforcement. The contract is satisfied by specifying the prompted
 behavior and keeping a miss observable; it does not promise a miss
 cannot happen. On a gate re-run against a re-opened parent (a
-`Deferred → In draft` resumption per "Plan-doc Status" above), a
-child already seeded — or already drafted or advanced past
-skeleton — is left as-is; re-seeding never clobbers existing
-child content.
+`Deferred → In draft` resumption per "Plan-doc Status" above),
+re-seeding splits by what the child has become:
+
+- A child **still a pristine skeleton** (not yet drafted, no
+  content beyond the seeded frontmatter and inherited contract)
+  is **re-synced** to the re-locked parent contract: if the
+  parent's child-contract text, slug, or descriptions changed
+  during the re-opening, the skeleton's inherited-contract and
+  frontmatter content is refreshed to match, since the skeleton's
+  only purpose is to carry the *currently locked* contract
+  forward and a stale skeleton would start the child's drafting
+  from outdated requirements.
+- A child **already drafted or advanced past skeleton** is left
+  as-is; re-seeding never clobbers content a drafting session
+  has put there. A divergence between such a child and a changed
+  parent contract is reconciled by that child's own drafting,
+  not by re-seeding overwriting it.
 
 ## Section variance disclosure
 
