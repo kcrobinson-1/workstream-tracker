@@ -131,8 +131,11 @@ A1/A2/A4 attach to; Phase Contracts is N≥2-only);
 
 The "Descendant slugs are server-generated" rule is **loosened,
 not replaced**. A parent-promotion-seeded slug is **declared in
-the stub's frontmatter** — author-supplied, format-validated,
-exactly as a root slug is. The file-write is declaration only:
+the stub's frontmatter** — author-supplied rather than
+server-generated, validated against the full *descendant*
+slug-grammar (root + ordered `mN`/`tN`/`pN` segments), not
+root-slug validation (which forbids those very segments). The
+file-write is declaration only:
 it performs **no server-side creation** (no node, work-instance,
 or allocation call). The child session **asserts** the declared
 slug to the server when it registers, via the exact-slug

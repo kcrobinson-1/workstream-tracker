@@ -133,8 +133,18 @@ position number and returns the constructed slug.
 A descendant slug may instead be **pre-declared** in a plan-tree
 doc's frontmatter — the case a parent-promotion stub creates (see
 "Parent-doc child contracts" below). A pre-declared slug is
-author-supplied and format-validated exactly as a root slug is.
-Writing the slug into a file is a *declaration of identity only*: it
+**author-supplied** rather than server-generated (the same
+author-supplied/validated posture root slugs have, as opposed to
+server construction), but it is validated against the **full
+descendant slug-grammar** in "Slug format" above — the root slug
+followed by its ordered `mN`/`tN`/`pN` position segments — which
+is the same well-formed-descendant validation the exact-slug
+create-or-attach registration path applies. Root-slug validation
+is **not** applied to it: a root slug forbids the very
+`mN`/`tN`/`pN` position segments a descendant slug requires, so
+validating a pre-declared child slug as a root would reject every
+well-formed descendant. Writing the slug into a file is a
+*declaration of identity only*: it
 performs no server-side creation — no node, no work-instance, no
 allocation call, no consumption of the server's position counter. The
 slug becomes known to the server only when a session for that
