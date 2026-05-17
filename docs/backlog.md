@@ -116,3 +116,67 @@ One option among several: extend the gate's step list to
 reference those rules by name (a superset checklist), so the
 gate is self-contained rather than relying on the runner to
 remember the adjacent always-on rules.
+
+### deterministic-interactive-registration
+
+**Status:** Open
+
+Deterministic work-instance registration for interactive,
+natural-language sessions.
+
+m1-t2 ships interactive registration as an observable
+best-effort grounded narration handshake. It is *not*
+deterministic, and provably cannot be: resolving natural-language
+intent to a canonical slug requires agent cognition, which
+postdates session start, while a deterministic trigger must run
+before it (the "registration circularity"). Best-effort is
+acceptable while the producer is the sole consumer and can
+compensate for a missed marker — but that mitigation evaporates
+when an external project adopts the tool. **Tripwire: this must
+be revisited and resolved before the neighborly-events
+integration milestone**, where sole-consumer compensation no
+longer holds. The circularity is dissolved only by changing who
+the launcher is; the concrete future home where deterministic
+registration is achieved is
+[`tool-originated-task-sessions`](#tool-originated-task-sessions)
+(the tool itself launches the agent, so the slug is known by
+construction).
+
+This entry also tracks the **observability residual**: a missed
+registration is unobservable from the rendered tree by
+construction (an unregistered session emits no signal the tool
+ever sees, so the tree cannot distinguish unregistered work from
+no work). t2's only backstop is the in-session narration
+handshake, which works solely while a contributor is present to
+notice it — the same sole-consumer compensation the tripwire is
+about. A tree-side heuristic ("a node with an active/Proposed
+plan doc but no work-instance") is the candidate future
+affordance, deferred under the same tripwire. This entry tracks
+both the determinism gap and the observability gap until
+resolved.
+
+### tool-originated-task-sessions
+
+**Status:** Open
+
+The tool's own UX originates a planning/implementation session
+from a plan-tree node.
+
+Today the contributor opens an agent and states intent in
+natural language; the tool only ever *observes* work. An
+opportunity: a "plan this task" / "work this task" affordance on
+a plan-tree node in the tool's UX that spawns the agent
+session itself. Because the tool is the launcher and the click
+carries the node's identity, the spawned session's canonical
+slug is known *by construction* before any agent cognition —
+which dissolves the registration circularity and makes
+work-instance registration deterministic for free (no slug
+resolution, no narration handshake needed for these sessions).
+Beyond registration it closes a larger loop: the visualization
+stops merely observing work and starts originating
+correctly-attributed work. Well beyond v0.2 (the tool acting /
+spawning agents is far past the epic's scope). One option among
+several, opportunity-framed; this is the home where the
+determinism deferred by
+[`deterministic-interactive-registration`](#deterministic-interactive-registration)
+is eventually achieved.
