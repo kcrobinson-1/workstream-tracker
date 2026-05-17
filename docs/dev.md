@@ -73,6 +73,28 @@ No CI, no build matrix today. Single-maintainer repo.
 The SQLite file at `DB_PATH` is created on first run. Delete it
 to start from a clean state.
 
+## Registering a session
+
+Work-instance registration is automatic for an interactive
+natural-language session: the agent runs the registration
+subcommand as part of the session-start narration handshake (see
+[`../AGENTS.md`](../AGENTS.md) "Session-start work-instance
+registration"). The manual command invocation is the documented
+fallback when the handshake did not run or failed:
+
+```sh
+workstream-tracker register --slug <canonical-slug>
+```
+
+`--slug` (or `WST_SLUG`) is the canonical plan-doc slug; `--actor`
+(or `WST_ACTOR`) defaults to a generated per-session id;
+`--server` (or `WST_SERVER`) defaults to `http://localhost:8080`.
+The command makes one short, best-effort attempt: on any failure
+it prints an explicit line and exits success — it never blocks or
+fails the session. Re-running it for the same slug and actor
+collapses to the existing work-instance, so restart/resume is
+safe.
+
 ## Validation Commands
 
 The cadence and discipline behind validation live in
