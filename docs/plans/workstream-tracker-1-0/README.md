@@ -72,7 +72,7 @@ them.
 
 ## Milestone Structure
 
-One drafted milestone, two proposed middle milestones, and a
+One landed milestone, two proposed middle milestones, and a
 final integration milestone whose slug is allocated at
 registration time.
 
@@ -89,8 +89,8 @@ registration time.
 
 **Milestones:**
 
-- `workstream-tracker-1-0-m1` (drafted, scope locked at four
-  tasks). **v0.2 — Read-experience improvements.** Multi-work-
+- `workstream-tracker-1-0-m1` (Landed — all four tasks
+  complete). **v0.2 — Read-experience improvements.** Multi-work-
   instance support per slug, automatic agent registration,
   descriptive tree labels (with frontmatter `short_description`
   parsing as a phase), expanded per-node display. Full task
@@ -277,18 +277,26 @@ entries at that moment.
   realize it's introducing a breaking change is a real
   surface. Mitigation: spec-changing milestones carry an
   explicit "is this additive?" check in their planning.
-- **Agent auto-registration (m1, t2) harder than estimated.**
-  Reliable slug derivation from agent context involves design
-  calls that may resist m1's task budget. Mitigation: m1's
-  task list is locked but unsized; if t2 blows up, escalate
-  to its own milestone before m1 ships.
+- **Agent auto-registration (m1, t2) harder than estimated —
+  RESOLVED, no escalation.** The risk assumed fragile slug
+  derivation from agent context. t2 drafting reframed it via the
+  registration circularity: deterministic pre-session derivation
+  is impossible, so the agent resolves the slug mid-session and
+  registers via a grounded narration handshake (observable
+  best-effort, not deterministic). t2 landed within m1 without
+  escalating to its own milestone; the residual determinism gap
+  is tracked by the
+  [`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
+  backlog entry with a re-deliberation tripwire at the
+  neighborly-events integration milestone.
 
 ## Sizing Summary
 
 Per-milestone task counts. Estimates pending milestone
 planning sessions for m2, m3, and the final milestone.
 
-- **m1**: 4 tasks. Locked. See [`m1-v0-2.md`](m1-v0-2.md).
+- **m1**: 4 tasks. Landed (all four tasks complete). See
+  [`m1-v0-2.md`](m1-v0-2.md).
 - **m2**: 2-4 tasks estimated. Render-layer tier classification
   and sort, plus collapse/expand affordances.
 - **m3**: 3-5 tasks estimated. Schema and API for richer

@@ -38,23 +38,25 @@ surface is involved; this is a read-path task.
 This is an **N ≥ 2 task plan**: this doc is the orchestrating
 task plan; phase content lives in per-phase plan files. The
 deliberation, rejected alternatives, and reality-check inputs
-live in the sibling scoping doc
-([`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)),
-which this plan does not restate. This task plan's `Status` is
-`In progress`: its orchestration contracts (Phase Contracts,
+were retired in the m1 milestone-terminal close-out per the
+`spec/planning/milestone.md` batch-deletion convention and
+survive in git history; this plan does not restate them. This
+task plan's `Status` is
+`Landed`: its orchestration contracts (Phase Contracts,
 Cross-Phase Decisions, Cross-Cutting Invariants, sequencing)
 locked at drafting (promotion-gate self-review per
 [`task-plan.md`](../../../spec/planning/task-plan.md) run), it
 flipped `Proposed → In progress` when P1's implementing PR
-(#15) merged, and it reaches `Landed` with **P2's** (the last
-phase's) implementing PR. Both phase plans are now drafted: P1
+(#15) merged, and reached `Landed` with **P2's** (the last
+phase's) implementing PR (#19). Both phase plans are `Landed`:
+P1
 [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
-is `Landed`, P2
-[`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md) is
-`Proposed` (drafted just-in-time after P1 merged, per scoping
-D2/D5). Note: P2's PR is **t4's task-terminal** PR, **not** the
-m1-milestone-terminal PR — m1 has tasks beyond t4 (see
-"Terminal state" below).
+and P2
+[`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md) (P2
+drafted just-in-time after P1 merged, resolved at t4 drafting).
+P2's PR was **t4's task-terminal** PR, **not** the
+m1-milestone-terminal PR; m1 has since reached terminal and its
+batch close-out is this PR (see "Terminal state" below).
 
 ## Goal
 
@@ -70,8 +72,8 @@ additive and degrades gracefully when `gh` is unavailable.
 
 ## Phases
 
-t4 ships in two phases (scoping D2). Phase plans are separate
-files per
+t4 ships in two phases (resolved at t4 drafting). Phase plans
+are separate files per
 [`task-plan.md`](../../../spec/planning/task-plan.md) path
 conventions.
 
@@ -85,24 +87,29 @@ conventions.
 - **P2 — `gh pr list` auto-discovery.**
   [`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md)
   (Status `Proposed`; drafted just-in-time now that P1's PR has
-  merged, per scoping D2/D5 — spike run, promotion-gate
+  merged, resolved at t4 drafting — spike run, promotion-gate
   self-review complete). Adds the codebase's first
   subprocess shell-out: one `gh pr list` per request, PRs whose
   title contains a node's slug merged/deduped into P1's
   related-PR set, best-effort with graceful degradation. The
-  novel-mechanism spike (scoping D5) has been run — findings and
-  the resolved P2 decisions (P2-D1…P2-D4) are in the scoping
-  doc; the plan carries a Validation Gate that exercises the
+  novel-mechanism spike (resolved at t4 drafting) has been run
+  — findings and the resolved P2 decisions (P2-D1…P2-D4) were
+  retired with the rest of the t4 scoping deliberation in the
+  m1 milestone-terminal close-out and survive in git history;
+  the plan carries a Validation Gate that exercises the
   `gh`-unavailable failure matrix against real environments.
   P2 is t4's last phase: its implementing PR is t4's
   **task-terminal** PR (flips P2, this task plan, and the
-  `m1-v0-2.md` t4 row to `Landed`). It is **not** the
-  m1-terminal PR — m1 still has `…-m1-t2` undrafted, so the
-  sibling scoping-doc batch deletion and milestone
-  reconciliation defer to the later m1-terminal PR.
+  `m1-v0-2.md` t4 row to `Landed`). It was **not** the
+  m1-terminal PR — when P2 landed, m1 still had `…-m1-t2`
+  undrafted, so the scoping-doc batch deletion and milestone
+  reconciliation deferred to the later m1-terminal PR; that
+  deferred batch deletion and reconciliation has since been
+  performed in the m1 milestone-terminal close-out PR.
 
 P1 → P2 is a sequence: P2 augments P1's already-rendered PR
-surface and ships no artifact without it (scoping D2).
+surface and ships no artifact without it (resolved at t4
+drafting).
 
 ## Phase Contracts
 
@@ -118,8 +125,8 @@ contracts."
   its author-curated related PRs inline beneath the existing
   badge/label/markers line, as static HTML. A node with neither
   renders an unchanged single line. The full long description is
-  rendered (no truncation, no interaction — scoping D1's
-  bans-on-surface consequence).
+  rendered (no truncation, no interaction — the
+  bans-on-surface consequence resolved at t4 drafting).
 - **Interfaces.** Consumes t3's `PlanNode.LongDescription`
   (Landed). Introduces the optional `related_prs` frontmatter
   field — a sequence of **absolute-URL strings** — and a
@@ -142,8 +149,8 @@ contracts."
   any reason, the node still renders its frontmatter PRs (or
   none) and the page never fails.
 - **Interfaces.** Reads and extends P1's `RelatedPRs` carry.
-  Dedupes by plain absolute-URL string equality (D5 spike
-  resolved scoping D3's deferred half — both sources are
+  Dedupes by plain absolute-URL string equality (resolved by
+  the P2 spike at t4 drafting — both sources are
   absolute URLs, no canonicalization), frontmatter entries
   first. No new frontmatter or spec field.
 - **Preserves.** P1's frontmatter PRs stay authoritative and are
@@ -157,30 +164,32 @@ Decisions that thread both phases, owned here per
 [`task-plan.md`](../../../spec/planning/task-plan.md)
 "Cross-PR coordination" (the task plan coordinates phases; phase
 plans do not pre-lock cross-phase contracts). Deliberation and
-rejected alternatives are in the scoping doc and not restated.
+rejected alternatives were retired in the m1 milestone-terminal
+close-out and survive in git history; they are not restated.
 
-- **Surface shape is inline static HTML, no JavaScript (scoping
-  D1).** Binds both phases: P2's discovered PRs render through
-  the same inline `node`-template block P1 establishes. Resolves
-  the milestone's deferred "Long-description rendering location
-  (t4)."
+- **Surface shape is inline static HTML, no JavaScript
+  (resolved at t4 drafting).** Binds both phases: P2's
+  discovered PRs render through the same inline `node`-template
+  block P1 establishes. Resolves the milestone's deferred
+  "Long-description rendering location (t4)."
 - **`related_prs` is one optional, additive frontmatter field
   of absolute-URL strings; its spec change ships in P1's PR
-  (scoping D3).** P2 adds no new field and inherits the
-  absolute-URL entry shape (no PR-syntax canonicalization in
-  either phase; `gh`'s `url` output is already this shape).
+  (resolved at t4 drafting).** P2 adds no new field and
+  inherits the absolute-URL entry shape (no PR-syntax
+  canonicalization in either phase; `gh`'s `url` output is
+  already this shape).
 - **Frontmatter PRs are authoritative; `gh` discovery is
-  best-effort and additive (scoping D4).** The P1↔P2 boundary:
-  P1 owns the frontmatter source and the render block; P2 owns
-  the `gh` source and the merge/dedupe into P1's set. The
-  dedupe key is **plain absolute-URL string equality**
-  (resolved by the D5 spike — scoping P2-D3; both sources are
-  absolute URLs, no canonicalization), frontmatter entries
-  first.
+  best-effort and additive (resolved at t4 drafting).** The
+  P1↔P2 boundary: P1 owns the frontmatter source and the
+  render block; P2 owns the `gh` source and the merge/dedupe
+  into P1's set. The dedupe key is **plain absolute-URL string
+  equality** (resolved by the P2 spike at t4 drafting; both
+  sources are absolute URLs, no canonicalization), frontmatter
+  entries first.
 - **P2's subprocess is a novel mechanism requiring a
-  just-in-time spike at P2 drafting (scoping D5).** The spike
-  branch is `spike/m1-t4-gh-prlist`, never merged into the
-  implementation PR.
+  just-in-time spike at P2 drafting (resolved at t4
+  drafting).** The spike branch is `spike/m1-t4-gh-prlist`,
+  never merged into the implementation PR.
 
 ## Cross-Cutting Invariants
 
@@ -253,12 +262,14 @@ at `—` (undrafted), and t4 is the last task of the
 *read-experience track*, not of m1. Per
 [`task-plan.md`](../../../spec/planning/task-plan.md) path
 conventions, the `scoping/` subfolder's contents delete **in
-batch at the milestone-terminal PR** (sibling scoping docs
-`m1-t1-*`, `m1-t3-*`, `m1-t4-*` together), and any milestone
-Status / Backlog / Documentation-Currency reconciliation
-happens there. Those m1-terminal actions are explicitly
-**out of scope for P2's PR** and defer to whichever PR lands
-m1's last remaining task.
+batch at the milestone-terminal PR** (all of m1's per-task
+scoping docs together), and any milestone Status / Backlog /
+Documentation-Currency reconciliation happens there. Those
+m1-terminal actions were explicitly **out of scope for P2's
+PR** and deferred to whichever PR landed m1's last remaining
+task; that deferred batch deletion and reconciliation has
+since been performed in the m1 milestone-terminal close-out
+PR.
 
 ## Documentation currency
 
@@ -266,15 +277,16 @@ m1's last remaining task.
   Status t4 row mirrors this task plan's Status: set to
   `Proposed` (linked to this plan; the `—` legend means "not
   drafted," which no longer holds). Its deferred "Long-
-  description rendering location (t4)" decision is resolved to
-  scoping D1, and a "t4 phase structure (resolved at t4
-  drafting)" note is added (N ≥ 2 per scoping D2), mirroring the
-  existing t3 note. Subsequent row values track the task plan's
-  lifecycle (`Proposed → In progress → Landed`) and land with
+  description rendering location (t4)" decision is resolved at
+  t4 drafting, and a "t4 phase structure (resolved at t4
+  drafting)" note is added (N ≥ 2, resolved at t4 drafting),
+  mirroring the existing t3 note. Subsequent row values track
+  the task plan's lifecycle (`Proposed → In progress →
+  Landed`) and land with
   the PR that performs each flip.
 - `spec/planning/shared.md` — the additive `related_prs` field
-  doc lands in P1's implementing PR (scoping D3); owned by the
-  P1 phase plan's Documentation currency.
+  doc lands in P1's implementing PR (resolved at t4 drafting);
+  owned by the P1 phase plan's Documentation currency.
 - [`design/v0.1-design.md`](../../../design/v0.1-design.md) §7 —
   "What the Website Renders" currently says the node shows only
   badge + label + marker. P1's PR updates §7 to reflect inline
@@ -295,8 +307,6 @@ read-path surface.
 - [`m1-v0-2.md`](m1-v0-2.md) — parent milestone; t4 task
   contract and the deferred decision this task resolves.
 - [`README.md`](README.md) — parent epic.
-- [`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)
-  — sibling scoping doc (deliberation, transient).
 - [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
   — P1 phase plan.
 - [`m1-t3-descriptive-labels.md`](m1-t3-descriptive-labels.md)

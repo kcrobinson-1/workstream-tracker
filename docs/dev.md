@@ -95,6 +95,41 @@ fails the session. Re-running it for the same slug and actor
 collapses to the existing work-instance, so restart/resume is
 safe.
 
+### Maximizing reliable registration (interactive sessions)
+
+The handshake is best-effort: an agent can get pulled into the
+substance of a rich first prompt and skip registration. It never
+fails the session, so a missed registration is silent — the
+session just never appears in the tree. To make a miss unlikely
+and immediately visible, split session start into two turns:
+
+1. **Make the first prompt minimal and non-analytical.** Name
+   the target node in plain language and ask only for
+   registration plus a plan read — explicitly bounding the
+   output. Example:
+
+   ```text
+   Register this session for the Tree Rendering task in the
+   demo-workstream epic, then read its plan doc. Don't analyze,
+   plan, or raise issues yet — stop after the registration
+   receipt and a one-line summary of what the plan covers.
+   ```
+
+   Name the node, not the slug: resolving the canonical slug
+   from the plan doc's `slug:` frontmatter is the agent's job.
+2. **Verify the receipt before continuing.** Confirm the output
+   echoes a real work-instance id and HTTP status. A prose
+   "registered successfully" with no id/status is not
+   confirmation — it is the failure this check exists to catch
+   (see [`../AGENTS.md`](../AGENTS.md) "Session-start
+   work-instance registration").
+3. **Send the real instructions on turn 2,** once the receipt
+   is confirmed.
+
+This is an interactive-session technique only. Headless or
+scheduled sessions have no human between turns to gate on the
+receipt; for those the manual command above is the backstop.
+
 ## Validation Commands
 
 The cadence and discipline behind validation live in

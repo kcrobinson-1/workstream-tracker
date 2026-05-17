@@ -37,8 +37,10 @@ touches the SQLite schema and the registration handler; the
 website read path and slug-allocation logic are deliberately
 untouched (verified multi-WI-safe — see Files to touch). The
 deliberation, rejected alternatives, and reality-check pass
-behind these contracts live in the paired scoping doc,
-[`scoping/m1-t1-multi-wi-per-slug.md`](scoping/m1-t1-multi-wi-per-slug.md).
+behind these contracts were retired in the m1
+milestone-terminal close-out per the
+`spec/planning/milestone.md` batch-deletion convention; they
+survive in git history.
 
 This is an N=1 task plan: the work is one coherent outcome with
 no intermediate point that ships independent value, so phase
@@ -273,7 +275,7 @@ additions; no new source files.
   asserting segment-order enforcement and rejection of
   segment-pattern root tokens (review-driven).
 
-**Intentionally not touched** (verified at scoping and at
+**Intentionally not touched** (verified at t1 drafting and at
 implementation):
 
 - `internal/site/site.go`, `internal/site/render.go` — read
@@ -282,7 +284,7 @@ implementation):
   slug in memory).
 - `internal/api/slugs.go` — EXISTS-based `rootExists` stays
   correct under relaxation; `rootExists` is not split
-  (Decision 5 in scoping). `generateDescendantSlug`'s max-based
+  (resolved at t1 drafting). `generateDescendantSlug`'s max-based
   allocation in `internal/slugs/slugs.go` (`NextDescendant`) is
   unchanged; only the additive `IsWellFormed` was added to that
   file.
@@ -409,9 +411,6 @@ work-instances (see Risk Register) remain the epic's deferred
 
 - [`m1-v0-2.md`](m1-v0-2.md) — parent milestone; t1 contract
   and Cross-Task Invariants.
-- [`scoping/m1-t1-multi-wi-per-slug.md`](scoping/m1-t1-multi-wi-per-slug.md)
-  — paired scoping doc (decisions, rejected alternatives,
-  reality-check pass).
 - [`README.md`](README.md) — parent epic.
 - [`design/v0.1-design.md`](../../../design/v0.1-design.md) §4,
   §5 — API and data model t1 builds on.

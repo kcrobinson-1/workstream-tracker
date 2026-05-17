@@ -8,13 +8,14 @@ short_description: Automatic agent registration
 
 Task plan for the second task of
 [`m1`](m1-v0-2.md) under the
-[workstream-tracker-1-0 epic](README.md). Paired scoping doc:
-[`scoping/m1-t2-auto-registration.md`](scoping/m1-t2-auto-registration.md)
-(authoritative for the deliberation, rejected alternatives, and
-the reality-check inputs; this plan owns the durable contract,
-file inventory, validation surface, and risks). N = 1 — one
+[workstream-tracker-1-0 epic](README.md). The paired scoping
+deliberation (rejected alternatives, reality-check inputs) was
+retired in the m1 milestone-terminal close-out per the
+`spec/planning/milestone.md` batch-deletion convention and
+survives in git history; this plan owns the durable contract,
+file inventory, validation surface, and risks. N = 1 — one
 phase, content absorbed inline; no separate phase plan files,
-per the scoping doc's plan-structure handoff and
+per the plan-structure handoff resolved at t2 drafting and
 [`task-plan.md`](../../../spec/planning/task-plan.md) "N = 1 task
 plan: phase content absorbed inline."
 
@@ -42,9 +43,9 @@ constraint, not an implementation gap: a trigger that fires
 before the agent thinks has nothing to read except its launch
 environment, while turning a natural-language request ("plan
 that task") into a canonical slug is interpretation that happens
-*after* the session starts (the "registration circularity," in
-the scoping doc). For the way the sole contributor actually
-works — open an agent, state intent in natural language — the
+*after* the session starts (the "registration circularity").
+For the way the sole contributor actually works — open an
+agent, state intent in natural language — the
 honest mechanism is therefore an **observable best-effort
 grounded narration handshake**: the agent resolves the slug
 mid-session and registers as a loud, fact-grounded handshake
@@ -231,7 +232,7 @@ surface — each breaks silently if only one site honors it.
   (unobservable by construction, a cousin of the registration
   circularity). The tree-side "this node likely has unregistered
   work" affordance is therefore deferred (Out of Scope below;
-  scoping Decision 7) and tracked by the
+  resolved at t2 drafting) and tracked by the
   `deterministic-interactive-registration` backlog tripwire — it
   is the same residual.
 
@@ -312,8 +313,8 @@ ships, so editing them now would document an unbuilt system:
   read-only. Verified by: `AGENTS.md` ("The shared modules …
   are vendored output; do not edit them directly") — this
   corrects the milestone doc's stale "wire into
-  `docs/agents/shared/`" Documentation-Currency line (scoping
-  Decision 6).
+  `docs/agents/shared/`" Documentation-Currency line (resolved
+  at t2 drafting).
 - `docs/agents/local/` — the repo-owned rule-additions surface
   for the narration rule.
 - [`docs/dev.md`](../../dev.md) — note that registration is
@@ -347,7 +348,7 @@ hard prohibition.
   a committed tool artifact.
 - [`design/vision.md`](../../../design/vision.md) — an optional
   one-clause honesty clarification ("automatic only with a
-  launch-supplied slug") was floated in scoping as the
+  launch-supplied slug") was floated at t2 drafting as the
   maintainer's call, not assumed. This plan does not edit the
   vision and does not require the clarification.
 
@@ -427,7 +428,7 @@ plan PR):
 
 - [`AGENTS.md`](../../../AGENTS.md) — add the narration-handshake
   universal rule (in `AGENTS.md` + `docs/agents/local/`, not
-  vendored shared, per scoping Decision 6).
+  vendored shared, resolved at t2 drafting).
 - `docs/agents/local/` — the narration rule's repo-owned
   surface.
 - [`docs/dev.md`](../../dev.md) — registration is automatic via
@@ -481,7 +482,7 @@ not a contract change):
   estimated" (marked RESOLVED at t2 drafting; no escalation);
 - the Documentation-Currency line that pointed t2 at the
   vendored read-only `docs/agents/shared/` (corrected to
-  `AGENTS.md` + `docs/agents/local/` per scoping Decision 6).
+  `AGENTS.md` + `docs/agents/local/`, resolved at t2 drafting).
 
 (The `v0.1-schema` and `short_description` Cross-Task Risk
 bullets are also stale relative to t1/t3 having Landed, but
@@ -495,8 +496,8 @@ Residual risks after the contract above.
 - **Narration silent skip.** A loosely-followed narration
   instruction can still degrade to a missing handshake. This is
   the *irreducible* residual: the handshake itself **is** the
-  observability backstop (Cross-Cutting Invariants / scoping
-  Decision 7), so a skipped handshake has no in-tool backstop —
+  observability backstop (Cross-Cutting Invariants; resolved
+  at t2 drafting), so a skipped handshake has no in-tool backstop —
   the rendered tree cannot surface it (unobservable by
   construction). Mitigation is therefore not another in-tool
   mechanism but: the `validation-honesty` audit (catches
@@ -547,11 +548,12 @@ deleted.
 ## Out of Scope
 
 Boundary calls recorded as final answers for this task; the
-deliberation prose is in the scoping doc.
+deliberation prose was retired in the m1 milestone-terminal
+close-out and survives in git history.
 
 - **A deterministic launcher path / committed session-start
-  hook / marker-writing helper.** Cut entirely (scoping Decision
-  1c): no current consumer, and the circularity is only
+  hook / marker-writing helper.** Cut entirely (resolved at t2
+  drafting): no current consumer, and the circularity is only
   dissolved by the future `tool-originated-task-sessions`
   capability where determinism is free-by-construction.
   Concrete consequence of the absence: there is no way to
@@ -583,9 +585,6 @@ deliberation prose is in the scoping doc.
 
 ## Related Docs
 
-- [`scoping/m1-t2-auto-registration.md`](scoping/m1-t2-auto-registration.md)
-  — the paired scoping doc (deliberation, rejected
-  alternatives, reality-check inputs).
 - [`m1-v0-2.md`](m1-v0-2.md) — parent milestone (v0.2).
 - [`README.md`](README.md) — parent epic
   (`workstream-tracker-1-0`).
