@@ -18,11 +18,13 @@ surface that detail: the long description, and the pull requests
 related to the node.
 
 It is being done now because it is the terminal task of m1's
-read-experience track and the last task of the milestone: t3 laid
-the parsing foundation specifically so t4 could consume it, and
-the milestone's "expanded per-node display" is the last gap
-between v0.1's bare-bones render and v0.2's "scannable per node"
-goal. Related PRs come from two sources the milestone t4 contract
+read-experience track (t3 → t4): t3 laid the parsing foundation
+specifically so t4 could consume it, and t4's "expanded
+per-node display" is the last gap on that track between v0.1's
+bare-bones render and v0.2's "scannable per node" goal. t4 is
+**not** m1's last task overall — the foundation track's
+`…-m1-t2` (Automatic agent registration) is still undrafted, so
+m1 is not terminal when t4 completes (see "Terminal state"). Related PRs come from two sources the milestone t4 contract
 names: an optional `related_prs` frontmatter field, and
 auto-discovery via `gh pr list` keyed on the slug.
 
@@ -39,18 +41,20 @@ deliberation, rejected alternatives, and reality-check inputs
 live in the sibling scoping doc
 ([`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)),
 which this plan does not restate. This task plan's `Status` is
-`Proposed`: its orchestration contracts (Phase Contracts,
-Cross-Phase Decisions, Cross-Cutting Invariants, sequencing) are
-decision-complete and the `In draft → Proposed` promotion-gate
-self-review per
-[`task-plan.md`](../../../spec/planning/task-plan.md) has been
-run. P2's *phase plan* is drafted just-in-time after P1's
-implementing PR merges (scoping D2/D5) — that is a legitimate
-future doc under the just-in-time rule, **not** an unsettled
-decision in this task plan, so it does not hold the task plan at
-`In draft`. The task plan flips `Proposed → In progress` when
-P1's implementing PR merges and `→ Landed` with P2's (last)
-implementing PR (see "Terminal state" below).
+`In progress`: its orchestration contracts (Phase Contracts,
+Cross-Phase Decisions, Cross-Cutting Invariants, sequencing)
+locked at drafting (promotion-gate self-review per
+[`task-plan.md`](../../../spec/planning/task-plan.md) run), it
+flipped `Proposed → In progress` when P1's implementing PR
+(#15) merged, and it reaches `Landed` with **P2's** (the last
+phase's) implementing PR. Both phase plans are now drafted: P1
+[`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
+is `Landed`, P2
+[`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md) is
+`Proposed` (drafted just-in-time after P1 merged, per scoping
+D2/D5). Note: P2's PR is **t4's task-terminal** PR, **not** the
+m1-milestone-terminal PR — m1 has tasks beyond t4 (see
+"Terminal state" below).
 
 ## Goal
 
@@ -79,14 +83,23 @@ conventions.
   dependency. Independently shippable: the page surfaces
   descriptions and manually-listed PRs.
 - **P2 — `gh pr list` auto-discovery.**
-  `m1-t4-p2-gh-discovery.md` (not yet drafted — drafted
-  just-in-time after P1's PR merges, per scoping D2/D5). Adds
-  the codebase's first subprocess shell-out: `gh pr list` keyed
-  on the slug, merged/deduped into P1's related-PR set,
-  best-effort with graceful degradation. Carries a
-  novel-mechanism spike (scoping D5) and a Validation Gate that
-  exercises the `gh`-unavailable failure matrix against real
-  environments.
+  [`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md)
+  (Status `Proposed`; drafted just-in-time now that P1's PR has
+  merged, per scoping D2/D5 — spike run, promotion-gate
+  self-review complete). Adds the codebase's first
+  subprocess shell-out: one `gh pr list` per request, PRs whose
+  title contains a node's slug merged/deduped into P1's
+  related-PR set, best-effort with graceful degradation. The
+  novel-mechanism spike (scoping D5) has been run — findings and
+  the resolved P2 decisions (P2-D1…P2-D4) are in the scoping
+  doc; the plan carries a Validation Gate that exercises the
+  `gh`-unavailable failure matrix against real environments.
+  P2 is t4's last phase: its implementing PR is t4's
+  **task-terminal** PR (flips P2, this task plan, and the
+  `m1-v0-2.md` t4 row to `Landed`). It is **not** the
+  m1-terminal PR — m1 still has `…-m1-t2` undrafted, so the
+  sibling scoping-doc batch deletion and milestone
+  reconciliation defer to the later m1-terminal PR.
 
 P1 → P2 is a sequence: P2 augments P1's already-rendered PR
 surface and ships no artifact without it (scoping D2).
@@ -129,9 +142,10 @@ contracts."
   any reason, the node still renders its frontmatter PRs (or
   none) and the page never fails.
 - **Interfaces.** Reads and extends P1's `RelatedPRs` carry.
-  Establishes the canonical PR-identity dedupe key (scoping D3's
-  deferred half) once the D5 spike fixes the `gh --json` shape.
-  No new frontmatter or spec field.
+  Dedupes by plain absolute-URL string equality (D5 spike
+  resolved scoping D3's deferred half — both sources are
+  absolute URLs, no canonicalization), frontmatter entries
+  first. No new frontmatter or spec field.
 - **Preserves.** P1's frontmatter PRs stay authoritative and are
   always rendered. The render path stays walk-on-every-request
   with no caching, file-watch, or in-memory build-up introduced
@@ -158,10 +172,11 @@ rejected alternatives are in the scoping doc and not restated.
 - **Frontmatter PRs are authoritative; `gh` discovery is
   best-effort and additive (scoping D4).** The P1↔P2 boundary:
   P1 owns the frontmatter source and the render block; P2 owns
-  the `gh` source and the merge/dedupe into P1's set by a
-  canonical key. P2's canonical-key spelling is a P2-plan open
-  input (scoping D3 deferred half / D5 spike), recorded as P2's
-  named handoff rather than pre-locked here.
+  the `gh` source and the merge/dedupe into P1's set. The
+  dedupe key is **plain absolute-URL string equality**
+  (resolved by the D5 spike — scoping P2-D3; both sources are
+  absolute URLs, no canonicalization), frontmatter entries
+  first.
 - **P2's subprocess is a novel mechanism requiring a
   just-in-time spike at P2 drafting (scoping D5).** The spike
   branch is `spike/m1-t4-gh-prlist`, never merged into the
@@ -222,17 +237,28 @@ parent milestone t4 row is closed (see Terminal state).
 
 Per [`task-plan.md`](../../../spec/planning/task-plan.md) "Task
 plan terminal state when N ≥ 2": this task plan is `Proposed`
-once its orchestration contracts lock (done in the drafting
-PR). It flips `Proposed → In progress` when P1's implementing
-PR merges (P1's phase plan flips `Landed` in that same PR), and
+once its orchestration contracts lock (done at drafting). It
+flips `Proposed → In progress` when P1's implementing PR merges
+(P1's phase plan flips `Landed` in that same PR), and
 `In progress → Landed` with **P2's** implementing PR (the last
-phase). An undrafted P2 *phase plan* is a just-in-time future
-doc, not an unsettled input — it does not gate this task plan's
-`Proposed`. P2's implementing PR also performs the parent
-milestone [`m1-v0-2.md`](m1-v0-2.md) t4-row close-out, and since
-t4 is m1's last task the milestone is then itself terminal,
-which that m1-terminal PR additionally handles (sibling
-scoping-doc batch deletion, milestone Status).
+phase). P2's PR — the **t4 task-terminal** PR — performs only
+the t4 close-out: flip P2 `→ Landed`, this task plan
+`→ Landed`, and the [`m1-v0-2.md`](m1-v0-2.md) t4 **row**
+`→ Landed`.
+
+**P2's PR is NOT the m1-milestone-terminal PR.** m1 has tasks
+beyond t4 — its Task Status table still carries
+`workstream-tracker-1-0-m1-t2` (Automatic agent registration)
+at `—` (undrafted), and t4 is the last task of the
+*read-experience track*, not of m1. Per
+[`task-plan.md`](../../../spec/planning/task-plan.md) path
+conventions, the `scoping/` subfolder's contents delete **in
+batch at the milestone-terminal PR** (sibling scoping docs
+`m1-t1-*`, `m1-t3-*`, `m1-t4-*` together), and any milestone
+Status / Backlog / Documentation-Currency reconciliation
+happens there. Those m1-terminal actions are explicitly
+**out of scope for P2's PR** and defer to whichever PR lands
+m1's last remaining task.
 
 ## Documentation currency
 
