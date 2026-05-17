@@ -191,11 +191,6 @@ optional sections" and [`shared.md`](../../../spec/planning/shared.md)
 Calls deferred until m1-m3 are sized — the answers may shift
 once the surface area is clearer.
 
-- **Intent layer in 1.0?** The vision treats the intent strip
-  and authoring nudges as core. Without them, the
-  drift-prevention pillar is absent; with them, 1.0 grows by at
-  least one substantial milestone (backlog parsing, intent-doc
-  rendering, graduation flow). Open.
 - **Triage zone in 1.0?** Distinct from the intent layer — the
   triage zone is where uncategorized work-instances sit until
   attached to a plan-tree node. Could land in 1.0 even if the
@@ -236,6 +231,15 @@ once the surface area is clearer.
   through 1.0; generalization is a post-1.0 path that runs
   through a private beta phase. Per
   [vision §5](../../../design/vision.md).
+- **Intent layer (intent strip + authoring nudges).** Resolved
+  at the m1 retrospective as a deliberate deferral past 1.0:
+  there is no concrete pain point today — the "plan docs lose
+  their intent" problem the intent layer was meant to solve is
+  currently handled by capturing intent directly inside scope
+  docs during scoping. It stays core product vision and a
+  possible post-1.0 direction, not cancelled. This is a
+  roadmap/sequencing call, not backlog-sized work; recorded in
+  [vision §4](../../../design/vision.md).
 - **Anything not on the path to "neighborly-events can adopt
   this."** If a candidate area can be cut without blocking
   that adoption, it gets cut.
