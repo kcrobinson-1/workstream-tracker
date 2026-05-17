@@ -217,14 +217,18 @@ PR-body callout.*
   — the task plan: `In progress → Landed` (P2 is the last
   phase) in the implementing PR.
 - `docs/plans/workstream-tracker-1-0/m1-v0-2.md` — the parent
-  milestone t4 row → `Landed` (mirrors the task plan); plus the
-  **m1-terminal close-out** this PR additionally performs (see
-  Documentation currency).
+  milestone **t4 row only** → `Landed` (mirrors the task plan).
+  No milestone Status / Backlog / Documentation-Currency
+  reconciliation here — m1 is not terminal (see Documentation
+  currency).
 - `docs/plans/workstream-tracker-1-0/scoping/m1-t4-expanded-per-node-display.md`
-  — **deleted** in this PR (sibling scoping-doc batch deletion
-  at the milestone-terminal PR, per
-  [`task-plan.md`](../../../spec/planning/task-plan.md) "Scoping
-  owns / plan owns").
+  — **NOT deleted in this PR.** Per
+  [`task-plan.md`](../../../spec/planning/task-plan.md) path
+  conventions the `scoping/` contents delete in batch at the
+  **m1-terminal PR** (with sibling `m1-t1-*` / `m1-t3-*`
+  scoping docs); m1 still has `…-m1-t2` undrafted, so deletion
+  defers to that later PR. P2's PR leaves the scoping doc in
+  place.
 
 **Intentionally not touched** *(estimate — where we don't
 expect changes, not a hard prohibition)*:
@@ -299,23 +303,21 @@ callout), not a contract breach.
    manual checks observed in real environments (steps 3–5 of
    the matrix need a no-`gh` / non-repo / hung-`gh` setup —
    actually run them).
-9. **Terminal close-out (this is the milestone-terminal PR).**
-   Per
+9. **t4 task-terminal close-out (this is t4's task-terminal
+   PR, NOT the m1-milestone-terminal PR).** Per
    [`task-plan.md`](../../../spec/planning/task-plan.md)
    "Plan-to-PR Completion Gate" / "Task plan terminal state
-   when N ≥ 2" and
-   [`shared.md`](../../../spec/planning/shared.md) "Scoping
-   owns / plan owns": flip this plan `Proposed → Landed`; flip
-   the task plan `In progress → Landed`; flip the `m1-v0-2.md`
-   t4 row → `Landed`; **delete** the sibling scoping doc
-   `scoping/m1-t4-expanded-per-node-display.md` (it survives in
-   git history); neutralize any now-dangling links to the
-   deleted scoping doc in the durable task/phase plans;
-   reconcile `m1-v0-2.md` Backlog Impact / Documentation
-   Currency for milestone terminality. Since t4 is m1's last
-   task, also confirm whether the milestone doc's own Status
-   should advance — flag in the PR if so rather than silently
-   deciding.
+   when N ≥ 2": flip this plan `Proposed → Landed`; flip the
+   task plan `In progress → Landed`; flip the `m1-v0-2.md` t4
+   **row** → `Landed`. **Do NOT** delete the scoping doc and
+   **do NOT** touch milestone Status / Backlog / Documentation
+   Currency: m1 is not terminal — its Task Status table still
+   carries `…-m1-t2` at `—` (undrafted), and per
+   [`task-plan.md`](../../../spec/planning/task-plan.md) path
+   conventions the `scoping/` batch deletion + milestone
+   reconciliation happen at the **m1-terminal PR** (whichever
+   PR lands m1's last remaining task), not here. Leaving the
+   scoping doc in place is correct, not an omission.
 10. **PR preparation.** PR body carries `## Estimate
     Deviations` (or `N/A`) and reconciles estimate-shaped plan
     sections with what shipped.
@@ -350,13 +352,16 @@ run at step 7:
   in the no-`gh` / non-repo / hung-`gh` environments, not
   reasoned from source.
 - **readiness-gate-truthfulness** (Status / parent-doc /
-  terminal-close-out surface) — the four flips
-  (P2→Landed, task→Landed, t4 row→Landed, milestone
-  reconciliation) and the scoping-doc deletion happen only
-  after every Goal/Contract/Validation item is satisfied or
-  deferred *in a plan*; a "looks done" flip that skips the
-  scoping-doc deletion is the exact terminal-close-out drift
-  this audit guards.
+  terminal-close-out surface) — the **three** t4 task-terminal
+  flips (P2 → Landed, task plan → Landed, `m1-v0-2.md` t4 row →
+  Landed) happen only after every Goal/Contract/Validation item
+  is satisfied or deferred *in a plan*. The audit guards drift
+  in **both** directions here: skipping a required flip, **and**
+  performing m1-terminal actions early — deleting the scoping
+  doc or flipping milestone Status/Backlog/Doc-Currency at this
+  PR is wrong (m1 is not terminal; `…-m1-t2` is undrafted).
+  Leaving the scoping doc in place is the correct outcome, not
+  an omission to "fix."
 
 rename-aware-diff-classification and trigger-map-currency have
 no matching surface (no renames, no directory restructure).
@@ -377,6 +382,17 @@ Final boundary calls (deliberation in the scoping doc):
   block unchanged; richer PR presentation is later-milestone.
 - **Mandating PR-title or branch conventions** to improve
   discovery precision — not P2's remit (scoping P2-D2).
+- **m1-milestone-terminal close-out.** P2's PR is t4's
+  *task-terminal* PR, not m1's milestone-terminal PR (m1's Task
+  Status table still carries `…-m1-t2` at `—`, undrafted). The
+  sibling `scoping/` batch deletion (`m1-t1-*` / `m1-t3-*` /
+  `m1-t4-*` together) and milestone Status / Backlog /
+  Documentation-Currency reconciliation are out of scope for
+  P2's PR and defer to whichever PR lands m1's last remaining
+  task, per
+  [`task-plan.md`](../../../spec/planning/task-plan.md) path
+  conventions. Leaving the t4 scoping doc in place after P2 is
+  correct, not an omission.
 
 ## Risk Register
 
@@ -408,16 +424,20 @@ Final boundary calls (deliberation in the scoping doc):
   implementing PR.
 - `m1-t4-expanded-per-node-display.md` (task plan) flips
   `In progress → Landed` in this PR — P2 is the last phase.
-- `m1-v0-2.md` — t4 row → `Landed` (mirrors the task plan);
-  this PR is the **m1-terminal PR**, so it also performs the
-  sibling scoping-doc batch deletion and reconciles the
-  milestone doc's Backlog Impact / Documentation Currency, and
-  flags whether the milestone Status itself advances (t4 is
-  m1's last task).
-- `scoping/m1-t4-expanded-per-node-display.md` — **deleted**
-  in this PR (transient; survives in git history). Dangling
-  references from the durable task/phase plans are neutralized
-  in the same PR.
+- `m1-v0-2.md` — **t4 row only** → `Landed` (mirrors the task
+  plan). This PR is **not** the m1-terminal PR: m1's Task
+  Status table still carries `…-m1-t2` at `—` (undrafted), so
+  milestone Status / Backlog / Documentation-Currency
+  reconciliation is **not** performed here — it happens at the
+  later m1-terminal PR.
+- `scoping/m1-t4-expanded-per-node-display.md` — **NOT
+  deleted** in this PR. Per
+  [`task-plan.md`](../../../spec/planning/task-plan.md) path
+  conventions the `scoping/` contents delete in batch at the
+  **m1-terminal PR** (with sibling `m1-t1-*` / `m1-t3-*`
+  scoping docs); m1 is not terminal, so the doc stays in place
+  and its references remain live. No link neutralization is
+  needed in this PR.
 
 ## Backlog Impact
 
@@ -434,7 +454,8 @@ wanted post-1.0 it would be raised then.
   Invariants, sequencing inherited by reference).
 - [`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)
   — sibling scoping doc; D5 spike findings + P2-D1…P2-D4
-  (transient; deleted in this PR).
+  (transient; deleted at the later m1-terminal PR, not by
+  P2's PR).
 - [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
   — P1 (Landed, #15); supplies the `RelatedPRs` carry and the
   render block P2 augments.
