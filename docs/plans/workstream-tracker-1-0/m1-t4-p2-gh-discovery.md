@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t4-p2
-Status: In draft
+Status: Proposed
 short_description: gh pr list auto-discovery
 ---
 

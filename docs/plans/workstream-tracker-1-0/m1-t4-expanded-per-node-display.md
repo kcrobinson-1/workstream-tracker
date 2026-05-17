@@ -80,8 +80,9 @@ conventions.
   descriptions and manually-listed PRs.
 - **P2 — `gh pr list` auto-discovery.**
   [`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md)
-  (Status `In draft`; drafted just-in-time now that P1's PR has
-  merged, per scoping D2/D5). Adds the codebase's first
+  (Status `Proposed`; drafted just-in-time now that P1's PR has
+  merged, per scoping D2/D5 — spike run, promotion-gate
+  self-review complete). Adds the codebase's first
   subprocess shell-out: one `gh pr list` per request, PRs whose
   title contains a node's slug merged/deduped into P1's
   related-PR set, best-effort with graceful degradation. The
@@ -134,9 +135,10 @@ contracts."
   any reason, the node still renders its frontmatter PRs (or
   none) and the page never fails.
 - **Interfaces.** Reads and extends P1's `RelatedPRs` carry.
-  Establishes the canonical PR-identity dedupe key (scoping D3's
-  deferred half) once the D5 spike fixes the `gh --json` shape.
-  No new frontmatter or spec field.
+  Dedupes by plain absolute-URL string equality (D5 spike
+  resolved scoping D3's deferred half — both sources are
+  absolute URLs, no canonicalization), frontmatter entries
+  first. No new frontmatter or spec field.
 - **Preserves.** P1's frontmatter PRs stay authoritative and are
   always rendered. The render path stays walk-on-every-request
   with no caching, file-watch, or in-memory build-up introduced
