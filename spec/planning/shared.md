@@ -158,6 +158,30 @@ back to its slug suffix, with the full slug always reachable via the
 node's tooltip). Pre-existing docs and vendored spec consumers are
 unaffected by its absence.
 
+**Optional `related_prs` field.** A plan-tree doc may carry an
+optional `related_prs` list in frontmatter — a YAML block sequence
+of **absolute-URL strings**, each identifying a pull request
+related to the node (e.g. a `.../pull/N` link):
+
+```yaml
+---
+slug: <slug>
+Status: <status>
+related_prs:
+  - https://github.com/<owner>/<repo>/pull/<n>
+  - https://github.com/<owner>/<repo>/pull/<m>
+---
+```
+
+It renders the doc's plan-tree node with an inline, author-curated
+list of links to those PRs. Each entry is an absolute URL
+(`http://`/`https://`); `#NNN` / `owner/repo#NNN` shorthand is not
+expanded — a non-URL entry renders as plain text rather than a
+link. Like `short_description`, the field is **optional and
+additive**: a doc that omits it (or carries an empty list) remains
+valid and renders with no warning, error, or skip, and pre-existing
+docs and vendored spec consumers are unaffected by its absence.
+
 ## Plan-doc Status
 
 Every plan-tree doc carries a `Status` field in frontmatter, alongside

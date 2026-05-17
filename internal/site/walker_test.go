@@ -142,6 +142,84 @@ func TestParsePlanDocNoShortDescriptionNoBody(t *testing.T) {
 	}
 }
 
+func TestParsePlanDocRelatedPRsPopulated(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	content := "---\nslug: epic-a-m1-t4\nStatus: Proposed\nrelated_prs:\n  - https://github.com/o/r/pull/1\n  - https://github.com/o/r/pull/2\n---\n# body\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	want := []string{"https://github.com/o/r/pull/1", "https://github.com/o/r/pull/2"}
+	if len(doc.RelatedPRs) != len(want) {
+		t.Fatalf("RelatedPRs = %v, want %v", doc.RelatedPRs, want)
+	}
+	for i := range want {
+		if doc.RelatedPRs[i] != want[i] {
+			t.Errorf("RelatedPRs[%d] = %q, want %q", i, doc.RelatedPRs[i], want[i])
+		}
+	}
+}
+
+func TestParsePlanDocRelatedPRsAbsent(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	if err := os.WriteFile(path, []byte("---\nslug: epic-a\nStatus: Landed\n---\n# x\n"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	if len(doc.RelatedPRs) != 0 {
+		t.Errorf("RelatedPRs = %v, want empty", doc.RelatedPRs)
+	}
+}
+
+func TestParsePlanDocRelatedPRsDropsNonStringElement(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	// The middle entry is a YAML integer, not a string: it must be
+	// dropped without erroring or skipping the doc.
+	content := "---\nslug: epic-a-m1-t4\nrelated_prs:\n  - https://github.com/o/r/pull/1\n  - 42\n  - https://github.com/o/r/pull/3\n---\n# x\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	want := []string{"https://github.com/o/r/pull/1", "https://github.com/o/r/pull/3"}
+	if len(doc.RelatedPRs) != len(want) {
+		t.Fatalf("RelatedPRs = %v, want %v (non-string dropped)", doc.RelatedPRs, want)
+	}
+	for i := range want {
+		if doc.RelatedPRs[i] != want[i] {
+			t.Errorf("RelatedPRs[%d] = %q, want %q", i, doc.RelatedPRs[i], want[i])
+		}
+	}
+}
+
+func TestParsePlanDocRelatedPRsNonSequence(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	// A scalar value where a sequence is expected: tolerated as an
+	// empty list, no error.
+	if err := os.WriteFile(path, []byte("---\nslug: epic-a\nrelated_prs: not-a-list\n---\n# x\n"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	if len(doc.RelatedPRs) != 0 {
+		t.Errorf("RelatedPRs = %v, want empty for non-sequence value", doc.RelatedPRs)
+	}
+}
+
 func TestParsePlanDocMissingSlug(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "no-slug.md")

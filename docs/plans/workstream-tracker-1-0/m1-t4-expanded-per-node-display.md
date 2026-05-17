@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t4
-Status: Proposed
+Status: In progress
 short_description: Expanded per-node display
 ---
 

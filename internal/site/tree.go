@@ -19,6 +19,7 @@ type PlanNode struct {
 	Label            string // computed display string; see buildLabel
 	ShortDescription string
 	LongDescription  string
+	RelatedPRs       []string
 	Children         []*PlanNode
 	WorkInstances    []*ActiveWorkInstance
 }
@@ -126,6 +127,7 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 			Label:            buildLabel(d, root, parsed, err),
 			ShortDescription: d.ShortDescription,
 			LongDescription:  d.LongDescription,
+			RelatedPRs:       d.RelatedPRs,
 			WorkInstances:    active[d.Slug],
 		}
 	}
