@@ -1,6 +1,6 @@
 ---
 slug: stub-children-on-parent-promotion
-Status: In draft
+Status: Proposed
 short_description: Seed skeleton child docs when a parent doc promotes
 ---
 
