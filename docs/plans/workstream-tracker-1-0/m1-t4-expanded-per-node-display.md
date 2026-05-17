@@ -79,14 +79,19 @@ conventions.
   dependency. Independently shippable: the page surfaces
   descriptions and manually-listed PRs.
 - **P2 — `gh pr list` auto-discovery.**
-  `m1-t4-p2-gh-discovery.md` (not yet drafted — drafted
-  just-in-time after P1's PR merges, per scoping D2/D5). Adds
-  the codebase's first subprocess shell-out: `gh pr list` keyed
-  on the slug, merged/deduped into P1's related-PR set,
-  best-effort with graceful degradation. Carries a
-  novel-mechanism spike (scoping D5) and a Validation Gate that
-  exercises the `gh`-unavailable failure matrix against real
-  environments.
+  [`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md)
+  (Status `In draft`; drafted just-in-time now that P1's PR has
+  merged, per scoping D2/D5). Adds the codebase's first
+  subprocess shell-out: one `gh pr list` per request, PRs whose
+  title contains a node's slug merged/deduped into P1's
+  related-PR set, best-effort with graceful degradation. The
+  novel-mechanism spike (scoping D5) has been run — findings and
+  the resolved P2 decisions (P2-D1…P2-D4) are in the scoping
+  doc; the plan carries a Validation Gate that exercises the
+  `gh`-unavailable failure matrix against real environments.
+  P2 is the last phase: its implementing PR is the m1-terminal
+  PR (task plan → `Landed`, scoping-doc deletion, milestone
+  reconciliation).
 
 P1 → P2 is a sequence: P2 augments P1's already-rendered PR
 surface and ships no artifact without it (scoping D2).
@@ -158,10 +163,11 @@ rejected alternatives are in the scoping doc and not restated.
 - **Frontmatter PRs are authoritative; `gh` discovery is
   best-effort and additive (scoping D4).** The P1↔P2 boundary:
   P1 owns the frontmatter source and the render block; P2 owns
-  the `gh` source and the merge/dedupe into P1's set by a
-  canonical key. P2's canonical-key spelling is a P2-plan open
-  input (scoping D3 deferred half / D5 spike), recorded as P2's
-  named handoff rather than pre-locked here.
+  the `gh` source and the merge/dedupe into P1's set. The
+  dedupe key is **plain absolute-URL string equality**
+  (resolved by the D5 spike — scoping P2-D3; both sources are
+  absolute URLs, no canonicalization), frontmatter entries
+  first.
 - **P2's subprocess is a novel mechanism requiring a
   just-in-time spike at P2 drafting (scoping D5).** The spike
   branch is `spike/m1-t4-gh-prlist`, never merged into the

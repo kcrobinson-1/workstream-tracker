@@ -433,18 +433,105 @@ aids; the symbolic anchors are load-bearing):
   carry is **Landed**, not a pending input. The P1 plan
   proceeds through the `In draft → Proposed` promotion gate in
   this session.
-- **P2 — deferred to P2's just-in-time drafting**, each citing
-  a concrete surface per
-  [`task-plan.md`](../../../../spec/planning/task-plan.md)
-  "Just-in-time scoping and plan drafting":
+- **P2 — RESOLVED at P2 drafting** by the D5 spike (findings
+  below). The three carried inputs are closed:
   - `gh pr list` query/field semantics and `--json` shape —
-    resolved by the D5 spike at P2 drafting (cited surface:
-    this doc's D5; spike branch `spike/m1-t4-gh-prlist`).
+    RESOLVED (D5 Findings 1–4, P2 plan Contracts).
   - Canonical PR-identity dedupe key (D3 deferred half) —
-    resolved at P2 drafting once the spike fixes the `gh`
-    shape (cited surface: D3 + D5).
-  - Bounded `gh` timeout value (D4) — resolved at P2 drafting
-    (cited surface: D4).
-  These are P2-plan open inputs, not P1 blockers; the task plan
-  records them as P2's named handoff and they do not gate P1's
-  promotion.
+    RESOLVED: plain absolute-URL string equality (D5 Finding
+    4; P2 plan).
+  - Bounded `gh` timeout value (D4) — RESOLVED: 5s (D5
+    Findings; P2 plan Contracts rationale).
+
+## D5 spike — findings and resolved P2 decisions
+
+The D5 novel-mechanism spike was run on a throwaway branch
+`spike/m1-t4-gh-prlist` (CLI exploration only, no code, branch
+discarded — per
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "Spike
+before plan for novel mechanisms"). It exercised real `gh pr
+list` behaviour against this repo. Findings (load-bearing for
+the P2 plan; the P2 plan owns the durable contract and is not
+restated here):
+
+- **Finding 1 — `gh pr list --search "<slug>"` over-matches.**
+  GitHub full-text search tokenises on hyphens; searching the
+  t4 slug returned m1-t2, m1-t3, and epic PRs. A raw
+  `--search "<slug>"` is **not** a precise slug→PR mapping.
+- **Finding 2 — `--search 'in:title <slug>'` narrows sharply.**
+  Restricting to the title qualifier returned only the PR whose
+  title verbatim contains the slug, cutting body-tokenisation
+  noise.
+- **Finding 3 — heterogeneous PR-title conventions cause
+  inherent under-match (the dealbreaker-class finding).** Only
+  `docs(plans)`-style PRs embed the full slug in their title;
+  `feat(m1-t4-p1)`-style PRs use short conventional-commit
+  scopes. **No `gh` query keyed on the full slug can find the
+  short-scope PRs.** Slug→PR auto-discovery is fundamentally
+  lossy in this repo. This does **not** kill P2: scoping D4
+  already made frontmatter `related_prs` authoritative and `gh`
+  discovery best-effort/additive precisely so imprecise
+  discovery is acceptable. It shapes the P2 contract — P2 must
+  render this precision boundary as a known, accepted
+  consequence (bans-on-surface), not hide it.
+- **Finding 4 — `--json url` yields the absolute PR URL.** It
+  matches P1's `related_prs` absolute-URL entry shape exactly,
+  so a discovered PR maps to the same shape and dedupe is plain
+  absolute-URL string equality — **no PR-syntax
+  canonicalization** (confirms scoping D3 deferred half and
+  D4's "gh's url output is already absolute").
+- **Finding 5 — every failure mode exits detectably.** Non-repo
+  / no GitHub remote → `gh` non-zero with
+  "fatal: not a git repository"; `gh` missing → exec error;
+  not-auth / no-network → non-zero with stderr. All collapse to
+  one handling: log-and-skip, render frontmatter PRs only, page
+  never fails (scoping D4 graceful degradation is implementable
+  with standard `exec` exit-code/error checking).
+
+**Resolved P2 decisions (deliberation; P2 plan owns the durable
+contract):**
+
+- **P2-D1 — one unfiltered `gh pr list` per request, then
+  in-process exact-substring title match for every node.** The
+  page renders the whole forest, so a per-slug query would be N
+  subprocesses per request. Instead P2 runs **one**
+  `gh pr list --state all --json url,title,number -L <cap>` per
+  request and, in Go, attaches a PR to a node when the node's
+  verbatim slug is a case-sensitive substring of the PR title.
+  The spike's `in:title`/over-match findings (1, 2) are *why*
+  the match field is **title** and the match is done in-process
+  (exact substring, immune to GitHub's hyphen tokenisation) —
+  not delegated to `--search`. One subprocess per request keeps
+  the walk-on-every-request invariant (scoping D4) without
+  per-node fan-out. Rejected: per-node `--search 'in:title
+  <slug>'` (N subprocesses/request); raw `--search "<slug>"`
+  (Finding 1 over-match); `--head` branch-keying (branch names
+  use mixed prefixes, no reliable slug). The `-L <cap>` bound
+  means PRs beyond the cap are missed — acceptable under the
+  best-effort posture (scoping D4); the cap value is set in the
+  P2 plan.
+- **P2-D2 — accept the under-match precision boundary as a
+  rendered consequence.** Auto-discovery finds only PRs whose
+  title verbatim contains the slug; short-scope PRs are not
+  discovered. Frontmatter `related_prs` stays the complete /
+  authoritative source (scoping D4). P2's validation observes
+  the consequence (a short-scope PR is *not* auto-listed)
+  rather than asserting it. Rejected: mandating PR-title
+  conventions (cannot retro-fix history; not P2's remit) or
+  scanning commit messages/bodies (re-introduces Finding-1
+  tokenisation noise with no authoritative-source benefit).
+- **P2-D3 — dedupe key = absolute-URL string equality;
+  frontmatter wins.** Both sources are absolute URLs (Finding
+  4); a `gh` URL already present in frontmatter is dropped.
+  Order: frontmatter entries first (authoritative, scoping D4),
+  then gh-only discoveries, both in source order. No canonical
+  normalisation (scoping D3).
+- **P2-D4 — 5s bounded subprocess timeout.** Single local user,
+  per-request (scoping D4 / m1 walk-on-every-request invariant
+  forbids caching); 5s is generous for a normal local `gh`
+  round-trip yet bounds a hung `gh` so a page render cannot
+  wedge. On timeout: kill, log-and-skip, frontmatter-only.
+  Rejected: unbounded (a hung `gh` wedges every request);
+  sub-second (a cold `gh`/network call legitimately exceeds it,
+  turning normal latency into silent total loss of
+  discovery).
