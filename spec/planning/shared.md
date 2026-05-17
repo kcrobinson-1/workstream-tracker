@@ -724,12 +724,20 @@ re-seeding splits by what the child has become:
 - A child **still a pristine skeleton** (not yet drafted, no
   content beyond the seeded frontmatter and inherited contract)
   is **re-synced** to the re-locked parent contract: if the
-  parent's child-contract text, slug, or descriptions changed
-  during the re-opening, the skeleton's inherited-contract and
-  frontmatter content is refreshed to match, since the skeleton's
-  only purpose is to carry the *currently locked* contract
-  forward and a stale skeleton would start the child's drafting
-  from outdated requirements.
+  parent's child-contract text or descriptions changed during the
+  re-opening, the skeleton's inherited-contract text and its
+  `short_description` are refreshed to match, since the
+  skeleton's only purpose is to carry the *currently locked*
+  contract forward and a stale skeleton would start the child's
+  drafting from outdated requirements. Re-sync **never rewrites
+  the skeleton's `slug`**: the slug is immutable identity once
+  declared (per "Slug format" / "Slug is identity; path is
+  layout" above), and a work-instance, link, or reference may
+  already point at it — rewriting it would split identity and
+  strand prior attachments. A re-opening that genuinely needs a
+  different child *identity* is not a re-sync but a delete of the
+  old child plus a fresh seed of the new one, done deliberately,
+  not silently folded into re-seeding.
 - A child **already drafted or advanced past skeleton** is left
   as-is; re-seeding never clobbers content a drafting session
   has put there. A divergence between such a child and a changed
