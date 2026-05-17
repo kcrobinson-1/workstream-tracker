@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t4-p2
-Status: Proposed
+Status: Landed
 short_description: gh pr list auto-discovery
 ---
 
@@ -75,6 +75,16 @@ is introduced; the render path stays walk-on-every-request.
   node's slug, deduped against existing `RelatedPRs`.
 - `ghTimeout` — the bounded subprocess timeout constant
   (`5 * time.Second`, scoping P2-D4).
+- `ghWaitDelay` — the post-kill I/O-wait bound
+  (`1 * time.Second`, set as `Cmd.WaitDelay`). After the
+  `ghTimeout` deadline kills `gh`, `Output()` would still block
+  until the stdout pipe closes; a killed `gh` whose grandchild
+  (e.g. a wrapping shell's `sleep`) still holds that pipe would
+  wedge the request well past `ghTimeout`. `WaitDelay`
+  force-closes the inherited pipes so the worst case is
+  bounded at ~`ghTimeout + ghWaitDelay` (observed in the
+  hung-`gh` failure-matrix check; see Estimate-shaped contract
+  refinement note in the Subprocess contract).
 - `ghPRListLimit` — the `-L` result cap constant (`200`).
 
 ## Contracts
@@ -110,11 +120,23 @@ Execution Steps.
   `exec`/exit-code/JSON-unmarshal error checks cover all of
   them.
 - The timeout kills the subprocess (context cancellation
-  propagated by `exec.CommandContext`) so a hung `gh` cannot
-  wedge a request beyond `ghTimeout`. `Verified by:`
-  `exec.CommandContext` sends kill on context done; the
-  5-second bound is scoping P2-D4 (generous for a normal local
-  `gh` round-trip, bounded against a hang).
+  propagated by `exec.CommandContext`) **and** `Cmd.WaitDelay`
+  (`ghWaitDelay`) force-closes the inherited stdout/stderr pipes
+  after the kill, so a hung `gh` cannot wedge a request beyond
+  ~`ghTimeout + ghWaitDelay`. **Estimate-shaped contract
+  refinement (PR-body Estimate Deviation):** the drafted
+  contract attributed the whole bound to `exec.CommandContext`
+  alone; the hung-`gh` failure-matrix check observed that
+  `exec.CommandContext`'s kill does *not* unblock `Output()`
+  while a killed `gh`'s grandchild still holds the stdout pipe
+  (request wedged ~30s in the spike repro), so the implementation
+  adds `Cmd.WaitDelay` to actually satisfy the contract's
+  "cannot wedge beyond the timeout" intent — the durable
+  guarantee is unchanged, the mechanism is corrected to what the
+  observed behaviour requires. `Verified by:` the hung-`gh`
+  manual check (request returned in ~6s, not ~30s, no leaked
+  process); the 5-second deadline is scoping P2-D4 (generous for
+  a normal local `gh` round-trip, bounded against a hang).
 
 ### Match contract
 
@@ -198,8 +220,8 @@ PR-body callout.*
 **New:**
 
 - `internal/site/ghprs.go` — `ghPR`, `discoverPRsByTitle`,
-  `augmentRelatedPRs`, the `ghTimeout` / `ghPRListLimit`
-  constants.
+  `augmentRelatedPRs`, the `ghTimeout` / `ghWaitDelay` /
+  `ghPRListLimit` constants.
 - `internal/site/ghprs_test.go` — match/merge/dedupe unit
   tests with a stubbed PR set (table tests; no real `gh`); a
   test that the failure path yields no augmentation and no
