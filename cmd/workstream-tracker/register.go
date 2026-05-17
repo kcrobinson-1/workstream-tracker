@@ -81,14 +81,34 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 	return 0
 }
 
-// sessionActor returns a generated per-session actor id, stable
-// across repeat invocations within the same worktree (so a
+// sessionActorIdleWindow bounds how long a cached actor id is
+// reused. Repeat register calls within one working session are
+// temporally clustered (the handshake fires at session start;
+// resume/restart follows within the same sitting), so a sliding
+// idle window collapses them onto one actor while a genuinely
+// later session — separated by a gap longer than this — gets a
+// fresh actor. A purely worktree-keyed cache with no expiry would
+// weld every future session in the worktree to one actor forever:
+// because the server dedupes active registrations by
+// (slug, actor), a later session on a slug that still has a
+// lingering active row would silently collapse onto the stale
+// work-instance and emit no marker, defeating cross-agent
+// visibility. A harness that can supply a real per-session id
+// should set WST_ACTOR; this default is the best harness-agnostic
+// approximation, with the residual (two sessions within the same
+// idle window, same worktree, same slug collapsing) tracked by the
+// deterministic-interactive-registration backlog tripwire.
+const sessionActorIdleWindow = 6 * time.Hour
+
+// sessionActor returns a generated per-session actor id: stable
+// across a session's clustered repeat invocations (so a
 // restart/resume collapses via the server's (slug, actor, active)
-// idempotency) and distinct across parallel worktrees (so parallel
-// agents never collapse onto one marker). It is never the git
-// user. The id is cached in a temp file keyed by the absolute
-// working directory; the first invocation generates it, later ones
-// read it back.
+// idempotency), distinct for a later session (idle window expiry),
+// and distinct across parallel worktrees (so parallel agents never
+// collapse onto one marker). It is never the git user. The id is
+// cached in a temp file keyed by the absolute working directory;
+// each reuse slides the window forward so an active session keeps
+// its actor, and a stale cache regenerates.
 func sessionActor() (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -97,9 +117,15 @@ func sessionActor() (string, error) {
 	sum := sha256.Sum256([]byte(wd))
 	cachePath := filepath.Join(os.TempDir(), "wst-actor-"+hex.EncodeToString(sum[:8])+".id")
 
-	if existing, err := os.ReadFile(cachePath); err == nil {
-		if id := strings.TrimSpace(string(existing)); id != "" {
-			return id, nil
+	if info, err := os.Stat(cachePath); err == nil && time.Since(info.ModTime()) <= sessionActorIdleWindow {
+		if existing, err := os.ReadFile(cachePath); err == nil {
+			if id := strings.TrimSpace(string(existing)); id != "" {
+				// Slide the idle window so an active session that
+				// keeps calling register keeps its actor.
+				now := time.Now()
+				_ = os.Chtimes(cachePath, now, now)
+				return id, nil
+			}
 		}
 	}
 

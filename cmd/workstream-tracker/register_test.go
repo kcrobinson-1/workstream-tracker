@@ -3,11 +3,15 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -126,7 +130,19 @@ func TestRegisterCommandSlugFromEnv(t *testing.T) {
 	}
 }
 
+func sessionActorCachePath(t *testing.T) string {
+	t.Helper()
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	sum := sha256.Sum256([]byte(wd))
+	return filepath.Join(os.TempDir(), "wst-actor-"+hex.EncodeToString(sum[:8])+".id")
+}
+
 func TestSessionActorStableAndNamespaced(t *testing.T) {
+	t.Cleanup(func() { _ = os.Remove(sessionActorCachePath(t)) })
+
 	a, err := sessionActor()
 	if err != nil {
 		t.Fatalf("sessionActor: %v", err)
@@ -140,5 +156,43 @@ func TestSessionActorStableAndNamespaced(t *testing.T) {
 	}
 	if !strings.HasPrefix(a, "wst-") {
 		t.Fatalf("generated actor must be namespaced (never the git user): %q", a)
+	}
+}
+
+func TestSessionActorRotatesAfterIdleWindow(t *testing.T) {
+	cachePath := sessionActorCachePath(t)
+	t.Cleanup(func() { _ = os.Remove(cachePath) })
+
+	first, err := sessionActor()
+	if err != nil {
+		t.Fatalf("sessionActor: %v", err)
+	}
+
+	// Age the cache past the idle window: a genuinely later session
+	// must NOT collapse onto the prior session's actor.
+	stale := time.Now().Add(-sessionActorIdleWindow - time.Minute)
+	if err := os.Chtimes(cachePath, stale, stale); err != nil {
+		t.Fatalf("chtimes: %v", err)
+	}
+
+	second, err := sessionActor()
+	if err != nil {
+		t.Fatalf("sessionActor (post-expiry): %v", err)
+	}
+	if second == first {
+		t.Fatalf("actor must rotate after the idle window, got same id %q", second)
+	}
+	if !strings.HasPrefix(second, "wst-") {
+		t.Fatalf("rotated actor must still be namespaced: %q", second)
+	}
+
+	// A fresh cache (just written by the call above) is reused, and
+	// the reuse slides the window forward.
+	third, err := sessionActor()
+	if err != nil {
+		t.Fatalf("sessionActor (within window): %v", err)
+	}
+	if third != second {
+		t.Fatalf("actor must be stable within the idle window: %q vs %q", second, third)
 	}
 }
