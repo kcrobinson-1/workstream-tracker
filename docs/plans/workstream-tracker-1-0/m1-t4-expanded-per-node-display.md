@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t4
-Status: In draft
+Status: Proposed
 short_description: Expanded per-node display
 ---
 
@@ -39,10 +39,18 @@ deliberation, rejected alternatives, and reality-check inputs
 live in the sibling scoping doc
 ([`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)),
 which this plan does not restate. This task plan's `Status` is
-`In draft`: the P2 phase plan is drafted just-in-time after P1's
-implementing PR merges (scoping D2/D5), so the task structure has
-a still-pending child plan and the task plan does not flip to a
-terminal state until P2 lands (see "Terminal state" below).
+`Proposed`: its orchestration contracts (Phase Contracts,
+Cross-Phase Decisions, Cross-Cutting Invariants, sequencing) are
+decision-complete and the `In draft → Proposed` promotion-gate
+self-review per
+[`task-plan.md`](../../../spec/planning/task-plan.md) has been
+run. P2's *phase plan* is drafted just-in-time after P1's
+implementing PR merges (scoping D2/D5) — that is a legitimate
+future doc under the just-in-time rule, **not** an unsettled
+decision in this task plan, so it does not hold the task plan at
+`In draft`. The task plan flips `Proposed → In progress` when
+P1's implementing PR merges and `→ Landed` with P2's (last)
+implementing PR (see "Terminal state" below).
 
 ## Goal
 
@@ -213,28 +221,31 @@ parent milestone t4 row is closed (see Terminal state).
 ## Terminal state
 
 Per [`task-plan.md`](../../../spec/planning/task-plan.md) "Task
-plan terminal state when N ≥ 2": P1's phase plan flips `Landed`
-when P1's implementing PR merges. This task plan's own Status
-flips `In draft → … → Landed` with **P2's** implementing PR (the
-last phase) — the same PR also performs the parent milestone
-[`m1-v0-2.md`](m1-v0-2.md) t4-row close-out and the milestone is
-then itself terminal (t4 is m1's last task), which the m1-
-terminal PR additionally handles (sibling scoping-doc batch
-deletion, milestone Status). Until P2's plan is drafted the task
-plan stays `In draft` (a pending child plan is an unsettled
-structural input, per scoping D2).
+plan terminal state when N ≥ 2": this task plan is `Proposed`
+once its orchestration contracts lock (done in the drafting
+PR). It flips `Proposed → In progress` when P1's implementing
+PR merges (P1's phase plan flips `Landed` in that same PR), and
+`In progress → Landed` with **P2's** implementing PR (the last
+phase). An undrafted P2 *phase plan* is a just-in-time future
+doc, not an unsettled input — it does not gate this task plan's
+`Proposed`. P2's implementing PR also performs the parent
+milestone [`m1-v0-2.md`](m1-v0-2.md) t4-row close-out, and since
+t4 is m1's last task the milestone is then itself terminal,
+which that m1-terminal PR additionally handles (sibling
+scoping-doc batch deletion, milestone Status).
 
 ## Documentation currency
 
 - [`m1-v0-2.md`](m1-v0-2.md) — the parent milestone's Task
-  Status t4 row is set to `In draft` (linked to this plan) as
-  part of *this* drafting change (the `—` legend means "not
-  drafted," which no longer holds); its deferred "Long-
+  Status t4 row mirrors this task plan's Status: set to
+  `Proposed` (linked to this plan; the `—` legend means "not
+  drafted," which no longer holds). Its deferred "Long-
   description rendering location (t4)" decision is resolved to
   scoping D1, and a "t4 phase structure (resolved at t4
   drafting)" note is added (N ≥ 2 per scoping D2), mirroring the
-  existing t3 note. Subsequent row values track the lifecycle
-  and land with the PR that performs each flip.
+  existing t3 note. Subsequent row values track the task plan's
+  lifecycle (`Proposed → In progress → Landed`) and land with
+  the PR that performs each flip.
 - `spec/planning/shared.md` — the additive `related_prs` field
   doc lands in P1's implementing PR (scoping D3); owned by the
   P1 phase plan's Documentation currency.

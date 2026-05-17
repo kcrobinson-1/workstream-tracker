@@ -328,11 +328,14 @@ breach.
    including all four manual render observations (observe the
    no-field and long-body consequences, don't assume them).
 10. **PR preparation.** PR body carries the
-    `## Estimate Deviations` section (or `N/A`). Flip this phase
-    plan's Status `Proposed → Landed` and advance the parent
-    milestone t4 row in the same PR per the Plan-to-PR
-    Completion Gate. The **task plan** stays `In draft` (P2
-    pending) — do not flip it in this PR.
+    `## Estimate Deviations` section (or `N/A`). In this same
+    PR, per the Plan-to-PR Completion Gate: flip this phase
+    plan's Status `Proposed → Landed`; flip the **task plan**
+    [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+    `Proposed → In progress` (this is the first phase's
+    implementing PR — the task plan does **not** reach `Landed`
+    until P2, the last phase, merges); and advance the parent
+    milestone t4 row to mirror the task plan (`In progress`).
 
 ## Commit Boundaries
 
@@ -358,8 +361,10 @@ mapped to this PR's diff surfaces, run at step 8:
   — the P1 `Proposed → Landed` flip and the parent milestone
   t4-row advance happen only after every Goal, Contract, and
   Validation step is satisfied or explicitly deferred *in this
-  plan*; the task plan is **not** flipped (P2 pending), which a
-  too-eager "task looks done" flip would get wrong.
+  plan*. The task plan flips only `Proposed → In progress`
+  here, **not** `→ Landed` (P2 is the last phase); a too-eager
+  "task looks done" flip of the task plan to `Landed` at P1
+  would get this wrong.
 
 Other seeded audits have no matching surface in P1:
 effect-cleanup (P1 opens no effect/subscription/process — that
@@ -418,16 +423,17 @@ doc):
 - `docs/plans/workstream-tracker-1-0/m1-v0-2.md` — the parent
   milestone's t4 row, its resolved "Long-description rendering
   location (t4)" decision, and the "t4 phase structure" note
-  were updated as part of the *drafting* change (the `—` legend
-  meant "not drafted," which no longer held). This implementing
-  PR re-touches the file only to advance the t4 row to mirror
-  P1's landing.
+  were updated as part of the *drafting* change. This
+  implementing PR re-touches the file only to advance the t4
+  row to mirror the task plan's `In progress` Status.
 - This plan's `Status` is `Proposed` (promotion-gate
   self-review complete); it flips `Proposed → Landed` in this
   implementing PR per the Plan-to-PR Completion Gate. The
   parent task plan
   [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
-  stays `In draft` (P2 pending) and is **not** flipped here.
+  is `Proposed`; this PR (the first phase's implementing PR)
+  flips it `Proposed → In progress` — it reaches `Landed` only
+  with P2's (last phase) implementing PR, not here.
 
 ## Backlog Impact
 
