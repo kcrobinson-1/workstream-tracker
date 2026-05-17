@@ -719,30 +719,24 @@ enforcement. The contract is satisfied by specifying the prompted
 behavior and keeping a miss observable; it does not promise a miss
 cannot happen. On a gate re-run against a re-opened parent (a
 `Deferred → In draft` resumption per "Plan-doc Status" above),
-re-seeding splits by what the child has become:
+re-seeding **never clobbers existing child content**: a child
+already seeded, drafted, or advanced past skeleton is left as-is,
+and a divergence between such a child and a changed parent
+contract is reconciled by that child's own drafting, not by
+re-seeding overwriting it.
 
-- A child **still a pristine skeleton** (not yet drafted, no
-  content beyond the seeded frontmatter and inherited contract)
-  is **re-synced** to the re-locked parent contract: if the
-  parent's child-contract text or descriptions changed during the
-  re-opening, the skeleton's inherited-contract text and its
-  `short_description` are refreshed to match, since the
-  skeleton's only purpose is to carry the *currently locked*
-  contract forward and a stale skeleton would start the child's
-  drafting from outdated requirements. Re-sync **never rewrites
-  the skeleton's `slug`**: the slug is immutable identity once
-  declared (per "Slug format" / "Slug is identity; path is
-  layout" above), and a work-instance, link, or reference may
-  already point at it — rewriting it would split identity and
-  strand prior attachments. A re-opening that genuinely needs a
-  different child *identity* is not a re-sync but a delete of the
-  old child plus a fresh seed of the new one, done deliberately,
-  not silently folded into re-seeding.
-- A child **already drafted or advanced past skeleton** is left
-  as-is; re-seeding never clobbers content a drafting session
-  has put there. A divergence between such a child and a changed
-  parent contract is reconciled by that child's own drafting,
-  not by re-seeding overwriting it.
+What re-seeding does about a child that is *still a pristine
+skeleton* whose parent contract changed during the re-opening —
+leave the stale skeleton, refresh its inherited contract, or
+require an explicit per-child reconciliation step — is a
+deliberately **open question**, not decided here, and is left so
+rather than settled reactively. Until it is taken up, the
+no-clobber rule above is the only binding behavior and a stale
+pristine skeleton is an accepted, observable residual: the
+rendered tree still shows the child, and its inherited contract
+may lag the re-locked parent until that child's own drafting
+reconciles it. A consumer project tracks the open question in its
+own backlog if it wants to carry it.
 
 ## Section variance disclosure
 

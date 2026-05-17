@@ -380,11 +380,18 @@ entry. That entry's Status is set to
 `Graduated — stub-children-on-parent-promotion` with the
 optional `**Plan:**` line pointing at this doc, in the planning
 change that creates this plan — this standalone task's only
-tracking surface (no parent epic/milestone row). No other
+tracking surface (no parent epic/milestone row). No existing
 backlog entry graduates, deletes, splits, or shifts; the
 `deterministic-interactive-registration` and triage-zone
 concerns are *referenced* as deliberated intersections, not
-shifted. Verified by:
+shifted. One new entry,
+[`stale-skeleton-on-parent-reopen`](../../backlog.md#stale-skeleton-on-parent-reopen),
+was captured during this task's implementing-PR review (a
+capture, not one of the four effects): the re-seeding behavior
+for a still-pristine skeleton on a `Deferred → In draft`
+parent re-opening is a deliberately open question, deferred
+rather than decided reactively; the spec carries only the
+no-clobber rule. Verified by:
 [`../../backlog.md`](../../backlog.md);
 [`../../../spec/backlog.md:43-72`](../../../spec/backlog.md)
 (graduation + `**Plan:**` line lifecycle).
