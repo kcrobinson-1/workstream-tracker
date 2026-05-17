@@ -31,15 +31,15 @@ surface is involved — this is a read-path-only change.
 
 This is an N = 1 task plan; phase content is absorbed inline.
 Deliberation, rejected alternatives, and reality-check inputs
-live in the sibling scoping doc
-([`scoping/m1-t3-descriptive-labels.md`](scoping/m1-t3-descriptive-labels.md)),
-which this plan does not restate. The
+were retired in the m1 milestone-terminal close-out per the
+`spec/planning/milestone.md` batch-deletion convention and
+survive in git history; this plan does not restate them. The
 `In draft → Proposed` promotion-gate self-review per
 [`task-plan.md`](../../../spec/planning/task-plan.md) has been
 run (end-to-end coherence, contract decision-completeness,
 universal `Verified by:` walk, reality-check re-confirmation);
-no open inputs remained (see the scoping doc's "Open decisions
-carried to plan-drafting"), so Status is `Proposed`.
+no open inputs remained at t3 drafting, so Status is
+`Proposed`.
 
 ## Goal
 
@@ -166,8 +166,8 @@ Steps — the contract is the behavior, not the mechanism.
 
 - A node's visible text is its `Label`. The full slug remains
   reachable as a hover tooltip on that text, exposed via the
-  HTML `title` attribute (scoping D4), emitted in an
-  auto-escaped context so the slug cannot break out of the
+  HTML `title` attribute (resolved at t3 drafting), emitted in
+  an auto-escaped context so the slug cannot break out of the
   attribute. `Verified by:`
   [`indexTmpl` in render.go](../../../internal/site/render.go)
   is built with `html/template` (imported at the top of the
@@ -232,7 +232,7 @@ structural call requires it; deviations are reported per
 
 **New:**
 
-- None beyond this plan doc and its sibling scoping doc.
+- None beyond this plan doc.
 
 **Intentionally not touched** *(estimate — these are where we
 don't expect to need changes, not a hard prohibition)*:
@@ -371,8 +371,8 @@ renames, and no directory restructure.
 ## Documentation currency
 
 - `spec/planning/shared.md` — the `short_description` field
-  addition lands in the implementing PR (same PR, per scoping
-  D2).
+  addition lands in the implementing PR (same PR, resolved at
+  t3 drafting).
 - `docs/plans/workstream-tracker-1-0/m1-v0-2.md` — the parent
   milestone's Task Status table t3 row is updated to `In draft`
   as part of *this* drafting change (the `—` legend means
@@ -395,8 +395,6 @@ entry (parent-epic deliberation) is post-1.0 and untouched by t3.
 - [`m1-v0-2.md`](m1-v0-2.md) — parent milestone; t3 task
   contract and deferred decisions.
 - [`README.md`](README.md) — parent epic.
-- [`scoping/m1-t3-descriptive-labels.md`](scoping/m1-t3-descriptive-labels.md)
-  — sibling scoping doc (deliberation, transient).
 - [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
   — the rules this plan is structured against.
 - [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)

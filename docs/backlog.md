@@ -129,18 +129,29 @@ best-effort grounded narration handshake. It is *not*
 deterministic, and provably cannot be: resolving natural-language
 intent to a canonical slug requires agent cognition, which
 postdates session start, while a deterministic trigger must run
-before it (the "registration circularity"). Best-effort is
-acceptable while the producer is the sole consumer and can
-compensate for a missed marker — but that mitigation evaporates
-when an external project adopts the tool. **Tripwire: this must
-be revisited and resolved before the neighborly-events
-integration milestone**, where sole-consumer compensation no
-longer holds. The circularity is dissolved only by changing who
-the launcher is; the concrete future home where deterministic
-registration is achieved is
+before it (the "registration circularity"). Observable
+best-effort is the accepted, vision-faithful posture, not a
+stopgap: the m1-t2 decision (locked at t2 drafting) treats the
+grounded narration handshake as a faithful operationalization of
+the long-term vision's prescribed mitigation, and "deterministic"
+was never an upstream promise for registration. Achieving
+determinism is therefore **not a 1.0 requirement** — its only
+resolution home is the post-v0.2
 [`tool-originated-task-sessions`](#tool-originated-task-sessions)
-(the tool itself launches the agent, so the slug is known by
-construction).
+capability (the tool itself launches the agent, so the slug is
+known by construction), which is well beyond this epic's scope;
+the registration circularity is dissolved only by changing who
+the launcher is, and that is where it gets dissolved. What *does*
+bind: best-effort's acceptability rests on sole-consumer
+compensation (the lone producer can notice and hand-fix a missed
+marker), and that compensation evaporates when an external
+project adopts the tool. **Tripwire: this must be
+re-deliberated — not necessarily resolved — before the
+neighborly-events integration milestone**, where sole-consumer
+compensation no longer holds; that re-deliberation decides
+whether best-effort is still acceptable at that point or whether
+a backstop must be pulled forward, and is not a commitment that
+registration becomes deterministic for 1.0.
 
 This entry also tracks the **observability residual**: a missed
 registration is unobservable from the rendered tree by

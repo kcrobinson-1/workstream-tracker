@@ -32,13 +32,14 @@ Surfaces touched conceptually: the plan-doc frontmatter contract
 plan-tree walker, the tree-node render template, and the
 plan-tree spec doc. No API/DB/schema, no subprocess, no
 JavaScript. Deliberation, rejected alternatives, and
-reality-check inputs live in the sibling scoping doc
-([`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)),
-which this plan does not restate.
+reality-check inputs were retired in the m1 milestone-terminal
+close-out per the `spec/planning/milestone.md` batch-deletion
+convention and survive in git history; this plan does not
+restate them.
 
 P1 has no pending input from a prior task: t3's
 `LongDescription` carry is **Landed** (re-confirmed against
-current code in the scoping reality-check), and t1/t2 are the
+current code in the t4 drafting reality-check), and t1/t2 are the
 independent foundation track P1 does not touch. The
 `In draft → Proposed` promotion-gate self-review per
 [`task-plan.md`](../../../spec/planning/task-plan.md)
@@ -57,7 +58,7 @@ documented in the spec and parsed with the same absence-tolerance
 as `short_description`. A node with neither a body nor
 `related_prs` renders a byte-unchanged badge/label/markers line.
 No truncation, no JavaScript, no panel, no expand/collapse
-(scoping D1).
+(resolved at t4 drafting).
 
 ## Naming
 
@@ -96,9 +97,10 @@ non-binding guidance under Execution Steps.
   shorthand support is out of scope (see Out Of Scope below),
   and canonical-identity normalisation (needed only to dedupe
   frontmatter entries against `gh`-discovered ones) is P2's
-  contract (scoping D3). P1 has no second source to dedupe
-  against, so it needs no canonical key. A `gh`-discovered PR
-  is already an absolute URL (P2's `gh … --json url`), so the
+  contract (resolved at t4 drafting). P1 has no second source
+  to dedupe against, so it needs no canonical key. A
+  `gh`-discovered PR is already an absolute URL (P2's `gh …
+  --json url`), so the
   two phases share one entry shape and no P1 canonicalization
   is implied.
 - The spec documents `related_prs` as an optional, additive
@@ -130,7 +132,7 @@ non-binding guidance under Execution Steps.
   (`goldmark-meta@v1.1.0/meta.go:18,140-141`); under yaml.v2 a
   block sequence into `interface{}` is `[]interface{}` of
   `string` — confirmed at this plan's promotion gate, recorded
-  in scoping reality-check. `stringList` asserts each element
+  in the t4 drafting reality-check. `stringList` asserts each element
   to a string and drops non-strings; asserting the value as a
   `[]string` directly would fail, so that shortcut is not used.
 
@@ -241,8 +243,8 @@ PR-body callout.*
 
 **New:**
 
-- None beyond the t4 plan docs and the sibling scoping doc
-  (created at drafting, not by this PR).
+- None beyond the t4 plan docs (created at drafting, not by
+  this PR).
 
 **Intentionally not touched** *(estimate — where we don't
 expect changes, not a hard prohibition)*:
@@ -282,14 +284,15 @@ The canonical Go toolchain is the gate (per
   absolute-URL `related_prs` shows a clickable PR list inline;
   (c) a node with **neither** shows exactly the prior single
   badge/label/markers line with nothing extra — observe the
-  no-field consequence (scoping D1 bans-on-surface), do not
-  assume it; (d) a node with a deliberately long multi-paragraph
-  body renders the full body inline (the accepted D1
-  consequence — look at the page length, confirm acceptable for
-  the current corpus); (e) a node with a non-URL `related_prs`
-  entry shows that entry as plain text, not a link and not a
-  broken in-page anchor — observe the non-URL fallback
-  consequence, do not assume it.
+  no-field consequence (the bans-on-surface contract resolved
+  at t4 drafting), do not assume it; (d) a node with a
+  deliberately long multi-paragraph body renders the full body
+  inline (the accepted bans-on-surface consequence — look at
+  the page length, confirm acceptable for the current corpus);
+  (e) a node with a non-URL `related_prs` entry shows that
+  entry as plain text, not a link and not a broken in-page
+  anchor — observe the non-URL fallback consequence, do not
+  assume it.
 
 ## Execution Steps
 
@@ -375,19 +378,21 @@ trigger-map-currency (no directory restructure).
 
 ## Out Of Scope
 
-Final boundary calls (deliberation prose is in the scoping
-doc):
+Final boundary calls (deliberation prose was retired with the
+t4 scoping doc in the m1 milestone-terminal close-out; it
+survives in git history):
 
 - **`#NNN` / `owner/repo#NNN` shorthand in `related_prs`.** P1
   accepts absolute URLs only; shorthand entries render as plain
   text (the non-URL fallback), not as expanded links. Expanding
   shorthand requires repo-context resolution that is
   PR-reference canonicalization — deferred with P2's
-  canonical-identity work (scoping D3), and a candidate
-  follow-up if real plan docs accumulate shorthand entries.
+  canonical-identity work (resolved at t4 drafting), and a
+  candidate follow-up if real plan docs accumulate shorthand
+  entries.
 - **Dedupe / canonical PR identity.** P1 has a single
   (frontmatter) source; the canonical key and merge belong to
-  P2 (scoping D3).
+  P2 (resolved at t4 drafting).
 - **`gh` auto-discovery.** P2's surface, deliberately absent
   from P1.
 
@@ -402,12 +407,13 @@ doc):
   `related_prs` list asserts the parsed slice, so a shape
   change is caught at `go test` (not in production) — the test
   is the durable regression guard.
-- **Long body inflates the page (scoping D1 consequence).**
-  Intended, not a regression: the current corpus has short
-  bodies and density/ordering work is milestone Out of Scope.
-  Called out so review does not read inline full-body rendering
-  as an accidental miss; the manual gate step (d) makes the
-  consequence observed rather than assumed.
+- **Long body inflates the page (bans-on-surface consequence,
+  resolved at t4 drafting).** Intended, not a regression: the
+  current corpus has short bodies and density/ordering work is
+  milestone Out of Scope. Called out so review does not read
+  inline full-body rendering as an accidental miss; the manual
+  gate step (d) makes the consequence observed rather than
+  assumed.
 - **Fallback path for field-less nodes.** A node without
   `related_prs`/body must render byte-identically to today on
   its node line. Covered by the render test and manual step (c);
@@ -417,7 +423,8 @@ doc):
 ## Documentation currency
 
 - `spec/planning/shared.md` — the additive `related_prs` field
-  doc lands in this implementing PR (same PR, scoping D3).
+  doc lands in this implementing PR (same PR, resolved at t4
+  drafting).
 - `design/v0.1-design.md` §7 — updated in this PR to reflect
   inline per-node detail.
 - `docs/plans/workstream-tracker-1-0/m1-v0-2.md` — the parent
@@ -445,8 +452,6 @@ None. No backlog entry graduates, is deleted, split, or shifts
 - [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
   — parent task plan (Cross-Phase Decisions, Cross-Cutting
   Invariants, sequencing this plan inherits by reference).
-- [`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)
-  — sibling scoping doc (deliberation, transient).
 - [`m1-v0-2.md`](m1-v0-2.md) — parent milestone.
 - [`m1-t3-descriptive-labels.md`](m1-t3-descriptive-labels.md)
   — t3 (Landed); supplies the `LongDescription` carry P1

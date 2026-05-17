@@ -21,9 +21,9 @@ phase makes related PRs **also** auto-discoverable: a single
 node's slug and merges them into that node's rendered PR list,
 so a contributor does not have to hand-maintain `related_prs`
 for every node. It is drafted now, just-in-time, because P1's
-implementing PR has merged (scoping D2/D5) — the just-in-time
-point for the phase that introduces the codebase's **first
-subprocess shell-out**.
+implementing PR has merged (resolved at t4 drafting) — the
+just-in-time point for the phase that introduces the
+codebase's **first subprocess shell-out**.
 
 It is being done now because t4's milestone contract names two
 related-PR sources ("an optional `related_prs` frontmatter
@@ -38,14 +38,15 @@ discovered PRs flow into (P1's block, unchanged). No API, DB,
 schema, frontmatter, or spec-field surface — P2 adds no new
 field.
 
-Deliberation, the D5 spike findings, rejected alternatives, and
-the resolved P2 decisions (P2-D1…P2-D4) live in the sibling
-scoping doc
-([`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)
-"D5 spike — findings and resolved P2 decisions"), which this
-plan does not restate. P2's previously-deferred inputs (gh
-query/field semantics, dedupe key, timeout) are all resolved
-there by the spike; no input remains open, so after the
+Deliberation, the spike findings, rejected alternatives, and
+the resolved P2 decisions (P2-D1…P2-D4) were retired with the
+rest of the t4 scoping deliberation in the m1
+milestone-terminal close-out per the
+`spec/planning/milestone.md` batch-deletion convention and
+survive in git history; this plan does not restate them. P2's
+previously-deferred inputs (gh query/field semantics, dedupe
+key, timeout) were all resolved by the spike at t4 drafting;
+no input remains open, so after the
 `In draft → Proposed` promotion-gate self-review this plan is
 `Proposed`.
 
@@ -74,7 +75,7 @@ is introduced; the render path stays walk-on-every-request.
   each node, appends discovered PR URLs whose title contains the
   node's slug, deduped against existing `RelatedPRs`.
 - `ghTimeout` — the bounded subprocess timeout constant
-  (`5 * time.Second`, scoping P2-D4).
+  (`5 * time.Second`, resolved at t4 drafting).
 - `ghWaitDelay` — the post-kill I/O-wait bound
   (`1 * time.Second`, set as `Cmd.WaitDelay`). After the
   `ghTimeout` deadline kills `gh`, `Output()` would still block
@@ -101,20 +102,21 @@ Execution Steps.
 - Exactly **one** `gh` subprocess runs per page request,
   independent of node count: `gh pr list --state all --json
   url,title,number -L 200`, executed via `exec.CommandContext`
-  with a 5-second timeout (`ghTimeout`, scoping P2-D4). The
-  command is invoked with a fixed argument vector (no shell, no
-  string interpolation of any plan-derived data into the
-  command line) — slugs never reach the command line, so there
-  is no command-injection surface. `Verified by:` the slug
-  match is done in Go against the decoded JSON (Match contract
-  below), not by passing the slug to `gh`.
+  with a 5-second timeout (`ghTimeout`, resolved at t4
+  drafting). The command is invoked with a fixed argument
+  vector (no shell, no string interpolation of any
+  plan-derived data into the command line) — slugs never
+  reach the command line, so there is no command-injection
+  surface. `Verified by:` the slug match is done in Go against
+  the decoded JSON (Match contract below), not by passing the
+  slug to `gh`.
 - Every failure path returns "no discoveries," never an error
   to the caller and never a non-200 page: missing `gh` binary
   (exec error), non-zero exit (not a git repo / not
   authenticated / API error), context-deadline timeout,
   empty/malformed JSON. Each is logged once via `slog` at
   warn and the render proceeds with frontmatter PRs only.
-  `Verified by:` D5 spike Finding 5 — every mode exits
+  `Verified by:` the t4 spike — every mode exits
   detectably (non-repo → `gh` non-zero "fatal: not a git
   repository"; missing → exec error); standard
   `exec`/exit-code/JSON-unmarshal error checks cover all of
@@ -135,38 +137,41 @@ Execution Steps.
   guarantee is unchanged, the mechanism is corrected to what the
   observed behaviour requires. `Verified by:` the hung-`gh`
   manual check (request returned in ~6s, not ~30s, no leaked
-  process); the 5-second deadline is scoping P2-D4 (generous for
-  a normal local `gh` round-trip, bounded against a hang).
+  process); the 5-second deadline (resolved at t4 drafting) is
+  generous for a normal local `gh` round-trip, bounded against
+  a hang.
 
 ### Match contract
 
 - A discovered PR is attached to a node iff the node's verbatim
   slug is a **case-sensitive substring of the PR title**.
   Matching is done in Go over the decoded `--json` array, never
-  via GitHub `--search` (D5 Findings 1–2: `--search` tokenises
-  on hyphens and over-matches; in-process substring is exact).
+  via GitHub `--search` (the t4 spike found `--search`
+  tokenises on hyphens and over-matches; in-process substring
+  is exact).
 - The discovered value appended is the PR's `url` field — an
   absolute URL, the identical entry shape P1 established
-  (scoping D3/D4, D5 Finding 4). No PR-reference
+  (resolved at t4 drafting). No PR-reference
   canonicalization is performed in either phase.
-- **Precision boundary (accepted consequence, scoping P2-D2).**
-  Discovery finds only PRs whose title verbatim contains the
-  slug. PRs whose title uses a short conventional-commit scope
-  (e.g. `feat(m1-t4-p1): …`) are **not** discovered. This is a
-  known, accepted loss: frontmatter `related_prs` is the
-  complete and authoritative source (scoping D4); `gh`
-  discovery is an additive convenience. The Validation Gate
-  observes this consequence rather than asserting it.
+- **Precision boundary (accepted consequence, resolved at t4
+  drafting).** Discovery finds only PRs whose title verbatim
+  contains the slug. PRs whose title uses a short
+  conventional-commit scope (e.g. `feat(m1-t4-p1): …`) are
+  **not** discovered. This is a known, accepted loss:
+  frontmatter `related_prs` is the complete and authoritative
+  source (resolved at t4 drafting); `gh` discovery is an
+  additive convenience. The Validation Gate observes this
+  consequence rather than asserting it.
 
 ### Merge contract
 
 - For each node the rendered `RelatedPRs` is: the node's
-  frontmatter entries in source order (authoritative, scoping
-  D4), followed by discovered PR URLs not already present, in
-  `gh` result order. Dedupe is plain absolute-URL **string
-  equality** (scoping P2-D3, D5 Finding 4); a discovered URL
-  already in the frontmatter list is dropped. No reordering or
-  rewriting of frontmatter entries.
+  frontmatter entries in source order (authoritative, resolved
+  at t4 drafting), followed by discovered PR URLs not already
+  present, in `gh` result order. Dedupe is plain absolute-URL
+  **string equality** (resolved at t4 drafting); a discovered
+  URL already in the frontmatter list is dropped. No reordering
+  or rewriting of frontmatter entries.
 - Augmentation mutates the in-request `PlanNode.RelatedPRs`
   slices only; nothing is persisted or cached across requests.
   `Verified by:` augmentation runs inside `Server.index` per
@@ -205,9 +210,9 @@ silently, walk-on-every-request, additive-spec-change,
 bare-bones-no-JS). The one P2 most directly carries:
 **walk-on-every-request** — P2's `gh` call runs inside the
 per-request handler with no caching, file-watch, goroutine, or
-in-memory build-up (scoping D4 rejected all three). P2 adds no
-new spec field, so additive-spec-change is vacuous here; no
-JavaScript; the P1 render block is unchanged.
+in-memory build-up (all three rejected at t4 drafting). P2
+adds no new spec field, so additive-spec-change is vacuous
+here; no JavaScript; the P1 render block is unchanged.
 
 ## Files to touch
 
@@ -243,16 +248,17 @@ PR-body callout.*
 - `docs/plans/workstream-tracker-1-0/m1-v0-2.md` — the parent
   milestone **t4 row only** → `Landed` (mirrors the task plan).
   No milestone Status / Backlog / Documentation-Currency
-  reconciliation here — m1 is not terminal (see Documentation
-  currency).
-- `docs/plans/workstream-tracker-1-0/scoping/m1-t4-expanded-per-node-display.md`
-  — **NOT deleted in this PR.** Per
+  reconciliation here — m1 was not yet terminal when P2 landed
+  (see Documentation currency).
+- The t4 scoping doc — **NOT deleted in P2's PR.** Per
   [`task-plan.md`](../../../spec/planning/task-plan.md) path
   conventions the `scoping/` contents delete in batch at the
-  **m1-terminal PR** (with sibling `m1-t1-*` / `m1-t3-*`
-  scoping docs); m1 still has `…-m1-t2` undrafted, so deletion
-  defers to that later PR. P2's PR leaves the scoping doc in
-  place.
+  **m1-terminal PR** (with the other m1 per-task scoping
+  docs); when P2 landed, m1 still had `…-m1-t2` undrafted, so
+  deletion deferred to that later PR. P2's PR left the scoping
+  doc in place; that deferred batch deletion and milestone
+  reconciliation has since been performed in the m1
+  milestone-terminal close-out PR.
 
 **Intentionally not touched** *(estimate — where we don't
 expect changes, not a hard prohibition)*:
@@ -281,21 +287,22 @@ No build wrapper exists. `Verified by:` repo root has no
   discovery error yields the unaugmented tree and no error.
 - **Failure-matrix manual checks against real environments**
   (the distinct, environment-dependent gate that warranted P2
-  being its own phase — scoping D2). Each is *observed*, not
-  asserted from source:
+  being its own phase — resolved at t4 drafting). Each is
+  *observed*, not asserted from source:
   1. **`gh` authenticated, repo with PRs:** a node whose slug
      verbatim appears in a PR title shows that PR URL appended
      after its frontmatter entries; render still single page,
      no JS.
-  2. **Precision boundary (scoping P2-D2):** a PR whose title
-     uses a short scope (`feat(m1-t4-p1): …`) is **not**
-     auto-listed on the `…-m1-t4` node — observe the
+  2. **Precision boundary (resolved at t4 drafting):** a PR
+     whose title uses a short scope (`feat(m1-t4-p1): …`) is
+     **not** auto-listed on the `…-m1-t4` node — observe the
      under-match, do not assume it.
   3. **`gh` missing:** run the server with `gh` not on `PATH`;
      the page renders frontmatter PRs only, one warn log, HTTP
      200.
   4. **Not a git repo / no remote:** run from a dir `gh`
-     rejects; same graceful outcome (D5 Finding 5).
+     rejects; same graceful outcome (confirmed by the t4
+     spike).
   5. **Hung `gh`:** stub a `gh` that sleeps past `ghTimeout`;
      the request returns within ~5s with frontmatter-only and a
      timeout warn — confirm the page is not wedged.
@@ -333,15 +340,19 @@ callout), not a contract breach.
    "Plan-to-PR Completion Gate" / "Task plan terminal state
    when N ≥ 2": flip this plan `Proposed → Landed`; flip the
    task plan `In progress → Landed`; flip the `m1-v0-2.md` t4
-   **row** → `Landed`. **Do NOT** delete the scoping doc and
-   **do NOT** touch milestone Status / Backlog / Documentation
-   Currency: m1 is not terminal — its Task Status table still
-   carries `…-m1-t2` at `—` (undrafted), and per
+   **row** → `Landed`. **Do NOT** delete the t4 scoping doc
+   and **do NOT** touch milestone Status / Backlog /
+   Documentation Currency: m1 was not yet terminal when P2
+   landed — its Task Status table still carried `…-m1-t2` at
+   `—` (undrafted), and per
    [`task-plan.md`](../../../spec/planning/task-plan.md) path
    conventions the `scoping/` batch deletion + milestone
    reconciliation happen at the **m1-terminal PR** (whichever
-   PR lands m1's last remaining task), not here. Leaving the
-   scoping doc in place is correct, not an omission.
+   PR lands m1's last remaining task), not in P2's PR. Leaving
+   the scoping doc in place was correct for P2, not an
+   omission; that deferred batch deletion and reconciliation
+   has since been performed in the m1 milestone-terminal
+   close-out PR.
 10. **PR preparation.** PR body carries `## Estimate
     Deviations` (or `N/A`) and reconciles estimate-shaped plan
     sections with what shipped.
@@ -354,12 +365,14 @@ phase). Expected commits: (a) `ghprs.go` discovery core +
 tests; (b) match/merge/dedupe + `site.go` integration + tests;
 (c) docs §7 + **t4 task-terminal** close-out — the three
 Status flips only (P2 → Landed, task plan → Landed,
-`m1-v0-2.md` t4 row → Landed). Commit (c) does **not** delete
+`m1-v0-2.md` t4 row → Landed). Commit (c) did **not** delete
 the scoping doc or reconcile milestone Status/Backlog/Doc-
-Currency: those are m1-terminal actions deferred to the later
-m1-terminal PR (see Step 9 / Out Of Scope — `…-m1-t2` is
-undrafted, m1 is not terminal). The order keeps each commit
-building and test-green.
+Currency: those were m1-terminal actions deferred to the later
+m1-terminal PR (see Step 9 / Out Of Scope — when P2 landed,
+`…-m1-t2` was undrafted and m1 was not yet terminal); that
+deferred batch deletion and reconciliation has since been
+performed in the m1 milestone-terminal close-out PR. The order
+keeps each commit building and test-green.
 
 ## Self-Review Audits
 
@@ -387,54 +400,61 @@ run at step 7:
   is satisfied or deferred *in a plan*. The audit guards drift
   in **both** directions here: skipping a required flip, **and**
   performing m1-terminal actions early — deleting the scoping
-  doc or flipping milestone Status/Backlog/Doc-Currency at this
-  PR is wrong (m1 is not terminal; `…-m1-t2` is undrafted).
-  Leaving the scoping doc in place is the correct outcome, not
-  an omission to "fix."
+  doc or flipping milestone Status/Backlog/Doc-Currency at
+  P2's PR was wrong (when P2 landed, m1 was not yet terminal;
+  `…-m1-t2` was undrafted). Leaving the scoping doc in place
+  was the correct outcome for P2, not an omission to "fix";
+  that deferred batch deletion and reconciliation has since
+  been performed in the m1 milestone-terminal close-out PR.
 
 rename-aware-diff-classification and trigger-map-currency have
 no matching surface (no renames, no directory restructure).
 
 ## Out Of Scope
 
-Final boundary calls (deliberation in the scoping doc):
+Final boundary calls (deliberation retired in the m1
+milestone-terminal close-out, in git history):
 
 - **Discovering short-scope PRs** (titles like
   `feat(m1-t4-p1): …` lacking the verbatim slug). Inherent
-  under-match (D5 Finding 3 / scoping P2-D2); frontmatter
+  under-match (resolved at t4 drafting); frontmatter
   `related_prs` is the authoritative complete source.
 - **Caching / background refresh / per-node fan-out.** One
   per-request subprocess only; caching is the m1 Cross-Task
-  Invariant ban (scoping D4).
+  Invariant ban (resolved at t4 drafting).
 - **PR-state styling** (open vs merged vs closed visual
   treatment). P2 lists discovered PR URLs through P1's existing
   block unchanged; richer PR presentation is later-milestone.
 - **Mandating PR-title or branch conventions** to improve
-  discovery precision — not P2's remit (scoping P2-D2).
-- **m1-milestone-terminal close-out.** P2's PR is t4's
-  *task-terminal* PR, not m1's milestone-terminal PR (m1's Task
-  Status table still carries `…-m1-t2` at `—`, undrafted). The
-  sibling `scoping/` batch deletion (`m1-t1-*` / `m1-t3-*` /
-  `m1-t4-*` together) and milestone Status / Backlog /
-  Documentation-Currency reconciliation are out of scope for
-  P2's PR and defer to whichever PR lands m1's last remaining
-  task, per
+  discovery precision — not P2's remit (resolved at t4
+  drafting).
+- **m1-milestone-terminal close-out.** P2's PR was t4's
+  *task-terminal* PR, not m1's milestone-terminal PR (when P2
+  landed, m1's Task Status table still carried `…-m1-t2` at
+  `—`, undrafted). The `scoping/` batch deletion (all of m1's
+  per-task scoping docs together) and milestone Status /
+  Backlog / Documentation-Currency reconciliation were out of
+  scope for P2's PR and deferred to whichever PR landed m1's
+  last remaining task, per
   [`task-plan.md`](../../../spec/planning/task-plan.md) path
-  conventions. Leaving the t4 scoping doc in place after P2 is
-  correct, not an omission.
+  conventions; that deferred batch deletion and reconciliation
+  has since been performed in the m1 milestone-terminal
+  close-out PR. Leaving the t4 scoping doc in place after P2
+  was correct, not an omission.
 
 ## Risk Register
 
 - **`gh` latency on the request path.** A normal `gh pr list`
   round-trip adds latency to every render. Accepted: single
-  local user, per-request (scoping D4); bounded by the 5s
-  `ghTimeout` so worst case is bounded, and a failure (incl.
-  timeout) degrades to P1's instant frontmatter-only render.
+  local user, per-request (resolved at t4 drafting); bounded
+  by the 5s `ghTimeout` so worst case is bounded, and a
+  failure (incl. timeout) degrades to P1's instant
+  frontmatter-only render.
 - **Precision boundary surprises a viewer** (expected PR not
-  auto-listed). Intended, not a regression (scoping P2-D2);
-  frontmatter `related_prs` is the authoritative path. Called
-  out so review doesn't read the under-match as a bug; the
-  Validation Gate observes it.
+  auto-listed). Intended, not a regression (resolved at t4
+  drafting); frontmatter `related_prs` is the authoritative
+  path. Called out so review doesn't read the under-match as a
+  bug; the Validation Gate observes it.
 - **Subprocess/timeout leak.** Mitigated by
   `exec.CommandContext` kill-on-deadline; the effect-cleanup
   audit + hung-`gh` manual check verify no wedged request or
@@ -454,37 +474,33 @@ Final boundary calls (deliberation in the scoping doc):
 - `m1-t4-expanded-per-node-display.md` (task plan) flips
   `In progress → Landed` in this PR — P2 is the last phase.
 - `m1-v0-2.md` — **t4 row only** → `Landed` (mirrors the task
-  plan). This PR is **not** the m1-terminal PR: m1's Task
-  Status table still carries `…-m1-t2` at `—` (undrafted), so
-  milestone Status / Backlog / Documentation-Currency
-  reconciliation is **not** performed here — it happens at the
-  later m1-terminal PR.
-- `scoping/m1-t4-expanded-per-node-display.md` — **NOT
-  deleted** in this PR. Per
+  plan). P2's PR was **not** the m1-terminal PR: when P2
+  landed, m1's Task Status table still carried `…-m1-t2` at
+  `—` (undrafted), so milestone Status / Backlog /
+  Documentation-Currency reconciliation was **not** performed
+  in P2's PR — it happened at the later m1-terminal PR.
+- The t4 scoping doc — **NOT deleted** in P2's PR. Per
   [`task-plan.md`](../../../spec/planning/task-plan.md) path
   conventions the `scoping/` contents delete in batch at the
-  **m1-terminal PR** (with sibling `m1-t1-*` / `m1-t3-*`
-  scoping docs); m1 is not terminal, so the doc stays in place
-  and its references remain live. No link neutralization is
-  needed in this PR.
+  **m1-terminal PR** (with the other m1 per-task scoping
+  docs); m1 was not yet terminal when P2 landed, so the doc
+  stayed in place and its references remained live then. That
+  deferred batch deletion and the reference scrub have since
+  been performed in the m1 milestone-terminal close-out PR.
 
 ## Backlog Impact
 
 None. No backlog entry graduates, is deleted, split, or shifts
 (see the parent task plan's Backlog Impact). The discovery
-precision boundary (scoping P2-D2) is an accepted consequence,
-not a captured backlog item; if richer slug→PR association is
-wanted post-1.0 it would be raised then.
+precision boundary (resolved at t4 drafting) is an accepted
+consequence, not a captured backlog item; if richer slug→PR
+association is wanted post-1.0 it would be raised then.
 
 ## Related Docs
 
 - [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
   — parent task plan (Cross-Phase Decisions, Cross-Cutting
   Invariants, sequencing inherited by reference).
-- [`scoping/m1-t4-expanded-per-node-display.md`](scoping/m1-t4-expanded-per-node-display.md)
-  — sibling scoping doc; D5 spike findings + P2-D1…P2-D4
-  (transient; deleted at the later m1-terminal PR, not by
-  P2's PR).
 - [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
   — P1 (Landed, #15); supplies the `RelatedPRs` carry and the
   render block P2 augments.
