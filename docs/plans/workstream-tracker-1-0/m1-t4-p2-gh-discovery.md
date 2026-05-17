@@ -28,8 +28,10 @@ subprocess shell-out**.
 It is being done now because t4's milestone contract names two
 related-PR sources ("an optional `related_prs` frontmatter
 field, **and** auto-discovers via `gh pr list`"); P1 shipped the
-first, P2 ships the second and completes t4 (the milestone's
-last task). Surfaces touched conceptually: a new subprocess
+first, P2 ships the second and completes **t4** (the
+read-experience track's terminal task — not m1's last task;
+`…-m1-t2` remains undrafted). Surfaces touched conceptually: a
+new subprocess
 boundary in the read path (the `gh` CLI), the site request
 handler that augments the tree, and the plan-tree render the
 discovered PRs flow into (P1's block, unchanged). No API, DB,
@@ -325,12 +327,17 @@ callout), not a contract breach.
 ## Commit Boundaries
 
 *Estimate of cohesive review chunks — implementer may refine.*
-Single implementing PR (this phase = 1 PR; P2 is the last
+Single implementing PR (this phase = 1 PR; P2 is t4's last
 phase). Expected commits: (a) `ghprs.go` discovery core +
 tests; (b) match/merge/dedupe + `site.go` integration + tests;
-(c) docs §7 + terminal close-out (Status flips, scoping-doc
-deletion, parent-doc reconciliation). The order keeps each
-commit building and test-green.
+(c) docs §7 + **t4 task-terminal** close-out — the three
+Status flips only (P2 → Landed, task plan → Landed,
+`m1-v0-2.md` t4 row → Landed). Commit (c) does **not** delete
+the scoping doc or reconcile milestone Status/Backlog/Doc-
+Currency: those are m1-terminal actions deferred to the later
+m1-terminal PR (see Step 9 / Out Of Scope — `…-m1-t2` is
+undrafted, m1 is not terminal). The order keeps each commit
+building and test-green.
 
 ## Self-Review Audits
 

@@ -18,11 +18,13 @@ surface that detail: the long description, and the pull requests
 related to the node.
 
 It is being done now because it is the terminal task of m1's
-read-experience track and the last task of the milestone: t3 laid
-the parsing foundation specifically so t4 could consume it, and
-the milestone's "expanded per-node display" is the last gap
-between v0.1's bare-bones render and v0.2's "scannable per node"
-goal. Related PRs come from two sources the milestone t4 contract
+read-experience track (t3 → t4): t3 laid the parsing foundation
+specifically so t4 could consume it, and t4's "expanded
+per-node display" is the last gap on that track between v0.1's
+bare-bones render and v0.2's "scannable per node" goal. t4 is
+**not** m1's last task overall — the foundation track's
+`…-m1-t2` (Automatic agent registration) is still undrafted, so
+m1 is not terminal when t4 completes (see "Terminal state"). Related PRs come from two sources the milestone t4 contract
 names: an optional `related_prs` frontmatter field, and
 auto-discovery via `gh pr list` keyed on the slug.
 
