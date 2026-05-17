@@ -59,6 +59,16 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 
 	roots := buildTree(docs, active)
 
+	// Best-effort gh pr list auto-discovery (t4 P2). A discovery
+	// failure is non-fatal: log once at warn and render the
+	// unaugmented tree (frontmatter PRs only). No caching /
+	// goroutine / file-watch — walk-on-every-request invariant.
+	if prs, err := discoverPRsByTitle(ctx); err != nil {
+		slog.Warn("gh pr discovery", "err", err)
+	} else {
+		augmentRelatedPRs(roots, prs)
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := renderIndex(w, indexData{Roots: roots, PlansPath: s.plansPath}); err != nil {
 		slog.Error("render index", "err", err)
