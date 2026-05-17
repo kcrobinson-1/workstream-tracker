@@ -111,6 +111,14 @@ session loads them; they are not optional.
 - [Anti-Patterns](docs/agents/shared/core/anti-patterns.md)
 - [Sub-Agent Delegation](docs/agents/shared/delegation/sub-agent-delegation.md)
 
+Repo-owned universal rule (not vendored shared):
+
+- [Session-start work-instance registration](docs/agents/local/session-registration.md)
+  — before task work, perform the observable best-effort grounded
+  narration handshake (resolve slug → confirm → echo the real
+  `workstream-tracker register` receipt → narrate failure
+  explicitly → proceed). Never blocks or fails the session.
+
 ## Self-review
 
 Before finishing, run the audits from

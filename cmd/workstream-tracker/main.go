@@ -21,7 +21,17 @@ import (
 	"github.com/kcrobinson-1/workstream-tracker/internal/site"
 )
 
+// main dispatches subcommands. With no subcommand the binary runs
+// the server (unchanged v0.1 behavior); the `register` subcommand
+// performs one best-effort work-instance registration.
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "register" {
+		os.Exit(runRegister(os.Args[2:], os.Getenv, os.Stdout, os.Stderr))
+	}
+	runServer()
+}
+
+func runServer() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	slog.SetDefault(logger)
 

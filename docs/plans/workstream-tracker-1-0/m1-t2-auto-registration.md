@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t2
-Status: Proposed
+Status: Landed
 short_description: Automatic agent registration
 ---
 
