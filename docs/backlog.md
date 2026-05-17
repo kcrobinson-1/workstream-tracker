@@ -61,7 +61,9 @@ its own entry when this graduates.
 
 ### stub-children-on-parent-promotion
 
-**Status:** Open
+**Status:** Graduated — stub-children-on-parent-promotion
+
+**Plan:** [`docs/plans/stub-children-on-parent-promotion/README.md`](plans/stub-children-on-parent-promotion/README.md)
 
 Seed skeleton child docs when a parent doc passes its
 promotion gate.
