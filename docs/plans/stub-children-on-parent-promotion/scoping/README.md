@@ -175,6 +175,62 @@ tool-enforced check — the precedent register the new step joins);
 best-effort … not deterministic" — the existing project
 vocabulary this reuses).
 
+### D7 — Stub-seeding binds all three parent→child relationships, via both promotion gates symmetrically
+
+**Decision.** The seeding obligation binds every relationship
+the "Parent-doc child contracts" rule binds: epic→milestone
+(`Milestone Contracts`), milestone→task (`Task Contracts`), and
+**task-plan with N≥2 phases→phase (`Phase Contracts`)**. It is
+therefore wired into *both* promotion gates symmetrically — the
+parent-doc gate in
+[`shared.md`](../../../../spec/planning/shared.md) (epic/milestone)
+and the task/phase gate in
+[`task-plan.md`](../../../../spec/planning/task-plan.md) (the
+N≥2 task plan promoting). A task plan with N=1 absorbs phase
+content inline and has no separate phase children to seed —
+nothing to do there, stated as a boundary so implementation
+doesn't try to stub inline phases.
+
+**Why uniform extension, not a phase carve-out.** Caught in
+review: the original plan named only `Milestone Contracts` /
+`Task Contracts` and wired only the parent-doc gate, while
+editing the three-doc-type "Parent-doc child contracts" rule.
+That leaves two incoherent outcomes — the shared-rule edit
+silently imposes stub-seeding on phase children with no gate to
+trigger it, or the edit contradicts the rule's explicit
+three-doc-type binding. Scoping stub-seeding to two of three
+relationships would require carving a phase exception *into* a
+rule whose whole point is binding all three at once. The
+motivating value (render planned-but-unstarted nodes; give
+registration a declared frontmatter slug) applies to phase
+children identically — a phase plan is a rendered tree node and
+its implementing PR carries a work-instance. Uniform extension
+also matches the project's demonstrated gate-symmetry value (the
+`promotion-gate-explicit-checklist` task explicitly preserved
+task/phase ↔ parent-doc gate symmetry).
+
+**Rejected alternative.** *Scope to epic/milestone only,
+explicitly exempting `Phase Contracts`.* Rejected: it weakens
+the feature against its own motivation for no stated reason, and
+the exemption prose would have to live inside the three-doc-type
+shared rule, which is the exact incoherence this decision
+removes.
+
+Verified by:
+[`../../../../spec/planning/shared.md:551-592`](../../../../spec/planning/shared.md)
+("Parent-doc child contracts" — explicitly binds three
+doc-types; `Phase Contracts` is the task-plan-N≥2 realization);
+[`../../../../spec/planning/shared.md:288-299`](../../../../spec/planning/shared.md)
+(the parent-doc gate binds epic/milestone only — task/phase
+plans do not load it, so a second gate is required);
+[`../../../../spec/planning/task-plan.md:441-447`](../../../../spec/planning/task-plan.md)
+(the symmetric task/phase gate the seeding step must also join);
+[`../../../../spec/planning/task-plan.md:190-194`](../../../../spec/planning/task-plan.md)
+(`Phase Contracts` required when N≥2; absorbed inline so absent
+at N=1);
+[`../promotion-gate-explicit-checklist/README.md:151-169`](../../promotion-gate-explicit-checklist/README.md)
+(the two-gate-symmetry precedent this mirrors).
+
 ## Inputs resolved before promotion
 
 - **I1 — D1 ratification — RESOLVED 2026-05-17.** D1 loosens a

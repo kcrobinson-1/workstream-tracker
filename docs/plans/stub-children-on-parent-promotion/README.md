@@ -8,12 +8,13 @@ short_description: Seed skeleton child docs when a parent doc promotes
 
 ## Context
 
-When a parent plan doc (epic or milestone) passes its
-`` `In draft` → `Proposed` `` promotion gate, its children exist
-only as names in the parent's contract section — each child slug
-has no doc until someone drafts it just-in-time. Two costs
-follow: planned-but-unstarted work is invisible in the rendered
-tree until its drafting session runs, and work-instance
+When a parent plan doc (an epic, a milestone, or a task plan
+with N≥2 phases) passes its `` `In draft` → `Proposed` ``
+promotion gate, its children exist only as names in the parent's
+child-contracts section — each child slug has no doc until
+someone drafts it just-in-time. Two costs follow:
+planned-but-unstarted work is invisible in the rendered tree
+until its drafting session runs, and work-instance
 auto-registration has no frontmatter slug to derive from before
 any drafting happens.
 
@@ -23,9 +24,11 @@ explicitly depends on m1-t1's now-landed exact-slug
 create-or-attach registration path; with that dependency
 satisfied, the entry is graduatable. The surface is entirely the
 planning spec this repo dogfoods and consumer projects vendor —
-the parent-doc promotion gate and the parent-doc child-contracts
-rule in [`shared.md`](../../../spec/planning/shared.md), plus the
-slug-generation rule the reconciliation narrows. No product
+the parent-doc child-contracts rule and parent-doc promotion
+gate in [`shared.md`](../../../spec/planning/shared.md), the
+symmetric task/phase gate in
+[`task-plan.md`](../../../spec/planning/task-plan.md), and the
+slug-generation rule the reconciliation loosens. No product
 code, schema, API, or lifecycle token changes (a slug+Status
 stub is an already-supported render case).
 
@@ -40,8 +43,11 @@ the no-pre-declared-slug fallback.
 ## Goal
 
 When a PR flips a parent doc to `Proposed`, the same PR also
-contains a skeleton doc for every child the parent's contract
-section names, each initialized with a canonical slug, a
+contains a skeleton doc for every child the parent's
+child-contracts section names — across all three relationships
+the "Parent-doc child contracts" rule binds (epic→milestone,
+milestone→task, task-N≥2→phase), via both promotion gates
+symmetrically (D7) — each initialized with a canonical slug, a
 level-appropriate short and long description, and the parent's
 WHAT-contract block plus any illustrative examples for that
 child; and the parent doc presents its children as a table that
@@ -76,9 +82,12 @@ The spec must establish these as checkable facts about a
 promoting PR's diff:
 
 - **A1 — A stub exists per named child.** For every child named
-  in the parent's `Milestone Contracts` / `Task Contracts`
-  section, a doc exists at that child's layout path in the same
-  PR that flips the parent to `Proposed`.
+  in the parent's child-contracts section — `Milestone
+  Contracts` (epic), `Task Contracts` (milestone), or `Phase
+  Contracts` (task plan with N≥2; absent and inapplicable at
+  N=1, where phase content is inline) — a doc exists at that
+  child's layout path in the same PR that flips the parent to
+  `Proposed` (D7).
 - **A2 — Stub frontmatter is canonical and complete.** Each stub
   carries `slug` (author-supplied at promotion per C2),
   `Status: In draft` (D2), and `short_description`.
@@ -107,11 +116,12 @@ Verified by:
 [`../../../spec/planning/shared.md:551-592`](../../../spec/planning/shared.md)
 (parent-doc child contracts — the WHAT block A3 copies and the
 section A4 restructures);
-[`../../../spec/planning/epic.md:43-67`](../../../spec/planning/epic.md)
+[`../../../spec/planning/epic.md:43-67`](../../../spec/planning/epic.md),
+[`../../../spec/planning/milestone.md:109-125`](../../../spec/planning/milestone.md),
 and
-[`../../../spec/planning/milestone.md:109-125`](../../../spec/planning/milestone.md)
-(per-level Milestone/Task Contracts + Status sections A1/A2/A4
-attach to);
+[`../../../spec/planning/task-plan.md:190-194`](../../../spec/planning/task-plan.md)
+(per-level Milestone/Task/Phase Contracts + Status sections
+A1/A2/A4 attach to; Phase Contracts is N≥2-only);
 [`../../../spec/planning/shared.md:265-286`](../../../spec/planning/shared.md)
 (Status lifecycle backing A2/D2);
 [`../../../spec/planning/task-plan.md:169-214`](../../../spec/planning/task-plan.md)
@@ -146,12 +156,14 @@ flow).
 
 ### C3 — Expected agent behavior (best-effort; observable; not guaranteed)
 
-The parent-doc `` `In draft` → `Proposed` `` promotion gate
-gains a step directing the promoting agent to seed the C1 stubs
-from the locked parent contracts in the promoting PR, and to not
-clobber a child already drafted or advanced when the gate
-re-runs on a re-opened parent. The step is framed — in the
-register the gate already uses — as a prompted obligation whose
+**Both** promotion gates gain a symmetric step directing the
+promoting agent to seed the C1 stubs from the locked parent
+contracts in the promoting PR, and to not clobber a child
+already drafted or advanced when the gate re-runs on a re-opened
+parent: the parent-doc gate in `shared.md` (epic/milestone
+children) and the task/phase gate in `task-plan.md` (an N≥2 task
+plan's phase children) per D7. The step is framed — in the
+register both gates already use — as a prompted obligation whose
 missed or imperfect execution is an accepted, observable
 residual addressed through prompt engineering and tree
 visibility, **not** a determinism guarantee: the spec is
@@ -163,20 +175,25 @@ Verified by:
 (the parent-doc gate — itself a prompted self-review, the
 register C3 joins; re-run-from-scratch behavior the no-clobber
 clause guards);
+[`../../../spec/planning/task-plan.md:441-510`](../../../spec/planning/task-plan.md)
+(the symmetric task/phase gate the second step joins; same
+re-run-from-scratch shape);
 [`../../backlog.md`](../../backlog.md)
 `deterministic-interactive-registration` (the "observable
 best-effort … not deterministic" project vocabulary reused).
 
 ### C4 — No rule-body duplication; layered authority preserved
 
-The new gate step cites "Parent-doc child contracts" and the
+Each gate step cites "Parent-doc child contracts" and the
 slug-generation rule by exact section title and restates neither
 body; the per-level files
 ([`epic.md`](../../../spec/planning/epic.md),
-[`milestone.md`](../../../spec/planning/milestone.md)) reference
-the obligation rather than carrying it. A reviewer finding a
-rule body restated inside the gate or a per-level file treats
-that as a defect, not safety-by-copying.
+[`milestone.md`](../../../spec/planning/milestone.md),
+[`task-plan.md`](../../../spec/planning/task-plan.md)) reference
+the obligation from their Milestone/Task/Phase Contracts entries
+rather than carrying it. A reviewer finding a rule body restated
+inside either gate or a per-level file treats that as a defect,
+not safety-by-copying.
 
 Verified by:
 [`../../../spec/planning/shared.md:551-558`](../../../spec/planning/shared.md)
@@ -205,10 +222,16 @@ Verified by:
   that promotes the seeding act to a guarantee, or that softens
   an artifact requirement to "should", breaks the register the
   project tenet requires (D6).
+- **Two-gate symmetry.** Both the parent-doc gate (`shared.md`)
+  and the task/phase gate (`task-plan.md`) carry the equivalent
+  seeding step; editing one without the other re-opens the
+  three-doc-type incoherence D7 closes. The only permitted
+  divergence is which child-contracts section the step's seeding
+  applies to (`Milestone`/`Task` vs. `Phase Contracts`).
 - **Exact-match tokens stay verbatim.** `In draft`, `Proposed`,
-  `Milestone Contracts`, `Task Contracts`, and every cited
-  section title are copied from their canonical definitions, not
-  paraphrased.
+  `Milestone Contracts`, `Task Contracts`, `Phase Contracts`,
+  and every cited section title are copied from their canonical
+  definitions, not paraphrased.
 
 ## Files to touch
 
@@ -223,11 +246,17 @@ Verified by:
   add the C1 stub-content + A4 table requirements and the A6
   exemption to "Parent-doc child contracts"; narrow "Slug
   generation" per C2.
-- [`../../../spec/planning/epic.md`](../../../spec/planning/epic.md)
+- [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+  — add the symmetric C3 seeding step to the task/phase
+  `` `In draft` → `Proposed` `` gate (N≥2 phase children; D7).
+- [`../../../spec/planning/epic.md`](../../../spec/planning/epic.md),
+  [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md),
   and
-  [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md)
-  — reference the new obligation from their Milestone/Task
-  Contracts entries (cite-by-name, no restatement; C4).
+  [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+  — reference the new obligation from their Milestone/Task/Phase
+  Contracts entries (cite-by-name, no restatement; C4). The
+  task-plan.md edit covers both its gate step and its Phase
+  Contracts reference.
 - [`../../backlog.md`](../../backlog.md) — flip the entry
   to `Graduated` with the `**Plan:**` line (Backlog Impact).
 
@@ -260,16 +289,23 @@ implementing PR opens:
    prose a reader can take to mean a seeded slug is later
    server-reallocated.
 4. **No-duplication / layering check.** Grep the diff: no rule
-   body restated in the gate or per-level files; references by
+   body restated in either gate or per-level files; references by
    section title only. Falsifier: a hunk copying rule-body text.
-5. **Triage-zone boundary check.** The spec states a stub
+5. **Two-gate symmetry check.** Both the parent-doc gate
+   (`shared.md`) and the task/phase gate (`task-plan.md`) carry
+   the equivalent seeding step, and the three child-contracts
+   section types (`Milestone`/`Task`/`Phase Contracts`) are all
+   covered with no phase carve-out left inside "Parent-doc child
+   contracts". Falsifier: one gate gains the step and the other
+   does not, or a section type is unaddressed.
+6. **Triage-zone boundary check.** The spec states a stub
    creates no work-instance and does not pre-empt the deferred
    open question. Falsifier: the boundary absent or implying
    resolution of triage zone.
-6. **Exact-match token check.** Grep the diff for every cited
+7. **Exact-match token check.** Grep the diff for every cited
    token/section title; confirm verbatim against canonical
    definitions.
-7. **Link-resolution check.** Every relative link added or moved
+8. **Link-resolution check.** Every relative link added or moved
    resolves from its editing file's location.
 
 The implementing PR body carries a `## Review Stance` section
@@ -291,9 +327,10 @@ diff surface is documentation/spec:
   audit each step is performed end-to-end against the final
   diff, not asserted from the plan.
 - **trigger-map-currency** — the change adds cross-references
-  from the gate and per-level files to "Parent-doc child
-  contracts" and "Slug generation"; audit every added pointer
-  resolves to the current section title and none drifts.
+  from both gates and the three per-level Contracts entries to
+  "Parent-doc child contracts" and "Slug generation"; audit
+  every added pointer resolves to the current section title and
+  none drifts.
 
 ## Out of Scope
 
@@ -308,6 +345,10 @@ diff surface is documentation/spec:
   allocation/registration call into the gate is rejected
   (scoping D1 alt-a). Server slug-generation is untouched as the
   no-pre-declared-slug fallback.
+- **Seeding for N=1 task plans.** An N=1 task plan absorbs phase
+  content inline and has no separate phase children; there is
+  nothing to seed and the spec says so explicitly rather than
+  leaving it ambiguous (scoping D7).
 - **New lifecycle states or a bespoke "stub" Status.** Stubs
   reuse `In draft` (scoping D2).
 - **Retrofitting existing parent docs with seeded children or
