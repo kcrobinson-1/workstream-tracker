@@ -294,10 +294,9 @@ out in the implementing PR body per
 - [`docs/plans/workstream-tracker-1-0/m1-v0-2.md`](m1-v0-2.md)
   — the recorded milestone t2-contract amendment (executed in
   this plan PR; see "Milestone amendment" below).
-- [`docs/backlog.md`](../../backlog.md) — the backlog
-  reconciliation (executed in this plan PR; see "Backlog
-  Impact" below): shift the existing
-  `deterministic-interactive-registration` framing and add
+- [`docs/backlog.md`](../../backlog.md) — add two net-new
+  entries (executed in this plan PR; see "Backlog Impact"
+  below): `deterministic-interactive-registration` and
   `tool-originated-task-sessions`.
 
 ### Documentation-Currency edits DEFERRED to the t2 implementation PR
@@ -516,21 +515,22 @@ Residual risks after the contract above.
 
 ## Backlog Impact
 
-This plan PR reconciles two backlog entries in
-[`docs/backlog.md`](../../backlog.md):
+This plan PR **adds two new backlog entries** (captures —
+not one of the four canonical backlog effects; disclosed as a
+section-variance in the PR body). Relative to this PR's base,
+neither entry exists yet, so both are net-new:
 
-- **Shift** `deterministic-interactive-registration`: it stays
-  Open, but its framing changes. t2 ships the *observable
-  best-effort* answer (the narration handshake); the future home
-  where deterministic registration is actually achieved is the
-  new entry below, not a "launch-ceremony helper." The entry is
-  also broadened to track the **observability residual** — a
-  missed registration is unobservable from the rendered tree by
-  construction, so the handshake is t2's only backstop and the
-  deferred tree-side heuristic affordance lives under this same
-  tripwire. The tripwire (revisit before the neighborly-events
-  integration milestone, where sole-consumer compensation no
-  longer holds) is retained.
+- **Add** `deterministic-interactive-registration`: authored to
+  track the determinism gap that t2's observable best-effort
+  narration handshake consciously accepts (the future home
+  where determinism is actually achieved is the second entry
+  below, not a "launch-ceremony helper"). It also tracks the
+  **observability residual** — a missed registration is
+  unobservable from the rendered tree by construction, so the
+  handshake is t2's only backstop and the deferred tree-side
+  heuristic affordance sits under the same tripwire (revisit
+  before the neighborly-events integration milestone, where
+  sole-consumer compensation no longer holds).
 - **Add** `tool-originated-task-sessions`: the opportunity where
   the tool's UX spawns the planning agent from a clicked
   plan-tree node. Because the tool is the launcher and the click

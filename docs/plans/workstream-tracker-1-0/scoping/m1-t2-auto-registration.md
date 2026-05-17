@@ -330,13 +330,13 @@ The plan doc (N = 1 recommended) will own, per
 - **Documentation Currency** — `AGENTS.md`, `docs/agents/local`,
   `docs/dev.md`, `design/v0.1-design.md` §3/§4, the milestone
   t2-contract amendment.
-- **Backlog Impact** — this plan PR **shifts** the framing of
-  `deterministic-interactive-registration` (it stays Open; t2
-  ships the observable best-effort answer; the future
-  determinism home becomes the new entry) and **adds**
+- **Backlog Impact** — this plan PR **adds two net-new
+  entries** (captures): `deterministic-interactive-registration`
+  (tracks the determinism gap t2's best-effort handshake
+  accepts, plus the observability residual) and
   `tool-originated-task-sessions` (the tool-spawns-the-agent
-  opportunity where deterministic registration is
-  free-by-construction). Neither is graduated here.
+  opportunity where determinism is free-by-construction). Both
+  are new relative to the PR base; neither is graduated here.
 - **Risk Register, Out of Scope, Related Docs** as content
   applies.
 
