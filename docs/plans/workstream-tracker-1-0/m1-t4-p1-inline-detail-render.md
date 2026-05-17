@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m1-t4-p1
-Status: Proposed
+Status: Landed
 short_description: Inline per-node detail render
 ---
 
