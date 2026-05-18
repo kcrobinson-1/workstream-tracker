@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4
-Status: Proposed
+Status: In draft
 short_description: Session roster (bound + unbound) with named sessions and a deliberately-unstructured raw-JSON detail view
 ---
 
@@ -8,44 +8,59 @@ short_description: Session roster (bound + unbound) with named sessions and a de
 
 ## Status
 
-`Proposed`. **History:** a first `Proposed` flip was premature —
-review caught a decision-completeness failure where two Contracts
-bullets (the roster's metadata read policy and the name/no-name
-fallback) deferred task-level *behavior* decisions to phase-plan
-drafting, which an N ≥ 2 orchestrating plan must own. The plan was
-regressed to `In draft`, both decisions resolved concretely in the
-Contracts section (read policy: register-event metadata baseline
-with the latest later event's metadata overlaid key-by-key,
-per-request; label: reported `name` else the work-instance slug,
-never the `wst-<uuid>` actor, with only the *literal
-slug-fallback formatting* render-time-deferred under "Bans on
-surface require rendering the consequence"), and the scoping
-Open-decisions section plus the p1/p2 stub Open-HOW reconciled to
-mechanism-only.
+`In draft`. **History:** two review findings each regressed a
+premature `Proposed`.
+
+1. *Decision-completeness.* Two Contracts bullets (the roster's
+   metadata read policy and the name/no-name fallback) deferred
+   task-level *behavior* decisions to phase-plan drafting, which
+   an N ≥ 2 orchestrating plan must own. Resolved concretely in
+   Contracts (read policy: register-event metadata baseline with
+   the latest later event's metadata overlaid key-by-key,
+   per-request; label: reported `name` else the work-instance
+   slug, never the `wst-<uuid>` actor, only the *literal
+   slug-fallback formatting* render-time-deferred under "Bans on
+   surface require rendering the consequence"); scoping
+   Open-decisions and the p1/p2 stub Open-HOW reconciled to
+   mechanism-only.
+2. *Cross-doc currency.* The plan permitted t4 to edit
+   `render.go`'s shared `indexData` / `renderIndex` data-path
+   plumbing, but the authoritative milestone Cross-Task Invariant
+   and the (`Landed`) t1 Region-ownership contract still made any
+   t4 `render.go` edit a reviewer-flag violation, with the plan
+   only *promising* to reconcile them in the implementing PR. A
+   `Proposed` plan resting on an unreconciled cross-doc
+   contradiction is drift; per the parent-doc-currency rule the
+   reconciliation belongs in this drafting change. The milestone
+   Cross-Task Invariant and t1's Region-ownership contract (and
+   its Cross-Cutting restatement) are now amended **here** with
+   the narrow data-path carve-out (shared `indexData` /
+   `renderIndex` plumbing is expected and not reviewer-flag;
+   changing a region body other than the task's own, or the shell
+   layout / region boundary, stays reviewer-flag); the plan and
+   scoping no longer defer that reconciliation.
 
 The load-bearing HOW calls the parent milestone deferred to t4 are
 resolved in the scoping doc
 ([`scoping/t4-session-roster.md`](scoping/t4-session-roster.md),
-decisions D1–D5); no "input from prior task" was pending (t1 is
+decisions D1–D5); no "input from prior task" is pending (t1 is
 `Landed`; t4 is independent of t2/t3 per the milestone Sequencing
-graph). The
+graph). What remains before `Proposed` is re-walking the
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion gate was **re-walked** before this
-flip with the corrected Contracts: read end-to-end for
-cross-section coherence; Contracts re-scanned for deferral phrases
-— now decision-complete (the sole residual deferral, the literal
-slug-fallback label formatting, is authorized by "Bans on surface
-require rendering the consequence," not deferred to a phase or to
-the task-drafting moment); the broadened `Verified by:` rule
-applied to every load-bearing claim including the new
-read-policy / slug-fallback citations and re-confirmed against the
-branch; required sections present with estimate-shaped sections
-labeled; no content descended to implementation prescription
-(query mechanism is explicitly carved as p2 HOW). The two phase
-skeleton docs the `Phase Contracts` section names —
+`In draft → Proposed` promotion gate with both findings resolved:
+end-to-end + cross-doc coherence (the milestone/t1 carve-out now
+makes the permitted `render.go` data-path edit consistent with the
+authoritative invariants); Contracts decision-complete (the sole
+residual deferral, the literal slug-fallback formatting, is
+authorized by "Bans on surface require rendering the
+consequence"); the broadened `Verified by:` rule re-confirmed
+against the branch; required sections present and estimate-shaped
+sections labeled; no implementation prescription (query mechanism
+explicitly carved as p2 HOW). The two phase skeleton docs the
+`Phase Contracts` section names —
 [`t4-p1-bare-roster.md`](t4-p1-bare-roster.md) and
-[`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were seeded at the
-first flip and left in place (no-clobber); only their inherited
+[`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were seeded at an
+earlier flip and left in place (no-clobber); only their inherited
 Open-HOW framing was corrected to mechanism-only.
 
 This is an **N ≥ 2 task plan** (orchestrating doc). Per-phase HOW
@@ -228,10 +243,12 @@ a mix of rules and estimates."
   milestone explicitly named as t4's surface. This relaxes t1's
   "t4 edits only `roster.go`" file-enforcement to "shared
   data-path plumbing through `indexData` is expected; changing a
-  *region body* other than the roster's is still reviewer-flag";
-  the milestone Cross-Task Invariant and t1's Region-ownership note
-  are reconciled in this task's implementing PR (see Documentation
-  Currency).
+  *region body* other than the roster's, or the shell layout, is
+  still reviewer-flag". The milestone Cross-Task Invariant and
+  t1's Region-ownership contract (and its Cross-Cutting
+  restatement) are **amended with this carve-out in this drafting
+  change** — not deferred to the implementing PR — so no `Proposed`
+  cross-doc contradiction stands (see Documentation Currency).
   `Verified by:`
   [`roster.go`](../../../../internal/site/roster.go) owns
   `{{define "roster"}}`;
@@ -433,10 +450,14 @@ Status/contract-bearing docs this task's PRs update:
   rule; subsequent row values track this plan's Status with the PR
   that performs each flip.
 - t1 [`t1-site-skeleton.md`](t1-site-skeleton.md) Region-ownership
-  note and the milestone Cross-Task Invariant — reconciled in t4's
-  implementing PR to distinguish shared `indexData` data-path
-  plumbing (expected) from region-body changes (still
-  reviewer-flag) (scoping D3).
+  contract + its Cross-Cutting restatement, and the milestone
+  Cross-Task Invariant — **amended with the data-path carve-out in
+  this drafting change** (not the implementing PR): shared
+  `render.go` `indexData` / `renderIndex` plumbing and `site.go`'s
+  loader are expected; region-body / shell-layout crossings stay
+  reviewer-flag (scoping D3). Editing the `Landed` t1 doc is a
+  forward-constraint currency fix against the authoritative
+  milestone invariant, not a t1 behavior change.
 - [`docs/agents/local/session-registration.md`](../../../agents/local/session-registration.md)
   — the handshake reports a session name; updated in p2's PR.
 - [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §5/§7

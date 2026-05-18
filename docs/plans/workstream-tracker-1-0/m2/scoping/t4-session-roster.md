@@ -118,11 +118,15 @@ hard restriction. Decision: t4 edits `render.go`'s shared
 `indexData` / `renderIndex` plumbing and `site.go`'s data path as
 needed; the roster **region body** (template + CSS) stays in
 `roster.go`, and the **forest region body** and **shell layout**
-are untouched. The plan carries a Documentation Currency obligation
-to update the milestone Cross-Task Invariant and t1's
-Region-ownership note so the distinction (shared data-path plumbing
-through `indexData` = expected; changing a region body = still
-reviewer-flag) is recorded, not silently violated.
+are untouched. The milestone Cross-Task Invariant and t1's
+Region-ownership contract (and its Cross-Cutting restatement) are
+**amended with this carve-out in the drafting change itself** (not
+deferred to the implementing PR): shared data-path plumbing through
+`render.go`'s `indexData` / `renderIndex` and `site.go`'s loader is
+expected; changing a region body other than the task's own, or the
+shell layout / region boundary, stays reviewer-flag. This keeps the
+plan tree free of a `Proposed` cross-doc contradiction (a review
+finding caught the earlier defer-to-implementing-PR framing).
 
 `Verified by:`
 [`Region-ownership contract in t1-site-skeleton.md`](../t1-site-skeleton.md)

@@ -113,7 +113,7 @@ the walk-on-every-request render path is unchanged.
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Proposed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
-| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
+| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [In draft (stub)](t4-p1-bare-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
 
@@ -127,13 +127,15 @@ resolved to N = 1 via the branch test; promotion-gate
 self-review run clean and the locked-decision supersession
 authorized), ready for code review and implementation. **t4**
 ([`t4-session-roster.md`](t4-session-roster.md)) is a
-**`Proposed` N ≥ 2 task plan** (drafted, scoping complete,
-promotion gate re-walked after a review finding regressed a
-premature `Proposed` and two deferred-contract decisions were
-resolved concretely — see the plan's Status history). Its two
-phases — [`t4-p1`](t4-p1-bare-roster.md) and
+**drafted N ≥ 2 task plan** back at `In draft` (two review
+findings each regressed a premature `Proposed` — a
+decision-completeness gap and a cross-doc-currency gap; both
+resolved, including this milestone's Cross-Task Invariant getting
+the data-path carve-out below, re-promotion pending the gate
+re-walk — see the plan's Status history). Its two phases —
+[`t4-p1`](t4-p1-bare-roster.md) and
 [`t4-p2`](t4-p2-enrichment.md) — were seeded as parent-promotion
-**stubs** and are scoped just-in-time at their own drafting. t3
+**stubs** and left in place (no-clobber). t3
 remains a seeded parent-promotion **stub**
 (`slug` + `Status: In draft` + inherited WHAT contract) — not yet
 a drafted plan. Each not-yet-drafted task's full HOW is scoped
@@ -251,6 +253,17 @@ any per-task drafting brushes against these.
   [`roster.go`](../../../../internal/site/roster.go) owns the
   roster region (t4's surface); a later-task diff crossing
   those file boundaries is the reviewer-flag signal.
+  **Data-path carve-out (resolved at t4 drafting, the consequence
+  of the deferred storage decision above).** This file-enforcement
+  governs *region bodies* and the *shell layout / region
+  boundary*, not the shared request-time data path. A later task
+  editing `render.go`'s shared `indexData` / `renderIndex`
+  plumbing (e.g. t4 adding a roster data field) or `site.go`'s
+  loader is **expected and not reviewer-flag** — the milestone
+  named the data path as t4's surface. What stays reviewer-flag: a
+  later task changing a *region body* other than its own
+  (`render.go` shell composition, `forest.go`, another's
+  `roster.go`) or altering the shell layout / region boundary.
   [`Server.index` in site.go](../../../../internal/site/site.go)
   is the single `/` handler.
 - **Opposite spec postures are intentional — do not
