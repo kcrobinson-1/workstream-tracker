@@ -19,14 +19,15 @@ import (
 // (frontmatter authoritative, per spec/planning/shared.md
 // "Plan-doc identity (slug)"), the Status value if present, the
 // optional short/long descriptions, the optional author-curated
-// related-PR list, and the path the doc was found at (for
-// diagnostics).
+// related-PR list, the optional doc-declared progress stages, and
+// the path the doc was found at (for diagnostics).
 type parsedDoc struct {
 	Slug             string
 	Status           string
 	ShortDescription string
 	LongDescription  string
 	RelatedPRs       []string
+	ProgressStages   []string
 	Path             string
 }
 
@@ -127,12 +128,14 @@ func parsePlanDoc(path string) (parsedDoc, error) {
 		ShortDescription: shortDescription,
 		LongDescription:  markdownBody(source),
 		RelatedPRs:       stringList(metaData["related_prs"]),
+		ProgressStages:   stringList(metaData["progress_stages"]),
 		Path:             path,
 	}, nil
 }
 
 // stringList tolerantly turns a frontmatter value into a []string.
-// The optional `related_prs` key decodes from goldmark-meta as a
+// The optional `related_prs` and `progress_stages` keys decode
+// from goldmark-meta as a
 // []interface{} of string (a YAML block sequence under
 // gopkg.in/yaml.v2 v2.3.0, pinned via goldmark-meta v1.1.0). This
 // follows the same absence-tolerance posture as the scalar

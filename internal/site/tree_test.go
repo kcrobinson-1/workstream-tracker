@@ -163,6 +163,31 @@ func TestBuildTreeCarriesRelatedPRs(t *testing.T) {
 	}
 }
 
+func TestBuildTreeCarriesProgressStages(t *testing.T) {
+	docs := []parsedDoc{
+		{Slug: "alpha", Status: "In progress"},
+		{Slug: "alpha-m1", Status: "Proposed", ProgressStages: []string{"Spec", "Render"}},
+	}
+	roots := buildTree(docs, nil)
+
+	// A node without the field carries an empty (non-panicking)
+	// slice; no inheritance from a declaring parent/child.
+	if len(roots[0].ProgressStages) != 0 {
+		t.Errorf("alpha ProgressStages = %v, want empty", roots[0].ProgressStages)
+	}
+
+	m1 := roots[0].Children[0]
+	want := []string{"Spec", "Render"}
+	if len(m1.ProgressStages) != len(want) {
+		t.Fatalf("alpha-m1 ProgressStages = %v, want %v", m1.ProgressStages, want)
+	}
+	for i := range want {
+		if m1.ProgressStages[i] != want[i] {
+			t.Errorf("ProgressStages[%d] = %q, want %q", i, m1.ProgressStages[i], want[i])
+		}
+	}
+}
+
 func TestStatusClass(t *testing.T) {
 	cases := []struct {
 		status, want string

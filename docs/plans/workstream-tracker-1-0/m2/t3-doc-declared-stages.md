@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t3
-Status: Proposed
+Status: Landed
 short_description: Additive spec field + parser + per-node progress-cell render driven by the doc
 ---
 
@@ -8,10 +8,23 @@ short_description: Additive spec field + parser + per-node progress-cell render 
 
 ## Status
 
-`Proposed`. Drafting is complete and the
+`Landed`. Implemented in this PR: the new optional
+`progress_stages` frontmatter field, the tolerant parser read
+reusing the `stringList` block-sequence decoder, the per-node
+progress-cell row in the forest render, the spec-doc entry, and
+the semantic tests. The Validation Gate below was satisfied
+(`go build`/`go vet`/`go test` green; semantic/structural render
++ parser tests; the absent-field Drafting-cell render observed
+against a real `go run` on the dogfood tree and a declaring-doc
+tree, not inferred from the diff). The drafting + promotion-gate
+history that produced the prior `Proposed` state is retained
+below as the durable decision record.
+
+The `` `In draft` → `Proposed` `` gate walk:
+`Proposed` was reached when drafting completed and the
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 `` `In draft` → `Proposed` `` promotion gate was walked before
-this flip. History: a spawned just-in-time planning session
+that flip. History: a spawned just-in-time planning session
 decomposed the genuine decisions into shapes and surfaced them;
 the contributor resolved them in-loop (2026-05-18, aligned with
 the recommendations) and then directed this session to walk the
@@ -380,21 +393,24 @@ each:
   entry (decomposed → RESOLVED D1–D6 → gate walked), plus the
   D5 reconciliation of the inherited t3 Task Contract from
   Status-gated to field-presence wording.
-- **Implementing PR:**
+- **Implementing PR (this PR):**
   [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §7
-  "What the Website Renders" gains the doc-driven progress-cell
+  "What the Website Renders" gained the doc-driven progress-cell
   row (reserved Drafting cell + declared stages, field-presence
-  gated, no inheritance), per the design-currency rule. The same
-  PR flips the m2 README t3 Task Status row `Proposed` →
-  `Landed` and this plan's Status at the implementation-terminal
-  per the [`task-plan.md`](../../../../spec/planning/task-plan.md)
+  gated, no inheritance), per the design-currency rule;
+  `progress_stages` was documented in
+  [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
+  adjacent to `short_description` / `related_prs`. The same PR
+  flipped the m2 README t3 Task Status row `Proposed` → `Landed`
+  and this plan's Status at the implementation-terminal per the
+  [`task-plan.md`](../../../../spec/planning/task-plan.md)
   "Plan-to-PR Completion Gate."
 
 ## Validation Gate
 
-The promotion gate has been walked (see Status). The gate below
-is the implementing PR's Validation Gate, satisfied before that
-PR opens.
+The promotion gate was walked at the `Proposed` flip (see
+Status). The gate below is the implementing PR's Validation
+Gate, satisfied by this PR.
 
 - `go build ./...`, `go vet ./...`, `go test ./...` all pass (per
   [`docs/dev.md`](../../../../docs/dev.md)).
