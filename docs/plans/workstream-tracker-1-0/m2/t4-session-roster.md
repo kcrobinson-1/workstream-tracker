@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4
-Status: In draft
+Status: Proposed
 short_description: Session roster (bound + unbound) with named sessions and a deliberately-unstructured raw-JSON detail view
 ---
 
@@ -8,18 +8,30 @@ short_description: Session roster (bound + unbound) with named sessions and a de
 
 ## Status
 
-`In draft`. Drafting is multi-pass: the load-bearing HOW calls the
-parent milestone deferred to t4 are resolved in the scoping doc
+`Proposed`. The load-bearing HOW calls the parent milestone
+deferred to t4 are resolved in the scoping doc
 ([`scoping/t4-session-roster.md`](scoping/t4-session-roster.md),
-decisions D1–D5) and no "input from prior task" is pending (t1 is
+decisions D1–D5) and no "input from prior task" was pending (t1 is
 `Landed`; t4 is independent of t2/t3 per the milestone Sequencing
-graph). What remains before `Proposed` is the
+graph). The
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion-gate self-review walk and, on that
-flip, seeding the two phase skeleton docs the `Phase Contracts`
-section names. Because this change spans three subsystems plus a
-cross-workstream backlog split, the promotion gate is run as a
-reviewed step, not folded into drafting.
+`In draft → Proposed` promotion gate was walked before this flip:
+read end-to-end for cross-section coherence; Contracts walked for
+deferral phrases (the only deferrals — the metadata read policy and
+the no-name fallback form — are handed to each phase's own
+just-in-time drafting via the scoping doc's Open-decisions handoff
+and the "Bans on surface require rendering the consequence" rule,
+not deferred to the task-drafting that produced this plan); the
+broadened `Verified by:` rule applied to every load-bearing claim
+and re-confirmed against the current branch; required sections
+present with estimate-shaped sections labeled; no content descended
+to implementation prescription (per-phase HOW stays in the phase
+plans). The two phase skeleton docs the `Phase Contracts` section
+names — [`t4-p1-bare-roster.md`](t4-p1-bare-roster.md) and
+[`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were seeded in the
+same flip per
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-promotion
+stub seeding."
 
 This is an **N ≥ 2 task plan** (orchestrating doc). Per-phase HOW
 lives in the phase plans seeded at the `Proposed` flip; this doc
