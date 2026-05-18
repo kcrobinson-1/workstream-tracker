@@ -26,15 +26,20 @@ it is a commit boundary, not a distinct validation surface. The
 real seam is preserved as a Commit Boundary (below), not a phase.
 
 The [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion-gate self-review has run and
-passed clean: end-to-end coherence, contract
-decision-completeness, the universal `Verified by:` walk, and
-reality-check re-confirmation against current code all pass; all
-required sections are present with no undisclosed variance and no
-descent into implementation prescription; N = 1 so no phase
-skeletons are seeded. The flip past the locked-decision
-supersession (C2/S1) was explicitly authorized by the
-contributor.
+`In draft → Proposed` promotion-gate self-review ran (contract
+decision-completeness, the universal `Verified by:` walk,
+reality-check re-confirmation against current code, no descent
+into implementation prescription; N = 1 so no phase skeletons),
+and the flip past the locked-decision supersession (C2/S1) was
+explicitly authorized by the contributor. Two findings the gate's
+spec-conformance and end-to-end-coherence steps should have
+caught were raised in review and applied as in-place corrections
+(plan remains `Proposed`): the estimate-preface requirement
+([`shared.md`](../../../../spec/planning/shared.md) "Plan content
+is a mix of rules and estimates") now labels Files to touch and
+Commit Boundaries; and the C3/C5 leaf-box contradiction (a leaf
+has no disclosure control, so the default-open rule is scoped to
+boxes with children) is resolved.
 
 Drafting deliberation, rejected alternatives, and `Verified by:`
 grounding for every decision below live in
@@ -73,10 +78,11 @@ Within the forest region, a root and its descendants render as
 nested epic/root → milestone → task → phase boxes. Each box shows
 its node's Status badge and its active-work actor markers, and is
 independently collapsible via native HTML, with no JavaScript and
-no new route. A node with active work in its own subtree renders
-expanded; an idle subtree renders collapsed; the state is
-recomputed from live work-instance data on every request, with no
-stored UI state. The flat nested-bullet render is fully replaced.
+no new route. Among boxes that have children, one with active
+work in its subtree renders expanded and an idle subtree renders
+collapsed; a leaf box has no children, no disclosure control, and
+no expand state. The expand state is recomputed from live
+work-instance data on every request, with no stored UI state. The flat nested-bullet render is fully replaced.
 Nodes carrying no rich data — including a bare `slug` +
 `Status: In draft` stub — still render as a valid box, and the
 existing per-node actor markers, long description, and related-PR
@@ -87,7 +93,8 @@ each root's internal epic → milestone → task → phase structure as
 nested collapsible boxes; a box with an active work-instance in
 its subtree is open on load and an idle subtree is closed; every
 box still shows its actor markers and detail; a stub renders as a
-closed/leaf box with just its badge and label; and the
+leaf box (no disclosure control) with just its badge and label;
+and the
 narrow-forest-column degrade is an observed, intentional layout,
 not a collision.
 
@@ -114,15 +121,21 @@ Final WHAT shape. HOW grounding is in
   [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
   S1, and the m2 README "Cross-Task Decisions" entry is
   reconciled to point at it in the same change as this plan.
-- **C3 — Default expand state from active work.** A box renders
-  expanded iff it, or any descendant, has an active
-  work-instance; otherwise collapsed. The value is computed in
-  the tree builder as a post-order pass after children are
-  wired, carried on the render-input node struct as one new
-  additive boolean field, and read by the template to emit the
-  open state. Recomputed every request from live data — no
-  persistence, consistent with the walk-on-every-request
-  invariant.
+- **C3 — Default expand state from active work.** Expand/collapse
+  applies only to a box that has a disclosure control — i.e., a
+  box with children; a leaf box has none (C5) and therefore has
+  no expand state at all (its badge, label, actor markers, and
+  detail are always visible — there is nothing to disclose). A
+  box *with children* renders expanded iff it, or any descendant,
+  has an active work-instance; otherwise collapsed. The
+  active-in-subtree signal is computed in the tree builder as a
+  post-order pass after children are wired, carried on the
+  render-input node struct as one new additive boolean field, and
+  read by the template to emit the open state on collapsible
+  boxes only. The "or any descendant" clause is what forces an
+  active leaf's ancestor boxes open so the leaf is visible.
+  Recomputed every request from live data — no persistence,
+  consistent with the walk-on-every-request invariant.
 - **C4 — Right-aligned Status region; t2 owns the per-node-row
   narrow-window degrade.** The box header places the label group
   left and the Status group right. t2 introduces this
@@ -186,6 +199,14 @@ is a reviewer-flag candidate.
 
 ## Files to touch
 
+_Estimate of the expected file shape, not a binding rule.
+Implementation may revise this list when a structural call
+requires it — including touching a file listed under
+"Intentionally not touched" (that line means "we don't expect to
+need these," not "implementation must not touch them"). Any
+deviation is normal and is handled via the PR-body Estimate
+Deviations callout, with the plan reconciled to what shipped._
+
 - **Modify:** the forest-region render template + styles (the
   node render, its CSS, the `<ul>` removal, the `<details>`
   structure, the header left/right groups and the narrow-window
@@ -235,6 +256,13 @@ is a reviewer-flag candidate.
   boundary.
 
 ## Commit Boundaries
+
+_The N = 1 phase count is a resolved rule (the branch-test
+outcome — see Status), not re-estimated here. The specific
+two-commit split below is an **estimate** of cohesive review
+chunks; the implementer may refine or reshuffle it, with any
+deviation handled via the PR-body Estimate Deviations callout and
+the plan reconciled to what shipped._
 
 N = 1 (one phase, one implementing PR), two commits. This is the
 real phase-D seam (collapsible render | active-work default-open)
