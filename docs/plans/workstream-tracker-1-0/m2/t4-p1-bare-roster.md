@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4-p1
-Status: In draft
+Status: Proposed
 short_description: Bare bound/unbound session roster replacing the t1 placeholder (no event join, no client change)
 ---
 
@@ -419,6 +419,26 @@ it re-enters scope at p2.
   Mitigation: SD1 fixes the loader as a pure function over the
   existing per-request values; the loader takes those values as
   parameters rather than acquiring its own.
+
+## Documentation Currency
+
+- Milestone [`README.md`](README.md) — the Task Status `t4-p1`
+  row and the stub-prose are reconciled **in this drafting
+  change** (row → `Proposed`; prose: p1 is now a drafted phase
+  plan, p2/t3 remain stubs) per
+  [`task-plan.md`](../../../../spec/planning/task-plan.md)
+  "Just-in-time scoping and plan drafting," mirroring the t1
+  precedent. The implementing PR advances the same row and this
+  plan's frontmatter Status onward to `Landed`.
+- This plan's `Status` lifecycle: `In draft` while drafted
+  (committed first), `Proposed` after the promotion-gate
+  self-review walk, then `Proposed → Landed` in the implementing
+  PR per the Plan-to-PR Completion Gate (Validation Gate fully
+  satisfiable pre-merge — no post-merge gate, single implementing
+  PR — so the default same-PR `Landed` flip applies; the N ≥ 2
+  parent task plan stays `Proposed` until p2 lands).
+- No `spec/`, `design/`, or `session-registration.md` currency is
+  owed by p1 — those are p2's (the client/CLI + handshake change).
 
 ## Related Docs
 

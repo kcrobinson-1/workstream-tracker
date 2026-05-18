@@ -169,13 +169,19 @@ does not re-litigate them:
   "Cross-PR coordination." p1 records the loader/`indexData`/region
   shape p2 consumes as the sibling-interface handoff in the plan's
   Goal/Contracts, tagged for p2 to verify at its drafting.
-- **No parent-doc update is owed by p1.** The
-  plan-drafting-updates-the-parent rule's t4 obligations (milestone
-  row, stub-prose reconciliation, the two deferral-note
-  resolutions) were discharged in the t4 task-plan drafting PR
-  (#34). p1's implementing PR advances only the milestone Task
-  Status `t4-p1` row per the normal Status-tracking rule, not as a
-  drafting-time parent reconciliation.
+- **Parent-doc update owed by this p1 drafting.** Per
+  [`task-plan.md`](../../../../../spec/planning/task-plan.md)
+  "Just-in-time scoping and plan drafting" (drafting updates the
+  parent tracking table in the same change), this drafting change
+  updates the milestone [`README.md`](../README.md) Task Status
+  `t4-p1` row to `Proposed` and reconciles its stub-prose (p1 is
+  now a drafted phase plan; p2 and t3 remain stubs) — mirroring
+  the t1 precedent. The t4 *task-plan*-level obligations
+  (milestone t4 row, the two deferral-note resolutions) were
+  already discharged in the t4 task-plan drafting PR (#34) and are
+  not re-touched. The implementing PR advances only the onward
+  Status values (`t4-p1` row and this plan → `Landed`), not a
+  fresh parent reconciliation.
 
 ## Reality-check inputs
 
