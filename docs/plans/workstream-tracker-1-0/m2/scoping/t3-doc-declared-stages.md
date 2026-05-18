@@ -8,15 +8,19 @@ milestone-terminal PR per
 "Scoping owns / plan owns." No Status field — scoping docs are
 not part of the plan-doc lifecycle.
 
-> **This scoping doc surfaces a decision space; it does not
-> resolve it.** This is a spawned, just-in-time drafting session
-> whose endpoint is a task plan at `Status: In draft` with the
-> genuine decisions decomposed into shapes and left OPEN for the
-> human. The "Decisions made at scoping time" section below
-> records only the procedural calls a rule lets this session make
-> (scoping-method calls); every product/spec decision is in "Open
-> questions for the human," not resolved here. No promotion gate
-> was run; no plan was promoted.
+> **History of this doc.** A spawned just-in-time drafting session
+> decomposed the genuine decisions into shapes and surfaced them
+> OPEN (the original endpoint was a task plan at `Status: In
+> draft`). The contributor then resolved D1–D6 in-loop
+> (2026-05-18) and directed the session to walk the
+> `` `In draft` → `Proposed` `` promotion gate in-session,
+> consciously extending past the spawn's original "stop at
+> `In draft`" bound at the contributor's explicit direction. The
+> "Decisions made at scoping time" section records the
+> scoping-method calls; "Decisions resolved by human input"
+> records D1–D6 with rejected shapes; the gate was walked and the
+> paired plan is now `Proposed`. No PR was opened by the session
+> (separately out of scope).
 
 ## Context summary
 
@@ -405,7 +409,10 @@ Status section carries the sketched file list.
   Naming (locked per D2 — frontmatter key `progress_stages`,
   rendered element "progress cell" + any new `PlanNode` field),
   Self-Review
-  Audits (`validation-honesty` + general checklist), Risk Register
+  Audits (`validation-honesty` + general checklist),
+  Documentation Currency (status-bearing docs the implementing PR
+  and the drafting/gate change touch — design §7, m2 README),
+  Risk Register
   (additive-breaking-a-vendored-consumer; homogenization pressure;
   the box≈PR assumption breaking → B2 as the additive-linear
   migration), Out of Scope (t4's roster; on-box

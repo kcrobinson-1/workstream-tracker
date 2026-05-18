@@ -112,19 +112,22 @@ field is unaffected.
 A plan doc may optionally declare its own ordered progress stages
 in frontmatter. The plan-tree walker reads the field with the same
 absence-tolerance the existing optional fields have. Every node in
-the forest renders a row of progress cells whose count and order
-come from that node's doc. A doc that omits the field — including
-the already-supported `slug` + `Status: In draft` stub — renders
-the Drafting cell only, with no error, skip, or broken layout. The
+the forest renders, on every node, a reserved Drafting cell
+followed by one cell per declared stage in the doc's order (so the
+declared count and order come from that node's doc). A doc that
+omits the field — including the already-supported `slug` +
+`Status: In draft` stub — renders the Drafting cell only, with no
+error, skip, or broken layout. The
 field is optional and additive: pre-existing docs and vendored
 spec consumers are unaffected by its absence, and t4's roster
 deliberately does not consume or schematize it.
 
 Verifiable when: rendering the dogfood `docs/plans/` tree shows,
-on every node box, a progress-cell row whose count and order match
-that node's declared stages; a stub and any field-omitting doc
-render exactly the Drafting cell as an intentional observed state
-(not an empty or errored row); the existing actor markers, Status
+on every node box, a progress-cell row = the reserved Drafting
+cell followed by one cell per declared stage in document order
+(N declared stages ⇒ N + 1 cells); a stub and any field-omitting
+doc render exactly the one Drafting cell as an intentional
+observed state (not an empty or errored row); the existing actor markers, Status
 badge, long description, and related-PR list still render
 unchanged; and the walk-on-every-request render path is unchanged.
 
@@ -155,11 +158,18 @@ grounding and the decomposition with rejected shapes live in
 - **C2 — Field shape and name (locked: D1 = A2, D2).** The
   optional frontmatter field is named `progress_stages` and is an
   ordered YAML block sequence of stage-label strings, read by the
-  existing tolerant block-sequence decoder. **Cell count = number
-  of entries; order = sequence order; the label of each cell is
-  its entry string** — so box count and order are derived from the
-  doc, as the locked m2 WHAT requires. One rendered cell
-  corresponds to one PR in the typical case. The shape stays a
+  existing tolerant block-sequence decoder. The declared entries
+  are the **post-Drafting** stages (C3: the Drafting cell is a
+  render-side reservation, never a declared entry). **The rendered
+  row is the reserved Drafting cell followed by one cell per
+  declared entry, in sequence order; each declared cell's label is
+  its entry string.** So a doc declaring N stages renders N + 1
+  cells (Drafting + N); a field-less doc or stub renders exactly
+  the one Drafting cell. The declared count and order come from
+  the doc, as the locked m2 WHAT requires — the constant leading
+  Drafting cell is render-side and not doc-controlled. One
+  declared cell corresponds to one PR in the typical case. The
+  shape stays a
   flat string sequence; growing a per-entry count later (the B2
   migration) is additive and out of scope here (Risk Register /
   Out of Scope). `Verified by:`
@@ -355,6 +365,29 @@ what shipped._
   goldmark-meta / `yaml.v2` block-sequence decode per D1 = A2 — no
   new dependency).
 
+## Documentation Currency
+
+Status-bearing / contract-bearing docs and the change that touches
+each:
+
+- **Already done in the drafting + in-session gate change** (not
+  the implementing PR): the m2 [`README.md`](README.md) parent-doc
+  currency — the t3 Task Status row (`In draft (stub)` →
+  `In draft` → `Proposed`), the t3 prose, and the
+  "Doc-declared-stages frontmatter shape" Cross-Task Decisions
+  entry (decomposed → RESOLVED D1–D6 → gate walked), plus the
+  D5 reconciliation of the inherited t3 Task Contract from
+  Status-gated to field-presence wording.
+- **Implementing PR:**
+  [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §7
+  "What the Website Renders" gains the doc-driven progress-cell
+  row (reserved Drafting cell + declared stages, field-presence
+  gated, no inheritance), per the design-currency rule. The same
+  PR flips the m2 README t3 Task Status row `Proposed` →
+  `Landed` and this plan's Status at the implementation-terminal
+  per the [`task-plan.md`](../../../../spec/planning/task-plan.md)
+  "Plan-to-PR Completion Gate."
+
 ## Validation Gate
 
 The promotion gate has been walked (see Status). The gate below
@@ -363,9 +396,10 @@ PR opens.
 
 - `go build ./...`, `go vet ./...`, `go test ./...` all pass (per
   [`docs/dev.md`](../../../../docs/dev.md)).
-- Unit tests cover: a declaring doc renders a progress-cell row of
-  the declared count and order; a field-omitting doc and a `slug`
-  + `Status: In draft` stub render exactly the Drafting cell; an
+- Unit tests cover: a doc declaring N stages renders the reserved
+  Drafting cell followed by N cells in document order (N + 1
+  total); a field-omitting doc and a `slug` + `Status: In draft`
+  stub render exactly the one Drafting cell; an
   absent / wrong-typed / partially-malformed field never errors or
   drops the node (the additive guarantee); the preserved t2
   surfaces (Status badge, actor markers, long description,
@@ -488,12 +522,12 @@ D5; surfaced, not decided here).
 - [`../../stub-children-on-parent-promotion/README.md`](../../stub-children-on-parent-promotion/README.md)
   — the landed stub render case the Drafting-cell-only behavior
   anchors to.
-- [`../../../design/vision.md`](../../../design/vision.md) §7 —
+- [`design/vision.md`](../../../../design/vision.md) §7 —
   the prose-to-data and sub-stage-cell open questions t3
   intersects but does not resolve.
-- [`../../../design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md)
   §7 — the render-scope section updated by the implementing PR.
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
-  and [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+- [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
+  and [`spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md)
   — the optional/additive + exact-match-label + decompose-shapes
   rules this task is structured against.
