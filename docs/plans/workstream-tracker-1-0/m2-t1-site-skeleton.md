@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t1
-Status: In draft
+Status: Proposed
 short_description: Two-region page shell — existing forest in the forest region, placeholder in the roster region
 ---
 
@@ -51,8 +51,26 @@ introduced here), and uses no novel mechanism (CSS-only
 two-column layout with `html/template`, both already in the
 codebase). All five narrow-surface conditions hold, so the
 planner explicitly invokes the carve-out; the reality-check
-inputs the gate protects are absorbed inline as `Verified by:`
-citations on every load-bearing claim below, not dropped.
+inputs the gate protects are absorbed inline in the
+**Reality-check inputs** section below (plus per-contract
+`Verified by:` citations), not dropped.
+
+The [`task-plan.md`](../../../spec/planning/task-plan.md)
+`In draft → Proposed` promotion-gate self-review has been run:
+read end-to-end for cross-section coherence; Contracts walked
+for deferral phrases (the only deferrals — exact CSS technique
+and the placeholder's final wording — are mechanism / render-time
+UX copy authorized by "the contract is the behavior, not the
+mechanism" and "Bans on surface require rendering the
+consequence," not deferrals to plan-drafting itself); the
+broadened `Verified by:` rule applied to every load-bearing
+claim; reality-check inputs re-confirmed against the current
+branch; required sections present with the narrow-surface
+Reality-check inputs section disclosed here; no content
+descended to implementation prescription. N = 1 (PR-count
+branch test: one code file — `render.go` — plus tests and doc
+currency, well under the split threshold), so no phase skeletons
+are seeded. No open inputs remained, so Status is `Proposed`.
 
 ## Goal
 
@@ -69,6 +87,72 @@ the empty-state ("no roots found"), and the
 walk-on-every-request render path are all unchanged — only the
 layout frame around the forest is new, plus the roster
 placeholder.
+
+## Reality-check inputs
+
+The narrow-surface carve-out compresses the scoping doc's
+reality-check pass into this section per
+[`task-plan.md`](../../../spec/planning/task-plan.md)
+"Verification protocols are not optional under this carve-out."
+Each load-bearing codebase claim below was checked against the
+current branch with a one-sentence falsifier; the per-contract
+`Verified by:` citations point at the same surfaces.
+
+- **`indexTmpl` is the single page template and a single
+  centered column.** Falsifier: "there is more than one
+  page template, or the body is already multi-column." Checked:
+  [`render.go`](../../../internal/site/render.go) defines exactly
+  one `template.Must(... "index" ...)`; `<body>` is one
+  `{{range .Roots}}`/`{{else}}` block inside
+  `body { … max-width: 60rem; margin: 0 auto }`. False —
+  single template, single column. This is the only file t1's
+  code change touches.
+- **The forest render to preserve is the Roots/empty block +
+  `node` template.** Falsifier: "node rendering lives outside
+  `indexTmpl` (a partial/file include)." Checked:
+  [`render.go`](../../../internal/site/render.go) — the
+  `{{if .Roots}} … {{range .Roots}}<div class="root">` block,
+  the `{{else}}<p class="empty">No plan-tree roots found …`
+  branch, and `{{define "node"}}` (actor markers ranging
+  `.WorkInstances`, long-desc, related-prs) are all inline in
+  the one template. False — nothing to chase across files; the
+  move is within one template body.
+- **The data path is untouched by a layout-only change.**
+  Falsifier: "the roster needs request-time data, so a
+  handler/query/`indexData` change is unavoidable." Checked:
+  [`site.go`](../../../internal/site/site.go) `Server.index`
+  walks plans + loads work-instances and calls
+  `renderIndex(w, indexData{Roots, PlansPath})`;
+  [`render.go`](../../../internal/site/render.go) `indexData`
+  has only `Roots` + `PlansPath`. The roster placeholder is
+  static markup needing no data. False — t1 is template/CSS
+  only; `site.go`/`tree.go`/`walker.go` stay untouched.
+- **The approved target is the m2 SVG and it specifies the
+  scroll/stack behavior.** Falsifier: "the SVG doesn't actually
+  say one-scrollbar / roster-top-right / stacked-narrow."
+  Checked:
+  [`workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg)
+  line 29 states it verbatim; the narrow-window note states
+  region stacking, mobile out of scope. False — the shell
+  behavior is anchored, not invented.
+- **No build/test wrapper exists; the Go toolchain is the
+  gate.** Falsifier: "a Makefile/justfile/script wraps
+  build+test." Checked: repo root has no `Makefile`/`justfile`;
+  `scripts/` is only `assemble.sh` (agent-rules vendoring).
+  False — `gofmt`/`go build`/`go vet`/`go test` is the gate.
+- **A render-test harness already exists to extend.** Falsifier:
+  "there is no render test file / no `renderIndex` test entry
+  point." Checked:
+  [`render_test.go`](../../../internal/site/render_test.go) has
+  a `renderTree` helper calling
+  `renderIndex(&buf, indexData{Roots, PlansPath})` and existing
+  cases; the new region/placeholder cases extend it. False — the
+  harness exists.
+- **A second tree exists for the manual render observation.**
+  Falsifier: "only the dogfood tree exists, so the gate can't
+  observe a second forest." Checked: `docs/plans/demo-workstream/`
+  is a populated second plan-tree root. False — the manual
+  observation can render both.
 
 ## Contracts
 
