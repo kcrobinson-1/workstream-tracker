@@ -112,7 +112,7 @@ the walk-on-every-request render path is unchanged.
 |-----------------------------------|------------------------------------------------------|--------|
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Landed](t2-expanded-render.md) |
-| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
+| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [In draft (stub)](t4-p1-bare-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
@@ -136,14 +136,23 @@ Cross-Task Invariant carries the data-path carve-out below — see
 the plan's Status history). Its two phases —
 [`t4-p1`](t4-p1-bare-roster.md) and
 [`t4-p2`](t4-p2-enrichment.md) — were seeded as parent-promotion
-**stubs** and are scoped just-in-time at their own drafting. t3
-remains a seeded parent-promotion **stub**
-(`slug` + `Status: In draft` + inherited WHAT contract) — not yet
-a drafted plan. Each not-yet-drafted task's full HOW is scoped
-just-in-time at its own drafting session per
+**stubs** and are scoped just-in-time at their own drafting. **t3**
+([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md)) is now a
+**drafted `In draft` task plan** (no longer a bare stub): a
+spawned just-in-time drafting session replaced the stub with a
+full task plan and a paired
+[`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+that decomposes the deferred frontmatter-shape decision into
+candidate shapes with trade-offs and a recommendation. It is held
+at `In draft` — not `Proposed`, no promotion gate run — pending
+human resolution of the surfaced open questions (see the t3 plan's
+Status section and the "Doc-declared-stages frontmatter shape"
+Cross-Task Decisions entry below). The t4 phase stubs remain
+parent-promotion stubs scoped just-in-time at their own drafting
+session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-"Just-in-time scoping and plan drafting"; the remaining stub
-is exempt from the required-sections rule until then per
+"Just-in-time scoping and plan drafting"; a remaining stub is
+exempt from the required-sections rule until then per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts." The Task Contracts below are the locked WHAT
 each task inherited.
@@ -390,6 +399,18 @@ their tasks draft.
   (goldmark-meta frontmatter read this field is added to);
   the vision's own open question on prose-to-data extraction in
   [`design/vision.md` §7](../../../../design/vision.md).
+  **Status: still OPEN — decomposed, not resolved.** t3's
+  just-in-time drafting session decomposed this into candidate
+  shapes (ordered stage-label list A1/A2/A3 vs. per-stage counts
+  B1/B2 vs. richer records C) with cited trade-offs and a
+  recommendation (A2 + field name `progress_stages`, Drafting box
+  render-side) in
+  [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+  "Open questions for the human" (OQ1/OQ2, with the dependent
+  OQ3/OQ4/OQ7). Per the spawned session's scope bound the decision
+  was **not locked**; it remains OPEN pending human input, and the
+  t3 plan is held at `In draft` (no promotion gate run) until the
+  human resolves it.
 - **Where richer session data is stored/read — RESOLVED at t4
   drafting: join the event log (no schema change).** A free-form
   `metadata` JSON column already exists on `events` but not on
