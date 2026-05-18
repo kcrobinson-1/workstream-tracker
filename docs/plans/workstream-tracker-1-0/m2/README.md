@@ -111,7 +111,7 @@ the walk-on-every-request render path is unchanged.
 | Slug                              | Title                                                | Status |
 |-----------------------------------|------------------------------------------------------|--------|
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
-| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Proposed](t2-expanded-render.md) |
+| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Landed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [In draft (stub)](t4-p1-bare-roster.md) |
@@ -120,12 +120,13 @@ the walk-on-every-request render path is unchanged.
 t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
 `Landed` (drafted, promoted, and implemented — the two-region
 shell shipped). t2
-([`m2-t2-expanded-render.md`](t2-expanded-render.md)) is a
-**drafted task plan** at `Status: Proposed` (its collapse
-mechanism resolved — see Cross-Task Decisions; phase split
-resolved to N = 1 via the branch test; promotion-gate
-self-review run clean and the locked-decision supersession
-authorized), ready for code review and implementation. **t4**
+([`m2-t2-expanded-render.md`](t2-expanded-render.md)) is
+`Landed` (drafted, promoted, and implemented — the forest
+region's flat bullet render replaced by nested, independently
+collapsible per-node boxes with active-work default-open; its
+collapse mechanism resolved to native `<details>` — see
+Cross-Task Decisions; phase split resolved to N = 1 via the
+branch test). **t4**
 ([`t4-session-roster.md`](t4-session-roster.md))
 is a **`Proposed` N ≥ 2 task plan** (drafted, scoping complete,
 gate re-walked after two review findings each regressed a

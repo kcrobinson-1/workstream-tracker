@@ -65,6 +65,35 @@ func TestBuildTreeAttachesActiveWorkInstances(t *testing.T) {
 	}
 }
 
+func TestBuildTreeActiveInSubtree(t *testing.T) {
+	docs := []parsedDoc{
+		{Slug: "alpha", Status: "In progress"},
+		{Slug: "alpha-m1", Status: "Proposed"},
+		{Slug: "alpha-m1-t1", Status: "In draft"},
+		{Slug: "beta", Status: "Proposed"},
+		{Slug: "beta-m1", Status: "Proposed"},
+	}
+	// Only the deepest node alpha-m1-t1 is active; beta is fully
+	// idle.
+	roots := buildTree(docs, map[string][]*ActiveWorkInstance{
+		"alpha-m1-t1": {{Actor: "agent-1"}},
+	})
+
+	alpha, beta := roots[0], roots[1]
+	if !alpha.ActiveInSubtree {
+		t.Errorf("alpha should be active-in-subtree (active descendant)")
+	}
+	if !alpha.Children[0].ActiveInSubtree {
+		t.Errorf("alpha-m1 should be active-in-subtree (active child)")
+	}
+	if !alpha.Children[0].Children[0].ActiveInSubtree {
+		t.Errorf("alpha-m1-t1 should be active-in-subtree (active itself)")
+	}
+	if beta.ActiveInSubtree || beta.Children[0].ActiveInSubtree {
+		t.Errorf("idle beta subtree must not be active-in-subtree")
+	}
+}
+
 func TestBuildTreeLabel(t *testing.T) {
 	docs := []parsedDoc{
 		{Slug: "alpha", ShortDescription: "Workstream tracker"},

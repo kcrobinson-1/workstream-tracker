@@ -22,6 +22,14 @@ type PlanNode struct {
 	RelatedPRs       []string
 	Children         []*PlanNode
 	WorkInstances    []*ActiveWorkInstance
+
+	// ActiveInSubtree is true iff this node, or any descendant,
+	// has an active work-instance. Computed post-order in
+	// buildTree after children are wired; the forest template
+	// reads it to decide the default expand state of a
+	// collapsible box (m2 t2 C3). Recomputed every request from
+	// live data — no persistence.
+	ActiveInSubtree bool
 }
 
 // ActiveWorkInstance is one currently-active work-instance
@@ -161,5 +169,28 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 		sort.Slice(n.Children, func(i, j int) bool { return n.Children[i].Slug < n.Children[j].Slug })
 	}
 
+	// Post-order pass (after children are wired): compute the C3
+	// default-open signal — a node is active-in-subtree iff it,
+	// or any descendant, has an active work-instance. The
+	// "or any descendant" clause is what forces an active leaf's
+	// ancestor boxes open so the leaf is visible.
+	for _, r := range roots {
+		markActiveInSubtree(r)
+	}
+
 	return roots
+}
+
+// markActiveInSubtree sets n.ActiveInSubtree post-order and
+// returns it, so a parent's value reflects already-computed
+// children.
+func markActiveInSubtree(n *PlanNode) bool {
+	active := len(n.WorkInstances) > 0
+	for _, c := range n.Children {
+		if markActiveInSubtree(c) {
+			active = true
+		}
+	}
+	n.ActiveInSubtree = active
+	return active
 }
