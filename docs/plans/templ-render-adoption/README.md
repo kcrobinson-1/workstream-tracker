@@ -1,6 +1,6 @@
 ---
 slug: templ-render-adoption
-Status: In draft
+Status: Landed
 short_description: Resolve templ vs html/template — accept html/template
 ---
 
