@@ -363,3 +363,45 @@ and this entry is where the resulting forest-shows-uuid /
 roster-shows-name gap is addressed. One option among several:
 render the reported name in the forest UX (and/or revisit the
 `wst-<uuid>` actor generator). Scope-framed, not prescribed.
+
+### destructive-metadata-updates
+
+**Status:** Open
+
+What the roster should do when a later event's metadata is
+destructive of (or silent about) previously-reported metadata.
+
+The roster's metadata read policy — the **locked t4 "Metadata
+read policy" contract** (`workstream-tracker-1-0-m2-t4`):
+register-event metadata as the identity baseline, the **single
+latest later event's** metadata overlaid **key-by-key**, per
+request — is deliberately non-accumulating and treats a later
+event that carries **no metadata** (`NULL`) or **non-object**
+metadata as "contributes nothing," so earlier metadata can
+outlive a newer event that meant to change or clear it. Two
+facets surfaced in review of the t4-p2 PR (#38): (1) a newer
+no-metadata heartbeat is excluded from the latest-later selection,
+so older metadata still overrides the register baseline; (2) a
+non-object later blob against an object baseline is ignored, so a
+stale object-derived name/detail is shown. The shipped code
+matches the locked contract, so this is a **product/contract
+question**, not a code defect against the plan — captured here
+rather than fixed in #38 (the plan's Risk Register already
+brackets the non-object facet as an accepted impl-robustness
+edge).
+
+Options among several: (a) accept and document the current
+behavior as intentional — `NULL` / non-object later metadata is a
+no-op, the most recent *object* metadata (or the register
+baseline) survives; (b) the UX surfaces every event's metadata
+block rather than a single merged view, so nothing is silently
+stale or hidden; (c) a non-destructive cross-event **upsert** —
+heartbeats only add or overwrite keys and never delete, folded
+across *all* later events rather than just the latest (the
+contributor's preferred direction; more complex — it needs a
+full event fold and an explicit delete/clear semantic, which is
+why it is backlog-sized, not a #38 fix); (d) possibly something
+else. Deferred, not 1.0-committed; re-deliberate when a producer
+that sends evolving per-heartbeat metadata actually exists (no
+current producer does — the `register` CLI sends a one-key
+`name` object or nothing).
