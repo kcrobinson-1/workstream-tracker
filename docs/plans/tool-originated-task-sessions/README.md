@@ -420,6 +420,11 @@ m1's locked contract.
   Whether m1 is a thin slug-passing invocation over that path
   or new registration surface is a technical-direction call for
   m1's milestone-planning session against merged code.
+  **Resolved** by that session: *reuse — no new registration
+  surface.* The deterministic mechanism already exists end-to-end
+  in merged code; m1 is a thin slug-passing use of it plus its
+  first-class contract expression and a determinism proof. (See
+  [`m1` Cross-Task Decision D1](m1/README.md).)
 - **How do the spec and agent rules express a deterministic,
   handshake-free registration path?** A tool-originated session
   skips the best-effort grounded narration handshake because
@@ -428,6 +433,10 @@ m1's locked contract.
   best-effort interactive path; they will need an additive
   expression of the deterministic path. Downstream of vision,
   but flagged so spec coherence is a conscious milestone input.
+  **Taken up by m1** as task t1 (the deterministic-path contract
+  expression), per m1's Cross-Task Decision D2; m2 consumes the
+  resulting contract rather than re-expressing it. (See
+  [`m1` Task Contracts and Cross-Task Decision D2](m1/README.md).)
 - **What is the relationship between this epic and the 1.0-epic
   interactive-registration tripwire?** Recorded as a non-goal
   in Out of Scope and as the dedicated, deliberately-Open
