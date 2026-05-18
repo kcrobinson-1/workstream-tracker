@@ -14,8 +14,10 @@ import "html/template"
 // A box with children is a native <details>/<summary> (no
 // JavaScript, no route — m2 t2 C2): its summary is the clickable
 // header and its children render as nested boxes inside the body.
-// A leaf box (no children) has no disclosure control and no
-// expand state (C5) — its header and detail are always visible.
+// It renders expanded (`open`) iff it, or any descendant, has an
+// active work-instance (C3, via PlanNode.ActiveInSubtree). A leaf
+// box (no children) has no disclosure control and no expand state
+// (C5) — its header and detail are always visible.
 // node-header / node-detail are factored out so both the
 // collapsible and leaf branches render the identical preserved
 // surfaces (C5: actor markers, long description, related PRs).
@@ -45,7 +47,7 @@ const forestTemplates = `
 
 {{define "node"}}
 {{- if .Children}}
-<details class="box box-{{.NodeType}}" open>
+<details class="box box-{{.NodeType}}"{{if .ActiveInSubtree}} open{{end}}>
 <summary><span class="box-header">{{template "node-header" .}}</span></summary>
 <div class="box-body">
 {{- template "node-detail" .}}
@@ -84,7 +86,17 @@ const forestTemplates = `
     .empty { color: #6b7280; font-style: italic; }
     .long-desc { white-space: pre-wrap; margin: 0.25rem 0 0.25rem 0; color: #374151; font-size: 0.9em; }
     .related-prs { list-style: none; margin: 0.25rem 0 0.25rem 0; padding-left: 1.25rem; font-size: 0.85em; }
-    .related-prs li { padding: 0.1rem 0; }{{end}}`
+    .related-prs li { padding: 0.1rem 0; }
+    /* m2 t2 C4: t2 owns the per-node-row narrow-window degrade.
+       When the forest column is narrow the right-aligned Status
+       group reflows below the label group as an intentional
+       stacked layout, rather than colliding with or truncating
+       the label. Distinct from the shell's region-stacking query
+       (render.go, max-width 60rem). */
+    @media (max-width: 48rem) {
+      .box-header { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+      .status-group { align-self: flex-start; }
+    }{{end}}`
 
 func init() {
 	template.Must(indexTmpl.Parse(forestTemplates))

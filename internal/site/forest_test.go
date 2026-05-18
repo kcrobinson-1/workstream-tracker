@@ -75,8 +75,10 @@ func TestRenderNestedBoxesReplaceBulletList(t *testing.T) {
 	html := renderTree(t, roots)
 
 	// Parent with children is a collapsible box; child is a nested
-	// leaf box, not an <li>.
-	if !strings.Contains(html, `<details class="box box-root" open>`) {
+	// leaf box, not an <li>. Expand state (open) is a separate
+	// concern (TestRenderDefaultOpenByActiveWork); this is the
+	// structural contract only.
+	if !strings.Contains(html, `<details class="box box-root"`) {
 		t.Errorf("parent node not rendered as a collapsible box; html:\n%s", html)
 	}
 	if !strings.Contains(html, `<summary><span class="box-header">`) {
@@ -189,6 +191,41 @@ func TestRenderEmptyStateInForestRegion(t *testing.T) {
 	}
 	if !strings.Contains(html, "The session roster lands in a later task.") {
 		t.Errorf("roster placeholder must still render when the forest is empty; html:\n%s", html)
+	}
+}
+
+// TestRenderDefaultOpenByActiveWork asserts the C3 default expand
+// state: a collapsible box with an active work-instance anywhere
+// in its subtree renders `open`, an idle subtree renders closed,
+// and an active leaf forces its ancestor boxes open ("or any
+// descendant") so the leaf is visible. Leaf boxes have no
+// disclosure control and no expand state.
+func TestRenderDefaultOpenByActiveWork(t *testing.T) {
+	docs := []parsedDoc{
+		// active root: active leaf m1 forces alpha open.
+		{Slug: "alpha", Status: "In progress"},
+		{Slug: "alpha-m1", Status: "Proposed"},
+		// idle root: no active work-instance anywhere.
+		{Slug: "beta", Status: "Proposed"},
+		{Slug: "beta-m1", Status: "Proposed"},
+	}
+	roots := buildTree(docs, map[string][]*ActiveWorkInstance{
+		"alpha-m1": {{Actor: "agent-1"}},
+	})
+	html := renderTree(t, roots)
+
+	// alpha is collapsible (has child) and has an active
+	// descendant -> open.
+	if !strings.Contains(html, `<details class="box box-root" open>`) {
+		t.Errorf("active-subtree root box should render open; html:\n%s", html)
+	}
+	// beta is collapsible but idle -> closed (no open attr).
+	if !strings.Contains(html, `<details class="box box-root">`) {
+		t.Errorf("idle root box should render closed (no open attr); html:\n%s", html)
+	}
+	// The active leaf alpha-m1 has no disclosure control at all.
+	if !strings.Contains(html, `<div class="box box-milestone box-leaf">`) {
+		t.Errorf("leaf box must have no expand state; html:\n%s", html)
 	}
 }
 
