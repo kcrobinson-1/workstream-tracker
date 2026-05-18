@@ -34,20 +34,20 @@ exact-slug create-or-attach path honors a caller-supplied slug
 verbatim with no natural-language resolution, no descendant
 generation, and no root-conflict check (Verified by
 [`design/v0.1-design.md` §4 exact-slug
-case](../../../design/v0.1-design.md), and
+case](../../../../design/v0.1-design.md), and
 [`internal/registerclient` package
-doc](../../../internal/registerclient/client.go),
+doc](../../../../internal/registerclient/client.go),
 [`internal/api/handlers.go`
 `registerWorkInstance` / `insertRegister`
-exact-slug branch](../../../internal/api/handlers.go)), and the
+exact-slug branch](../../../../internal/api/handlers.go)), and the
 `workstream-tracker register --slug <slug>` subcommand already
 invokes exactly that path, prints the real receipt, and never
 gates the session (Verified by
 [`cmd/workstream-tracker/register.go`
-`runRegister`](../../../cmd/workstream-tracker/register.go)). The
+`runRegister`](../../../../cmd/workstream-tracker/register.go)). The
 "narration handshake" is **not in the binary** — it is a layered
 agent procedure described only in
-[`docs/agents/local/session-registration.md`](../../../docs/agents/local/session-registration.md);
+[`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md);
 the CLI itself is already deterministic and handshake-free given
 a construction-known slug.
 
@@ -71,18 +71,22 @@ row, and m1's Inherited Contract](../README.md).)
 
 ## Task Status
 
-Task planning has not begun for any task; this is the milestone
-session's output, before per-task scoping.
+Both tasks were skeleton-seeded when this milestone passed its
+`In draft` → `Proposed` promotion gate (per
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
+child contracts → Parent-promotion stub seeding"); each carries
+the inherited locked contract at `Status: In draft`. Per-task
+planning (HOW scoping) has not begun.
 
-| Task | Slug | Status |
-|---|---|---|
-| t1 | `tool-originated-task-sessions-m1-t1` | Not started (no plan doc yet) |
-| t2 | `tool-originated-task-sessions-m1-t2` | Not started (no plan doc yet) |
+| Task | Slug | Skeleton | Status |
+|---|---|---|---|
+| t1 | `tool-originated-task-sessions-m1-t1` | [`t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md) | In draft (skeleton; task planning not started) |
+| t2 | `tool-originated-task-sessions-m1-t2` | [`t2-determinism-proof-harness.md`](./t2-determinism-proof-harness.md) | In draft (skeleton; task planning not started) |
 
 Task count is this milestone-planning session's output and is an
 **estimate of scope shape**, not an epic-level commitment;
 per-task PR counts are re-derived at each task's planning session
-per [`task-plan.md`](../../../spec/planning/task-plan.md)
+per [`task-plan.md`](../../../../spec/planning/task-plan.md)
 "PR-count predictions need a branch test".
 
 ## Sequencing
@@ -103,7 +107,7 @@ contract *names* — writing the proof first risks asserting
 properties the sanctioned contract does not actually express.
 Numbering reflects ship order, not strict dependency; t2 can be
 *drafted* in parallel with t1's implementation under the
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 parallel-drafting citation rules, but lands after t1 so the
 proof's assertions cite the locked contract wording.
 
@@ -117,8 +121,8 @@ Per-task **WHAT** contracts only; each task's **HOW** (file
 inventory, signatures, validation-gate specifics, execution
 ordering, risk register) is scoped at that task's own planning
 session against then-merged code, per
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc child
-contracts" and [`milestone.md`](../../../spec/planning/milestone.md)
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc child
+contracts" and [`milestone.md`](../../../../spec/planning/milestone.md)
 "Anti-goal: WHAT-contract each task, do not HOW-scope any task".
 
 | Task | Short description | End result and what it preserves (WHAT) | Sibling interface |
@@ -137,10 +141,10 @@ brushes against them.
   path and `workstream-tracker register --slug` are reused
   verbatim. (Verified by [`design/v0.1-design.md` §4: exact-slug
   is "a pure consumer — no endpoint, request/response field, or
-  schema change"](../../../design/v0.1-design.md).)
+  schema change"](../../../../design/v0.1-design.md).)
 - **Additive only.** The interactive best-effort grounded
   narration handshake
-  ([`session-registration.md`](../../../docs/agents/local/session-registration.md))
+  ([`session-registration.md`](../../../../docs/agents/local/session-registration.md))
   and the spec's exact-slug create-or-attach posture remain
   unchanged; the deterministic path is a sanctioned sibling,
   never a replacement. (Locked m1 Preserves clause.)
@@ -151,15 +155,15 @@ brushes against them.
   (Verified by [epic Cross-Cutting Invariants, "What
   'deterministic' is scoped to"](../README.md).)
 - **Rule/spec-change discipline.** A
-  [`docs/agents/local/**`](../../../docs/agents/local/) edit
+  [`docs/agents/local/**`](../../../../docs/agents/local/) edit
   follows
-  [`rule-additions.md`](../../../docs/agents/shared/meta/rule-additions.md)
+  [`rule-additions.md`](../../../../docs/agents/shared/meta/rule-additions.md)
   (name the rule retired/merged, or why none); a
-  [`spec/**`](../../../spec/) edit follows the AGENTS.md
+  [`spec/**`](../../../../spec/) edit follows the AGENTS.md
   `spec-authoring` pre-edit read; neither introduces
   tool-origination / spawn-UX content. (Verified by
   [`AGENTS.md` "Mandatory pre-edit reads" and "Adding to this
-  rule set"](../../../AGENTS.md).)
+  rule set"](../../../../AGENTS.md).)
 
 ## Cross-Task Decisions
 
@@ -172,22 +176,22 @@ brushes against them.
   check, and is idempotent on `(slug, actor, active)` (Verified by
   [`internal/api/handlers.go` `registerWorkInstance` exact-slug
   validation + `insertRegister` exact-slug
-  branch](../../../internal/api/handlers.go), and
+  branch](../../../../internal/api/handlers.go), and
   [`internal/api/slugs.go` /
   `internal/slugs/slugs.go` `IsWellFormed`: grammar-only,
-  repo-blind](../../../internal/slugs/slugs.go)); the
+  repo-blind](../../../../internal/slugs/slugs.go)); the
   single-request client posts exactly that
   (Verified by [`internal/registerclient/client.go`
-  `Register`](../../../internal/registerclient/client.go)); the
+  `Register`](../../../../internal/registerclient/client.go)); the
   CLI already carries `--slug`/`WST_SLUG`,
   `--actor`/`WST_ACTOR`, `--server`/`WST_SERVER`, prints the real
   receipt, and exits success regardless (Verified by
   [`cmd/workstream-tracker/register.go`
-  `runRegister`](../../../cmd/workstream-tracker/register.go)); an
+  `runRegister`](../../../../cmd/workstream-tracker/register.go)); an
   end-to-end CLI test already drives this against a real API
   server (Verified by
   [`cmd/workstream-tracker/register_test.go`
-  `TestRegisterCommandSuccessAndIdempotentRepeat`](../../../cmd/workstream-tracker/register_test.go)).
+  `TestRegisterCommandSuccessAndIdempotentRepeat`](../../../../cmd/workstream-tracker/register_test.go)).
   m1 is therefore a thin slug-passing *use* of the existing path
   plus its first-class contract expression and a
   determinism-specific proof — not new registration surface. This
@@ -208,8 +212,8 @@ brushes against them.
 
 - **D3 — Defer to t1's task planning:** the exact section
   placement and wording in
-  [`shared.md`](../../../spec/planning/shared.md) and
-  [`session-registration.md`](../../../docs/agents/local/session-registration.md),
+  [`shared.md`](../../../../spec/planning/shared.md) and
+  [`session-registration.md`](../../../../docs/agents/local/session-registration.md),
   and the `rule-additions.md` retire-or-merge target for the
   agent-rule addition. These are HOW, are not a cross-task
   blocker (t2 does not depend on the wording, only on the named
@@ -228,12 +232,12 @@ brushes against them.
   builds throwaway scaffolding"](../README.md)). The milestone
   doc states this up front so the value is legible at review.
 - **Spec change reaches every consumer project.** A
-  [`spec/**`](../../../spec/) edit changes the contract every
+  [`spec/**`](../../../../spec/) edit changes the contract every
   consumer follows. Mitigation: the additive-only and no-new-
   surface invariants; the `spec-authoring` pre-edit read; the
   API is unchanged so vendored consumers' runtime behavior is
   untouched (Verified by [`design/v0.1-design.md` §4: exact-slug
-  is a pure consumer, no schema change](../../../design/v0.1-design.md)).
+  is a pure consumer, no schema change](../../../../design/v0.1-design.md)).
 - **Deterministic-path wording drifts into tool-origination /
   spawn-UX language, pulling m2 vision forward.** Mitigation:
   Cross-Task Invariant "Rule/spec-change discipline" and D2's
@@ -250,24 +254,24 @@ brushes against them.
 ## Documentation Currency
 
 Map of which docs each task must keep accurate (per
-[`milestone.md`](../../../spec/planning/milestone.md) required
+[`milestone.md`](../../../../spec/planning/milestone.md) required
 "Documentation Currency"):
 
 - **t1 edits:**
-  [`spec/planning/shared.md`](../../../spec/planning/shared.md)
+  [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
   (additive deterministic-path expression, near "Slug
   generation" / the registration posture) and
-  [`docs/agents/local/session-registration.md`](../../../docs/agents/local/session-registration.md)
+  [`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md)
   (additive deterministic-path section; interactive handshake
   section unchanged). t1 must also keep
-  [`AGENTS.md`](../../../AGENTS.md)'s session-registration pointer
+  [`AGENTS.md`](../../../../AGENTS.md)'s session-registration pointer
   coherent if the agent-rule's shape changes.
 - **t2 edits:** test files under
-  [`cmd/workstream-tracker/`](../../../cmd/workstream-tracker/)
+  [`cmd/workstream-tracker/`](../../../../cmd/workstream-tracker/)
   (the existing `register_test.go` httptest-API pattern is the
   template); no product-doc edits.
 - **Currency check, no edit expected:**
-  [`design/v0.1-design.md` §4](../../../design/v0.1-design.md)
+  [`design/v0.1-design.md` §4](../../../../design/v0.1-design.md)
   already documents the exact-slug flow as a pure consumer with
   no schema change; both tasks must remain consistent with it and
   neither is expected to edit it. If a task finds it must, that
@@ -309,18 +313,18 @@ of Scope](../README.md)).
 - [`../README.md`](../README.md) — the parent epic; locks m1's
   WHAT and carries the two open questions m1 resolves (reuse vs
   new surface; spec/agent-rule expression).
-- [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md)
+- [`../../../spec/planning/milestone.md`](../../../../spec/planning/milestone.md)
   — the rules this milestone doc is structured against.
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — cross-level planning rules; the "Slug generation" exact-slug
   create-or-attach posture m1 reuses and t1 expresses additively.
-- [`../../../design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`../../../design/v0.1-design.md`](../../../../design/v0.1-design.md)
   — §4 API: the exact-slug create-or-attach flow as a pure
   consumer with no schema change (the no-new-surface anchor).
-- [`../../../docs/agents/local/session-registration.md`](../../../docs/agents/local/session-registration.md)
+- [`../../../docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md)
   — the interactive best-effort handshake t1 preserves unchanged
   and adds the deterministic sibling section beside.
-- [`../../../internal/registerclient/client.go`](../../../internal/registerclient/client.go),
-  [`../../../internal/api/handlers.go`](../../../internal/api/handlers.go),
-  [`../../../cmd/workstream-tracker/register.go`](../../../cmd/workstream-tracker/register.go)
+- [`../../../internal/registerclient/client.go`](../../../../internal/registerclient/client.go),
+  [`../../../internal/api/handlers.go`](../../../../internal/api/handlers.go),
+  [`../../../cmd/workstream-tracker/register.go`](../../../../cmd/workstream-tracker/register.go)
   — the merged registration path m1 reuses (D1's code grounding).
