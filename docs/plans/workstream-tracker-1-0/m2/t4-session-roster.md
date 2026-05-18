@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4
-Status: Proposed
+Status: Landed
 short_description: Session roster (bound + unbound) with named sessions and a deliberately-unstructured raw-JSON detail view
 ---
 
@@ -8,9 +8,20 @@ short_description: Session roster (bound + unbound) with named sessions and a de
 
 ## Status
 
-`Proposed` (re-promoted after the gate re-walk below).
-**History:** two review findings each regressed a premature
-`Proposed`.
+`Landed`. Both phases shipped: p1
+([`t4-p1-bare-roster.md`](t4-p1-bare-roster.md), the bare
+bound/unbound roster) and p2
+([`t4-p2-enrichment.md`](t4-p2-enrichment.md), client/CLI
+metadata + named sessions + the event-log join + the expandable
+raw-JSON detail). Per
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "Task
+plan terminal state when N ≥ 2," this task plan's terminal flip
+co-locates with p2's implementing PR, which also executes the
+Backlog Impact mutations and the Documentation Currency updates
+and advances the milestone `t4-p2` + `t4` rows.
+
+**History (Proposed phase):** two review findings each regressed
+a premature `Proposed`.
 
 1. *Decision-completeness.* Two Contracts bullets (the roster's
    metadata read policy and the name/no-name fallback) deferred

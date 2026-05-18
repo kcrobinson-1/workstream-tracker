@@ -39,7 +39,11 @@ fails the session — whatever happens, you proceed.
    (Slug also via `WST_SLUG`; actor via `--actor`/`WST_ACTOR`,
    defaulting to a generated per-session id — never the git user;
    server via `--server`/`WST_SERVER`, default
-   `http://localhost:8080`.)
+   `http://localhost:8080`. Optionally report a human session
+   name via `--name`/`WST_NAME` — it becomes the session's roster
+   label; omitting it lists the session under its slug. The name
+   is the sole conventionally-read reported key; it is sent as
+   request metadata and never blocks the best-effort attempt.)
 4. **Narrate failure explicitly.** If the command reports a
    failure, or the slug is unresolvable, say so explicitly and
    actionably — the session will not appear in the tree; the

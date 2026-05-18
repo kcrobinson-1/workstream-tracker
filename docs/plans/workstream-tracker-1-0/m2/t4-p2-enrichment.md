@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4-p2
-Status: Proposed
+Status: Landed
 short_description: Client/CLI metadata + named sessions + event-log join + expandable raw-JSON detail
 ---
 
@@ -579,25 +579,40 @@ maps to p2's diff surfaces:
 
 Per [`spec/backlog.md`](../../../../spec/backlog.md) effect
 taxonomy. The effect decisions were recorded at t4 task-plan /
-scoping drafting (t4 Backlog Impact, scoping D2); p2's
-implementing PR executes the **backlog-file mutations** (it is
-the t4 task-terminal PR):
+scoping drafting (t4 Backlog Impact, scoping D2) as a **split** of
+`deterministic-interactive-registration`. Reconciled to shipped
+reality: a sibling backlog rework merged to `main` between this
+plan's drafting and its implementation (the
+[`tool-originated-task-sessions`](../../../backlog.md#tool-originated-task-sessions)
+graduation) performed a **three-way split** of
+`deterministic-interactive-registration` ahead of t4 and
+**graduated** the determinism thread into that post-1.0 entry,
+explicitly leaving the observability residual
+([`unregistered-work-unobservable`](../../../backlog.md#unregistered-work-unobservable))
+at a broad framing for t4 to **shift**. p2's implementing PR (the
+t4 task-terminal PR) therefore executes the **backlog-file
+mutations** as a shift + a create, not the originally-estimated
+split:
 
 - [`deterministic-interactive-registration`](../../../backlog.md#deterministic-interactive-registration)
-  — **split.** Reduce the entry to the **determinism gap only**
-  (registration circularity, sole-consumer compensation, the
-  neighborly-events tripwire); it stays `Open` and is the entry
-  the independent determinism workstream graduates. Remove the
-  observability-gap prose it currently also carries.
-- **New entry — observability residual** (`Open`). Captures the
-  residual t4 narrows: registered-but-unbound work is now
-  surfaced by the roster, so the residual is *unregistered* work
-  only; the tree-side-heuristic candidate stays deferred under
-  the same neighborly-events tripwire.
-- **New entry — humanize forest actor display** (`Open`). The
-  forest still renders the raw `wst-<uuid>`; the roster now shows
-  names. Replace the raw uuid in the forest UX (and/or revisit
-  the actor generator). Scope-framed, not prescribed.
+  — **no t4 action.** The sibling rework already split it
+  three-way and graduated the determinism thread; the tripwire
+  thread is its own `Open`
+  [`interactive-registration-tripwire`](../../../backlog.md#interactive-registration-tripwire)
+  entry. The original "reduce to determinism-only, t4 graduates
+  it" estimate is superseded by that newer, t4-aware rework.
+- [`unregistered-work-unobservable`](../../../backlog.md#unregistered-work-unobservable)
+  — **shift** (the effect the sibling rework explicitly deferred
+  to t4). The roster now surfaces registered-but-unbound work, so
+  this entry is narrowed from missed-or-unregistered to
+  *unregistered* work only; it stays `Open`, deferred under the
+  `interactive-registration-tripwire`.
+- **New entry — humanize forest actor display**
+  ([`humanize-forest-actor`](../../../backlog.md#humanize-forest-actor),
+  `Open`). The forest still renders the raw `wst-<uuid>`; the
+  roster now shows names. Replace the raw uuid in the forest UX
+  (and/or revisit the actor generator). Scope-framed, not
+  prescribed.
 
 ## Related Docs
 

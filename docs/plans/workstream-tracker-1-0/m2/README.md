@@ -113,9 +113,9 @@ the walk-on-every-request render path is unchanged.
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Landed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [Proposed](t3-doc-declared-stages.md) |
-| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
+| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Landed](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [Landed](t4-p1-bare-roster.md) |
-| `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [Proposed](t4-p2-enrichment.md) |
+| `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [Landed](t4-p2-enrichment.md) |
 
 t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
 `Landed` (drafted, promoted, and implemented — the two-region
@@ -128,28 +128,25 @@ collapse mechanism resolved to native `<details>` — see
 Cross-Task Decisions; phase split resolved to N = 1 via the
 branch test). **t4**
 ([`t4-session-roster.md`](t4-session-roster.md))
-is a **`Proposed` N ≥ 2 task plan** (drafted, scoping complete,
+is a **`Landed` N ≥ 2 task plan** (drafted, scoping complete,
 gate re-walked after two review findings each regressed a
 premature `Proposed` — a decision-completeness gap and a
 cross-doc-currency gap; the latter is why this milestone's
 Cross-Task Invariant carries the data-path carve-out below — see
-the plan's Status history). Its two phases were seeded as
-parent-promotion **stubs**; phase 1
-[`t4-p1`](t4-p1-bare-roster.md) is **`Landed`** (drafted,
-promoted, and implemented — the bare bound/unbound roster shipped:
-every active session listed and classified against the
-in-request walked parsed-doc set, replacing t1's placeholder, no
-event join / no client change); phase 2
-[`t4-p2`](t4-p2-enrichment.md) is now a **`Proposed`** drafted
-phase plan (scoped just-in-time against merged p1 code: the
-client/CLI metadata + `name` affordance, the event-log join
-keyed on `work_instances.id`, and the expandable raw-JSON
-detail; its implementing PR is t4-terminal and carries the
-backlog shift + new entries and the p2/t4/milestone-row
-`Landed` flips). **t3**
-([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md)) is now
-a **`Proposed` N = 1 task plan**: a spawned just-in-time drafting
-session replaced the stub with a full task plan and a paired
+the plan's Status history). Both phases shipped: phase 1
+[`t4-p1`](t4-p1-bare-roster.md) is **`Landed`** (the bare
+bound/unbound roster — every active session listed and classified
+against the in-request walked parsed-doc set, replacing t1's
+placeholder, no event join / no client change); phase 2
+[`t4-p2`](t4-p2-enrichment.md) is **`Landed`** (client/CLI
+metadata + the `name` affordance, the event-log join keyed on
+`work_instances.id`, and the expandable raw-JSON detail; its
+t4-terminal implementing PR also co-located the backlog shift +
+the new entries and the p2/t4/milestone-row `Landed` flips).
+**t3** ([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md))
+is now a **`Proposed` N = 1 task plan**: a spawned just-in-time
+drafting session replaced the stub with a full task plan and a
+paired
 [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
 that decomposed the deferred frontmatter-shape decision into
 candidate shapes with trade-offs; the contributor resolved the
@@ -165,8 +162,8 @@ universal `Verified by:`, reality-check re-confirmation, always-on
 rules, the D6 branch-test sketch resolving N = 1) and the plan
 flipped to `Proposed`; phase split N = 1 so no phase stubs to
 seed (see the t3 plan's Status section and the "Doc-declared-stages
-frontmatter shape" Cross-Task Decisions entry below). With t3 and
-t4-p2 now both drafted and `Proposed`, no m2 child remains a
+frontmatter shape" Cross-Task Decisions entry below). With t3
+(`Proposed`) and the t4 phases (`Landed`), no m2 child remains a
 seeded parent-promotion stub; each not-yet-drafted child was
 scoped just-in-time at its own drafting session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)

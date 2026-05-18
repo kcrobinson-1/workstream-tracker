@@ -241,29 +241,30 @@ target is this entry.
 
 **Status:** Open
 
-A missed registration is unobservable from the rendered tree.
+Unregistered work is unobservable from the rendered tree.
 
-A missed/unregistered session emits no signal the tool ever
-sees, so the rendered tree cannot distinguish unregistered work
-from no work. The only backstop today is the in-session
-narration handshake, which works solely while a contributor is
-present to notice it — the same sole-consumer compensation the
+An *unregistered* session emits no signal the tool ever sees, so
+the rendered tree cannot distinguish unregistered work from no
+work. The only backstop today is the in-session narration
+handshake, which works solely while a contributor is present to
+notice it — the same sole-consumer compensation the
 [`interactive-registration-tripwire`](#interactive-registration-tripwire)
-is about. A tree-side heuristic ("a node with an active/Proposed
-plan doc but no work-instance") is the candidate future
-affordance, deferred.
+is about, and this entry is deferred under that same tripwire. A
+tree-side heuristic ("a node with an active/Proposed plan doc but
+no work-instance") is the candidate future affordance, deferred;
+not committed for 1.0.
 
 This thread was carved out of
 [`deterministic-interactive-registration`](#deterministic-interactive-registration)
 in its three-way split and stays **Open** (not graduated, not
-the determinism entry, not the tripwire). It is created here at
-its current broad framing so the split is self-contained per
-[`spec/backlog.md`](../spec/backlog.md) ("the PR that lands the
-plan also updates the backlog file accordingly"). The
-session-roster work (`workstream-tracker-1-0-m2-t4`) later
-**shifts** it: once the roster surfaces registered-but-unbound
-work, the residual narrows to *unregistered* work only. That is
-a shift of an existing entry, not a create.
+the determinism entry, not the tripwire). It was created at a
+broad missed-or-unregistered framing so that split was
+self-contained. The session-roster work
+(`workstream-tracker-1-0-m2-t4`) has now **shifted** it (t4-p2,
+the m2 t4 task-terminal PR): once the roster surfaced
+registered-but-unbound work, the residual narrowed to
+*unregistered* work only — a shift of an existing entry, not a
+create.
 
 ### tool-originated-task-sessions
 
@@ -344,3 +345,21 @@ follows. One option among several: reconcile the "Goal" /
 "Scoping owns / plan owns" phrasings to "Path conventions" so all
 three say milestone-terminal for a milestone's tasks/phases and
 task-terminal only for standalone task plans.
+
+### humanize-forest-actor
+
+**Status:** Open
+
+Humanize the forest's per-node actor display.
+
+The forest still renders the raw `wst-<uuid>` actor in its
+per-node `actor-marker` spans; the m2 t4 session roster now shows
+a human session name for the same work-instances (the reported
+`name` metadata, slug fallback). The forest and roster therefore
+disagree on how a session is identified — a deliberate,
+surfaced inconsistency: the v0.1 forest-actor no-regress
+invariant kept the forest marker unchanged through t4 on purpose,
+and this entry is where the resulting forest-shows-uuid /
+roster-shows-name gap is addressed. One option among several:
+render the reported name in the forest UX (and/or revisit the
+`wst-<uuid>` actor generator). Scope-framed, not prescribed.
