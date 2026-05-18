@@ -110,15 +110,14 @@ the walk-on-every-request render path is unchanged.
 
 | Slug                              | Title                                                | Status |
 |-----------------------------------|------------------------------------------------------|--------|
-| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Proposed](m2-t1-site-skeleton.md) |
+| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](m2-t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [In draft (stub)](m2-t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](m2-t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](m2-t4-session-roster.md) |
 
-t1 ([`m2-t1-site-skeleton.md`](m2-t1-site-skeleton.md)) is a
-drafted, `Proposed` plan (its own `In draft` → `Proposed`
-drafting session and promotion gate have run — no longer a
-stub); t2–t4 remain seeded parent-promotion
+t1 ([`m2-t1-site-skeleton.md`](m2-t1-site-skeleton.md)) is
+`Landed` (drafted, promoted, and implemented — the two-region
+shell shipped); t2–t4 remain seeded parent-promotion
 **stubs** (`slug`
 + `Status: In draft` + inherited WHAT contract) — not yet
 drafted plans. Each not-yet-drafted task's full HOW is scoped

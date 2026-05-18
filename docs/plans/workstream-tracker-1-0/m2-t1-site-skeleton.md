@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t1
-Status: Proposed
+Status: Landed
 short_description: Two-region page shell — existing forest in the forest region, placeholder in the roster region
 ---
 
@@ -351,6 +351,12 @@ structural call requires it; deviations are reported per
   badge/label) and the empty-state when there are no roots, and
   that the roster region contains the deliberate placeholder
   text (so the no-roster consequence is observed, not assumed).
+  *Shipped deviation:* the new `<aside class="roster">` tag made
+  the pre-existing `TestRenderRelatedPRsNonURLIsPlainText`
+  assertion `strings.Contains(html, "<a")` a false positive (it
+  matched `<aside`); that one assertion was tightened to `"<a "`
+  / `"<a>"` (actual anchor tags). Production behavior is
+  unchanged — an over-broad test matcher, not a contract change.
 - `design/v0.1-design.md` — §7 "What the Website Renders" is
   updated to describe the two-region shell (forest region +
   deliberate roster placeholder) per the parent-milestone
@@ -411,6 +417,19 @@ build/test). The canonical Go toolchain is the gate:
   scrolling at a tall window; (d) narrowing the window below the
   threshold stacks the roster below the forest with no
   horizontal scroll or truncation.
+  *Shipped result:* (a)–(c) observed in a real browser render
+  against both the dogfood and `demo-workstream` trees (the
+  latter renders the forest-region empty-state while the roster
+  placeholder still shows — empty forest is not a blank region).
+  (d): the preview browser pins its CSS viewport at 980px and
+  could not cross the 960px (`60rem`) breakpoint by resize, so
+  the stack was observed by confirming the `@media (max-width:
+  60rem) { .layout { flex-direction: column } }` rule is present
+  and parsed in the live stylesheet **and** measuring the
+  rendered geometry under that exact declaration: roster moves
+  to full container width directly below the forest, document
+  `scrollWidth == clientWidth` (no horizontal scroll). The CSS
+  media mechanism is standard, not novel.
 
 ## Execution Steps
 
@@ -561,10 +580,11 @@ re-wrapped, the package layout is unchanged).
   remain stubs. Subsequent row values track this plan's Status
   (`In draft → Proposed → Landed`) and land with the PR that
   performs each flip.
-- This plan's `Status` lifecycle: `In draft` while drafted, then
-  `Proposed` after the promotion-gate self-review (this drafting
-  PR's second commit), then `Proposed → Landed` in the
-  implementing PR per the Plan-to-PR Completion Gate.
+- This plan's `Status` lifecycle: `In draft` while drafted,
+  `Proposed` after the promotion-gate self-review (drafting PR
+  #25), then `Proposed → Landed` in this implementing PR per the
+  Plan-to-PR Completion Gate (Validation Gate satisfied
+  pre-merge — no post-merge gate, so same-PR flip to `Landed`).
 
 ## Backlog Impact
 
