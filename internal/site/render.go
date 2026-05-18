@@ -56,6 +56,7 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
 type indexData struct {
 	Roots     []*PlanNode
 	PlansPath string
+	Roster    []RosterEntry
 }
 
 // renderIndex writes the rendered index page to w.
