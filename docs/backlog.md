@@ -241,29 +241,30 @@ target is this entry.
 
 **Status:** Open
 
-A missed registration is unobservable from the rendered tree.
+Unregistered work is unobservable from the rendered tree.
 
-A missed/unregistered session emits no signal the tool ever
-sees, so the rendered tree cannot distinguish unregistered work
-from no work. The only backstop today is the in-session
-narration handshake, which works solely while a contributor is
-present to notice it — the same sole-consumer compensation the
+An *unregistered* session emits no signal the tool ever sees, so
+the rendered tree cannot distinguish unregistered work from no
+work. The only backstop today is the in-session narration
+handshake, which works solely while a contributor is present to
+notice it — the same sole-consumer compensation the
 [`interactive-registration-tripwire`](#interactive-registration-tripwire)
-is about. A tree-side heuristic ("a node with an active/Proposed
-plan doc but no work-instance") is the candidate future
-affordance, deferred.
+is about, and this entry is deferred under that same tripwire. A
+tree-side heuristic ("a node with an active/Proposed plan doc but
+no work-instance") is the candidate future affordance, deferred;
+not committed for 1.0.
 
 This thread was carved out of
 [`deterministic-interactive-registration`](#deterministic-interactive-registration)
 in its three-way split and stays **Open** (not graduated, not
-the determinism entry, not the tripwire). It is created here at
-its current broad framing so the split is self-contained per
-[`spec/backlog.md`](../spec/backlog.md) ("the PR that lands the
-plan also updates the backlog file accordingly"). The
-session-roster work (`workstream-tracker-1-0-m2-t4`) later
-**shifts** it: once the roster surfaces registered-but-unbound
-work, the residual narrows to *unregistered* work only. That is
-a shift of an existing entry, not a create.
+the determinism entry, not the tripwire). It was created at a
+broad missed-or-unregistered framing so that split was
+self-contained. The session-roster work
+(`workstream-tracker-1-0-m2-t4`) has now **shifted** it (t4-p2,
+the m2 t4 task-terminal PR): once the roster surfaced
+registered-but-unbound work, the residual narrowed to
+*unregistered* work only — a shift of an existing entry, not a
+create.
 
 ### tool-originated-task-sessions
 
@@ -344,3 +345,63 @@ follows. One option among several: reconcile the "Goal" /
 "Scoping owns / plan owns" phrasings to "Path conventions" so all
 three say milestone-terminal for a milestone's tasks/phases and
 task-terminal only for standalone task plans.
+
+### humanize-forest-actor
+
+**Status:** Open
+
+Humanize the forest's per-node actor display.
+
+The forest still renders the raw `wst-<uuid>` actor in its
+per-node `actor-marker` spans; the m2 t4 session roster now shows
+a human session name for the same work-instances (the reported
+`name` metadata, slug fallback). The forest and roster therefore
+disagree on how a session is identified — a deliberate,
+surfaced inconsistency: the v0.1 forest-actor no-regress
+invariant kept the forest marker unchanged through t4 on purpose,
+and this entry is where the resulting forest-shows-uuid /
+roster-shows-name gap is addressed. One option among several:
+render the reported name in the forest UX (and/or revisit the
+`wst-<uuid>` actor generator). Scope-framed, not prescribed.
+
+### destructive-metadata-updates
+
+**Status:** Open
+
+What the roster should do when a later event's metadata is
+destructive of (or silent about) previously-reported metadata.
+
+The roster's metadata read policy — the **locked t4 "Metadata
+read policy" contract** (`workstream-tracker-1-0-m2-t4`):
+register-event metadata as the identity baseline, the **single
+latest later event's** metadata overlaid **key-by-key**, per
+request — is deliberately non-accumulating and treats a later
+event that carries **no metadata** (`NULL`) or **non-object**
+metadata as "contributes nothing," so earlier metadata can
+outlive a newer event that meant to change or clear it. Two
+facets surfaced in review of the t4-p2 PR (#38): (1) a newer
+no-metadata heartbeat is excluded from the latest-later selection,
+so older metadata still overrides the register baseline; (2) a
+non-object later blob against an object baseline is ignored, so a
+stale object-derived name/detail is shown. The shipped code
+matches the locked contract, so this is a **product/contract
+question**, not a code defect against the plan — captured here
+rather than fixed in #38 (the plan's Risk Register already
+brackets the non-object facet as an accepted impl-robustness
+edge).
+
+Options among several: (a) accept and document the current
+behavior as intentional — `NULL` / non-object later metadata is a
+no-op, the most recent *object* metadata (or the register
+baseline) survives; (b) the UX surfaces every event's metadata
+block rather than a single merged view, so nothing is silently
+stale or hidden; (c) a non-destructive cross-event **upsert** —
+heartbeats only add or overwrite keys and never delete, folded
+across *all* later events rather than just the latest (the
+contributor's preferred direction; more complex — it needs a
+full event fold and an explicit delete/clear semantic, which is
+why it is backlog-sized, not a #38 fix); (d) possibly something
+else. Deferred, not 1.0-committed; re-deliberate when a producer
+that sends evolving per-heartbeat metadata actually exists (no
+current producer does — the `register` CLI sends a one-key
+`name` object or nothing).

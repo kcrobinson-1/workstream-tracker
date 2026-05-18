@@ -36,6 +36,13 @@ type PlanNode struct {
 // attached to a plan-tree node. Marker-shaped data only —
 // terminal-state work-instances are filtered out before render.
 type ActiveWorkInstance struct {
+	// ID is work_instances.id (the generated PRIMARY KEY) — the
+	// key events.work_instance_id references. Carried for the
+	// roster's p2 event-log join (loadActiveWorkInstances selects
+	// it; buildRoster joins reported metadata on it). The forest
+	// node-header renders only Actor, so this additive, unrendered
+	// field cannot regress the v0.1 forest actor markers.
+	ID    string
 	Actor string
 }
 
