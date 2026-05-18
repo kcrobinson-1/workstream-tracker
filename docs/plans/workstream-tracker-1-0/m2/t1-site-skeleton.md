@@ -274,12 +274,22 @@ contend on `render.go` or each other.*
   unchanged against the split.
 - After this split, t2 edits only `forest.go` (+
   `forest_test.go`), t4 edits only `roster.go` (+
-  `roster_test.go`); neither edits `render.go` or the other's
-  file. A later-task PR that edits `render.go` to change a
-  region body, or edits a sibling region's file, is reworking
-  the shell / a sibling's surface and is reviewer-flag (the
-  inherited "shell is t1's; siblings build into regions"
-  invariant, now file-enforced).
+  `roster_test.go`) **for region-body work**; neither edits
+  `render.go`'s shell composition or the other's region file. A
+  later-task PR that edits `render.go` to change a region body or
+  the shell layout, or edits a sibling region's file, is
+  reworking the shell / a sibling's surface and is reviewer-flag
+  (the inherited "shell is t1's; siblings build into regions"
+  invariant, now file-enforced). **Data-path carve-out (amended
+  by t4 drafting against the milestone Cross-Task Invariant, which
+  is authoritative; this `Landed` note is reconciled to it as a
+  forward-constraint currency fix, not a t1 behavior change):** a
+  later task editing `render.go`'s **shared `indexData` /
+  `renderIndex` plumbing** (a roster/data field) or `site.go`'s
+  loader is **expected and not reviewer-flag** — that shared
+  request-time data path was always outside the region-body
+  file-enforcement; only region-body and shell-layout crossings
+  are flagged.
 
 ### Forest-region contract (`internal/site/forest.go`)
 
@@ -383,8 +393,12 @@ scoping-vs-duplication discipline.
   here is the locked surface t2/t4 build against. The
   Region-ownership contract makes this **file-enforced**:
   `render.go` is the shell, `forest.go` is t2's, `roster.go` is
-  t4's — a later-task diff that crosses those file boundaries is
-  the reviewer-flag signal.
+  t4's — a later-task diff that crosses those *region-body* /
+  *shell-layout* boundaries is the reviewer-flag signal. (The
+  shared `render.go` `indexData` / `renderIndex` data-path
+  plumbing is carved out — see the Region-ownership contract's
+  data-path carve-out, amended by t4 drafting against the
+  authoritative milestone invariant.)
 - **Render path stays walk-on-every-request.** No caching,
   file-watch, or in-memory build-up. t1 trivially preserves this
   because it changes no data path. `Verified by:`

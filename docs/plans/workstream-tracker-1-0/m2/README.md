@@ -113,7 +113,9 @@ the walk-on-every-request render path is unchanged.
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Proposed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
-| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](t4-session-roster.md) |
+| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
+| `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [In draft (stub)](t4-p1-bare-roster.md) |
+| `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
 
 t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
 `Landed` (drafted, promoted, and implemented — the two-region
@@ -123,14 +125,24 @@ shell shipped). t2
 mechanism resolved — see Cross-Task Decisions; phase split
 resolved to N = 1 via the branch test; promotion-gate
 self-review run clean and the locked-decision supersession
-authorized), ready for code review and implementation. t3–t4
-remain seeded parent-promotion **stubs** (`slug`
-+ `Status: In draft` + inherited WHAT contract) — not yet
-drafted plans. Each not-yet-drafted task's full HOW is scoped
+authorized), ready for code review and implementation. **t4**
+([`t4-session-roster.md`](t4-session-roster.md))
+is a **`Proposed` N ≥ 2 task plan** (drafted, scoping complete,
+gate re-walked after two review findings each regressed a
+premature `Proposed` — a decision-completeness gap and a
+cross-doc-currency gap; the latter is why this milestone's
+Cross-Task Invariant carries the data-path carve-out below — see
+the plan's Status history). Its two phases —
+[`t4-p1`](t4-p1-bare-roster.md) and
+[`t4-p2`](t4-p2-enrichment.md) — were seeded as parent-promotion
+**stubs** and are scoped just-in-time at their own drafting. t3
+remains a seeded parent-promotion **stub**
+(`slug` + `Status: In draft` + inherited WHAT contract) — not yet
+a drafted plan. Each not-yet-drafted task's full HOW is scoped
 just-in-time at its own drafting session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-"Just-in-time scoping and plan drafting"; the remaining stubs
-are exempt from the required-sections rule until then per
+"Just-in-time scoping and plan drafting"; the remaining stub
+is exempt from the required-sections rule until then per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts." The Task Contracts below are the locked WHAT
 each task inherited.
@@ -241,6 +253,17 @@ any per-task drafting brushes against these.
   [`roster.go`](../../../../internal/site/roster.go) owns the
   roster region (t4's surface); a later-task diff crossing
   those file boundaries is the reviewer-flag signal.
+  **Data-path carve-out (resolved at t4 drafting, the consequence
+  of the deferred storage decision above).** This file-enforcement
+  governs *region bodies* and the *shell layout / region
+  boundary*, not the shared request-time data path. A later task
+  editing `render.go`'s shared `indexData` / `renderIndex`
+  plumbing (e.g. t4 adding a roster data field) or `site.go`'s
+  loader is **expected and not reviewer-flag** — the milestone
+  named the data path as t4's surface. What stays reviewer-flag: a
+  later task changing a *region body* other than its own
+  (`render.go` shell composition, `forest.go`, another's
+  `roster.go`) or altering the shell layout / region boundary.
   [`Server.index` in site.go](../../../../internal/site/site.go)
   is the single `/` handler.
 - **Opposite spec postures are intentional — do not
@@ -366,14 +389,19 @@ their tasks draft.
   (goldmark-meta frontmatter read this field is added to);
   the vision's own open question on prose-to-data extraction in
   [`design/vision.md` §7](../../../../design/vision.md).
-- **Where richer session data is stored/read (decide when t4
-  drafts).** A free-form `metadata` JSON column already exists
-  on `events` but not on `work_instances`, and
-  `loadActiveWorkInstances` selects only `slug, actor`. Whether
-  t4 reads enriched data by joining the event log or by an
-  additive `work_instances` column is a HOW call for t4,
-  bounded by the additive-spec/additive-schema invariant.
-  Verified by:
+- **Where richer session data is stored/read — RESOLVED at t4
+  drafting: join the event log (no schema change).** A free-form
+  `metadata` JSON column already exists on `events` but not on
+  `work_instances`, and `loadActiveWorkInstances` selects only
+  `slug, actor`. t4 reads enriched data by **joining the event
+  log**, not by adding a `work_instances` column: the write path
+  is already plumbed to `events.metadata`, no migration runner
+  exists, and the event log stays the single append-only source
+  of truth. See
+  [`t4-session-roster.md`](t4-session-roster.md) Contracts
+  ("Reported data") and
+  [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
+  decision D1. Verified by:
   [`schema.go`](../../../../internal/db/schema.go) (`events` has
   `metadata`, `work_instances` does not);
   [`loadActiveWorkInstances` in site.go](../../../../internal/site/site.go)
@@ -498,26 +526,36 @@ framed directly as a milestone of the parent epic and does not
 graduate from a backlog entry.
 
 - [`deterministic-interactive-registration`](../../../backlog.md#deterministic-interactive-registration)
-  — **referenced as a deliberated intersection, effect
-  decided when t4 drafts.** t4's bound+unbound roster delivers
-  the "surface unregistered/unbound work in the view"
-  observability mitigation direction this Open entry names.
-  Whether that reframes the entry (a `shift`, since the
-  observability gap gets a concrete home while the determinism
-  gap stays Open with its neighborly-events tripwire intact)
-  or is only a deliberated intersection (the
-  `stub-children-on-parent-promotion` precedent — referenced,
-  not shifted) is a minimal-surface call deferred to t4's
-  Backlog Impact, not over-resolved here. Either way the
-  entry stays Open and its integration-milestone tripwire is
-  untouched by this milestone. **Named open question:** the
-  precise effect (shift vs. reference-only).
+  — **RESOLVED at t4 drafting: split** (the effect this milestone
+  deferred to t4's Backlog Impact). The milestone named only
+  "shift vs. reference-only"; t4 drafting resolved it to a
+  **split** because the contributor will take
+  `deterministic-interactive-registration` up as its own
+  independent workstream — splitting makes the two plans
+  structurally unable to couple. The entry is reduced to the
+  **determinism gap only** (registration circularity,
+  sole-consumer compensation, the neighborly-events tripwire),
+  stays `Open`, and is the entry the independent determinism
+  workstream graduates; a **new entry** captures the
+  observability residual t4 narrows (registered-but-unbound is
+  now surfaced by the roster; the residual is *unregistered* work
+  only), also `Open`. The entry stays `Open` and its
+  integration-milestone tripwire is untouched by this milestone.
+  The split exceeds the two options this milestone enumerated and
+  is authorized by the milestone's explicit deferral of the
+  effect to t4 plus the new independent-workstream premise; the
+  backlog-file mutation executes in t4's implementing PR. See
+  [`t4-session-roster.md`](t4-session-roster.md) Backlog Impact
+  and [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
+  decision D2.
 - [`stale-skeleton-on-parent-reopen`](../../../backlog.md#stale-skeleton-on-parent-reopen),
   [`repo-rooted-doc-links`](../../../backlog.md#repo-rooted-doc-links),
   [`tool-originated-task-sessions`](../../../backlog.md#tool-originated-task-sessions)
   — not touched by this milestone (open, post-1.0 or
   unrelated). No backlog entry graduates, gets deleted, or is
-  split by this milestone doc.
+  split **by this milestone doc itself**; the
+  `deterministic-interactive-registration` split resolved above
+  is performed by t4's implementing PR, not by this doc.
 
 ## Out of Scope
 

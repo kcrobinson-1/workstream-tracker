@@ -262,3 +262,29 @@ several: a throwaway spike converting the forest/roster/node
 templates to templ components to weigh the
 ergonomics-versus-extra-dependency tradeoff §10 originally
 cited, before committing either way.
+
+### scoping-deletion-target-spec-conflict
+
+**Status:** Open
+
+`spec/planning/task-plan.md` self-conflicts on where a
+task-plan-under-a-milestone's scoping doc is deleted.
+
+The "Goal: scoping doc + plan doc" section says scoping "deletes
+in batch with sibling scoping docs at the **plan's terminal PR**,
+or at the milestone-terminal PR **for phase plans** under a
+milestone" — implying a task plan (even under a milestone) deletes
+its scoping at the task-terminal PR. "Path conventions" says the
+`m<N>/scoping/` subfolder's contents "delete in batch at the
+**milestone-terminal PR** (or the task-terminal PR for
+**standalone task plans**)" — implying milestone-terminal for a
+milestone's tasks and phases alike. The two readings diverge
+exactly for a task plan nested under a milestone (e.g.
+`workstream-tracker-1-0-m2-t4`); a Codex review flagged the
+ambiguity on PR #34. "Path conventions" is the more operationally
+specific rule (it governs the physical shared subfolder and the
+batch-deletion intent) and is the reading the m2-t4 scoping doc
+follows. One option among several: reconcile the "Goal" /
+"Scoping owns / plan owns" phrasings to "Path conventions" so all
+three say milestone-terminal for a milestone's tasks/phases and
+task-terminal only for standalone task plans.
