@@ -226,9 +226,15 @@ any per-task drafting brushes against these.
   Both regions share one visual vocabulary anchored to
   [`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg);
   neither region invents a divergent card/box/spacing/type
-  language. Verified by:
-  [`indexTmpl` in render.go](../../../internal/site/render.go)
-  is the single template t1 restructures into the two regions;
+  language. Verified by: t1 (PR #26) made this **file-enforced**
+  — [`render.go`](../../../internal/site/render.go) is the
+  shell (the `.layout` container + `{{template "forest" .}}` /
+  `{{template "roster" .}}` composition, one parsed `indexTmpl`
+  tree), [`forest.go`](../../../internal/site/forest.go) owns
+  the forest/`node` region (t2's surface), and
+  [`roster.go`](../../../internal/site/roster.go) owns the
+  roster region (t4's surface); a later-task diff crossing
+  those file boundaries is the reviewer-flag signal.
   [`Server.index` in site.go](../../../internal/site/site.go)
   is the single `/` handler.
 - **Opposite spec postures are intentional — do not
@@ -246,8 +252,9 @@ any per-task drafting brushes against these.
   deferred *on the assumption* node-level actor tags remain
   present. Every task that touches the render path preserves
   the existing per-node actor-marker render. Verified by:
-  [`indexTmpl` "node" template in render.go](../../../internal/site/render.go)
-  ranges `.WorkInstances` into `actor-marker` spans;
+  [the `node` template in forest.go](../../../internal/site/forest.go)
+  ranges `.WorkInstances` into `actor-marker` spans (relocated
+  unedited from `render.go` by t1 PR #26);
   [`buildTree` in tree.go](../../../internal/site/tree.go)
   attaches `active[d.Slug]` to each node.
 - **Render path stays walk-on-every-request.** No task
@@ -327,9 +334,10 @@ decision will be grounded.
   than regress it silently. Verified by:
   [the v0.2 no-JS decision in m1-v0-2.md "Cross-Task
   Decisions"](m1-v0-2.md);
-  [`indexTmpl` in render.go](../../../internal/site/render.go)
-  (t1 restructures this into the two regions; t2 changes the
-  forest region's node render).
+  [the `node` template in forest.go](../../../internal/site/forest.go)
+  (t1 PR #26 split the regions into their own files; t2 changes
+  the forest region's node render here, not in the `render.go`
+  shell).
 - **Doc-declared-stages frontmatter shape (decide when t3
   drafts).** The field name, structure, and whether it encodes
   per-stage counts or an ordered stage list is the spec-change

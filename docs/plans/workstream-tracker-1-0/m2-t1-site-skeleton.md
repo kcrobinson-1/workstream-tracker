@@ -105,8 +105,12 @@ current branch with a one-sentence falsifier; the per-contract
   one `template.Must(... "index" ...)`; `<body>` is one
   `{{range .Roots}}`/`{{else}}` block inside
   `body { … max-width: 60rem; margin: 0 auto }`. False —
-  single template, single column. This is the only file t1's
-  code change touches.
+  single template, single column. *(Revised after PR #25: the
+  Region-ownership contract splits the source across
+  `render.go`/`forest.go`/`roster.go`; the runtime
+  `indexTmpl` stays one parsed template tree assembled via
+  `init()`, so this premise — single template, single render
+  path — still holds; only the source-file count changes.)*
 - **The forest render to preserve is the Roots/empty block +
   `node` template.** Falsifier: "node rendering lives outside
   `indexTmpl` (a partial/file include)." Checked:
@@ -177,11 +181,14 @@ mechanism.
   the secondary right region," anchored to
   [`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg).
   `Verified by:`
-  [`indexTmpl` in render.go](../../../internal/site/render.go)
-  is today a single centered `body { max-width: 60rem }` column
-  with one content block (`{{range .Roots}}`); it is the single
-  template t1 restructures into the two regions, and the
-  parent-milestone Cross-Task Invariant names it as such.
+  [`render.go`](../../../internal/site/render.go) owns the
+  **shell** template — page chrome, the `.layout` container, and
+  the `{{template "forest" .}}` / `{{template "roster" .}}`
+  composition — and the shared `indexData` / `renderIndex` /
+  funcs; the region bodies are defined in their own files (see
+  the Region-ownership contract). Pre-t1 this was a single
+  centered `body { max-width: 60rem }` column with one content
+  block.
 - **One page scroll.** The page scrolls as a whole (the tall
   forest is the scroll content); neither region gets its own
   independent scrollbar or `overflow` scroll container. The
@@ -220,46 +227,104 @@ mechanism.
   Both regions share one visual vocabulary anchored to
   workstreams-view-m2.svg."
 
-### Forest-region contract (`internal/site/render.go`)
+### Region-ownership contract (file split)
+
+*Contract revised after PR #25 (folded into the open
+implementing PR #26 per
+[`task-plan.md`](../../../spec/planning/task-plan.md)
+"Plan-to-PR Completion Gate" — a rule deviation rewrites the
+plan rule in the same PR). The original plan put all three
+concerns in `render.go`; this revision makes the milestone's
+"independently-owned regions" intent structural so t2 (forest
+internals) and t4 (roster) edit disjoint files and never
+contend on `render.go` or each other.*
+
+- The two regions are **owned by separate files**, each
+  self-contained (its template define **and** its scoped CSS
+  **and** its tests):
+  - `internal/site/render.go` — the **shell only**: page
+    chrome, shell CSS (`body`, `h1`, `.layout`, `.forest`,
+    `.roster`, the narrow-window `@media`), the `<head>` style
+    composition, the `{{template "forest" .}}` /
+    `{{template "roster" .}}` calls, and the shared
+    `indexData` / `renderIndex` / template funcs. The shell
+    composes; it does not define a region body.
+  - `internal/site/forest.go` — the `{{define "forest"}}`
+    template (the `{{if .Roots}} … {{range .Roots}}<div
+    class="root">{{template "node" .}}</div> … {{else}}<p
+    class="empty">…</p>{{end}}` block), the `{{define "node"}}`
+    template, and the forest/node CSS (`.root`, `.badge`,
+    `.status-*`, `.actor-marker`, `.label`, `.empty`,
+    `.long-desc`, `.related-prs`, `ul`/`li`) as a
+    `{{define "forest-style"}}` block the shell injects into
+    `<head>`. This is **t2's** growth surface.
+  - `internal/site/roster.go` — the `{{define "roster"}}`
+    template (the deliberate placeholder panel) and the roster
+    CSS (`.roster-panel`, `.roster-title`,
+    `.roster-placeholder`) as a `{{define "roster-style"}}`
+    block. This is **t4's** growth surface.
+- All region defines are parsed into the single `indexTmpl`
+  tree (one parsed `*template.Template`, funcs set once on it),
+  so the runtime render path and the walk-on-every-request
+  invariant are unchanged — this is a **source reorganization
+  with byte-for-intent identical rendered output**, not a
+  behavior change. `Verified by:` the `TestRenderNoFieldNode…`
+  byte-identity node pin (moved to `forest_test.go`) and the
+  two-region shell test (in `render_test.go`) both pass
+  unchanged against the split.
+- After this split, t2 edits only `forest.go` (+
+  `forest_test.go`), t4 edits only `roster.go` (+
+  `roster_test.go`); neither edits `render.go` or the other's
+  file. A later-task PR that edits `render.go` to change a
+  region body, or edits a sibling region's file, is reworking
+  the shell / a sibling's surface and is reviewer-flag (the
+  inherited "shell is t1's; siblings build into regions"
+  invariant, now file-enforced).
+
+### Forest-region contract (`internal/site/forest.go`)
 
 - The forest region carries the **existing forest render
   verbatim**: the `{{if .Roots}} … {{range .Roots}}<div
   class="root">{{template "node" .}}</div> … {{else}}<p
   class="empty">No plan-tree roots found …</p>{{end}}` block and
-  the entire `{{define "node"}}` template are moved **inside**
-  the forest region wrapper with **no change to node shape,
-  nesting, badges, actor markers, long-description, or
-  related-PR rendering**. The `node` template body is not edited
-  at all. `Verified by:`
-  [`indexTmpl` in render.go](../../../internal/site/render.go)
-  lines 47–77 — the Roots/empty block and `node` template that
-  must move unchanged; the milestone names "no node-shape change
-  — that is t2."
+  the entire `{{define "node"}}` template move into
+  `forest.go`'s `{{define "forest"}}` / `{{define "node"}}`
+  with **no change to node shape, nesting, badges, actor
+  markers, long-description, or related-PR rendering**. The
+  `node` template body is not edited at all — only relocated.
+  `Verified by:`
+  [`forest.go`](../../../internal/site/forest.go) — the
+  `forest`/`node` defines whose markup must equal the prior
+  `render.go` output; the milestone names "no node-shape change
+  — that is t2," and the byte-identity node test
+  (`forest_test.go`) is the falsifier.
 - The empty-state path is preserved and renders **inside the
   forest region**: when there are no roots, the forest region
   shows the existing `No plan-tree roots found at <code>…</code>`
   message (not a blank region), while the roster region still
   shows its placeholder. `Verified by:`
-  [`render.go`](../../../internal/site/render.go) `{{else}}`
-  branch (line 54) — the empty-state markup that must survive
-  the move.
+  [`forest.go`](../../../internal/site/forest.go) `{{else}}`
+  branch in the `forest` define — the empty-state markup that
+  survives the relocation.
 - All existing CSS classes the forest render depends on
   (`.root`, `.badge`, `.status-*`, `.actor-marker`, `.label`,
   `.empty`, `.long-desc`, `.related-prs`, `ul`/`li`) keep their
-  current visual behavior; the layout change adds the
-  region/column rules around them and may widen the page
-  container, but does not restyle a node's internals. `Verified
-  by:` [`render.go`](../../../internal/site/render.go) lines
-  24–43 — the existing `<style>` block; the diff adds layout
-  rules and does not alter these node-level rules.
+  current visual behavior; they move into `forest.go`'s
+  `{{define "forest-style"}}` block the shell injects, with
+  rule content unchanged (only the shell-level `body`/`.layout`
+  rules and the widened container live in `render.go`).
+  `Verified by:`
+  [`forest.go`](../../../internal/site/forest.go) `forest-style`
+  define — same rule bodies as the prior single `<style>`,
+  relocated not restyled.
 - v0.1's per-node actor tags still render on every node exactly
   as today (the deferred "actor icons on progress boxes" work
   assumes node-level actor tags remain). `Verified by:`
-  [`indexTmpl` "node" template in render.go](../../../internal/site/render.go)
-  line 61 ranges `.WorkInstances` into `actor-marker` spans;
-  t1 does not touch that line.
+  [`forest.go`](../../../internal/site/forest.go) — the `node`
+  define ranges `.WorkInstances` into `actor-marker` spans;
+  that line is relocated unedited.
 
-### Roster-region contract (`internal/site/render.go`)
+### Roster-region contract (`internal/site/roster.go`)
 
 - The roster region renders a **deliberate, intentional
   placeholder**: a panel using the design's roster-column
@@ -315,7 +380,11 @@ scoping-vs-duplication discipline.
   page-shell behavior; no later task alters the shell or a
   region boundary. (Parent milestone "Cross-Task Invariants" —
   first bullet.) t1's diff IS the shell, so every shell decision
-  here is the locked surface t2/t4 build against.
+  here is the locked surface t2/t4 build against. The
+  Region-ownership contract makes this **file-enforced**:
+  `render.go` is the shell, `forest.go` is t2's, `roster.go` is
+  t4's — a later-task diff that crosses those file boundaries is
+  the reviewer-flag signal.
 - **Render path stays walk-on-every-request.** No caching,
   file-watch, or in-memory build-up. t1 trivially preserves this
   because it changes no data path. `Verified by:`
@@ -323,9 +392,9 @@ scoping-vs-duplication discipline.
   calls `walkPlans` + `loadActiveWorkInstances` per request; t1
   does not touch `site.go`.
 - **v0.1 actor tags on nodes must not regress.** Preserved by
-  the Forest-region contract (the `node` template is moved
-  unedited). (Parent milestone "Cross-Task Invariants" — actor
-  bullet.)
+  the Forest-region contract (the `node` template is relocated
+  to `forest.go` unedited). (Parent milestone "Cross-Task
+  Invariants" — actor bullet.)
 - **Single visual vocabulary anchored to the m2 mockup.**
   Enforced by the Page-shell contract's last bullet.
 
@@ -338,40 +407,56 @@ structural call requires it; deviations are reported per
 
 **Modify:**
 
-- `internal/site/render.go` — restructure `indexTmpl`'s
-  `<body>` into the two-region layout (forest region wrapping
-  the existing Roots/empty block + `node` template unchanged;
-  roster region with the deliberate placeholder); add the
-  layout/region CSS rules and widen the page container to fit
-  two columns. The `node` template body and the existing
-  node-level CSS rules are not edited.
-- `internal/site/render_test.go` — add coverage that a rendered
-  page contains both region containers, that the forest region
-  still contains the existing forest output (a known node's
-  badge/label) and the empty-state when there are no roots, and
-  that the roster region contains the deliberate placeholder
-  text (so the no-roster consequence is observed, not assumed).
-  *Shipped deviation:* the new `<aside class="roster">` tag made
-  the pre-existing `TestRenderRelatedPRsNonURLIsPlainText`
-  assertion `strings.Contains(html, "<a")` a false positive (it
-  matched `<aside`); that one assertion was tightened to `"<a "`
-  / `"<a>"` (actual anchor tags). Production behavior is
-  unchanged — an over-broad test matcher, not a contract change.
+- `internal/site/render.go` — reduce to the **shell**: keep
+  `indexData`, `renderIndex`, the template funcs, the shell
+  template (page chrome, shell CSS, `<head>` style composition
+  via `{{template "forest-style"}}`/`{{template "roster-style"}}`,
+  the `.layout` container, and `{{template "forest" .}}` /
+  `{{template "roster" .}}`), plus an `init()` that parses the
+  region defines into `indexTmpl`. The forest/node templates
+  and node CSS, and the roster template and roster CSS, move
+  out (see New).
+- `internal/site/render_test.go` — keep the `renderTree`
+  helper and the two-region **shell composition** test (both
+  region containers present, forest precedes roster). The
+  forest/node and roster cases move to their region test files
+  (see New). *Shipped deviation (PR #26):* the new `<aside
+  class="roster">` tag made the pre-existing
+  `TestRenderRelatedPRsNonURLIsPlainText` assertion
+  `strings.Contains(html, "<a")` a false positive (it matched
+  `<aside`); that one assertion was tightened to `"<a "` /
+  `"<a>"` (actual anchor tags). That test moves to
+  `forest_test.go` (it exercises node related-PR render).
+  Production behavior unchanged — an over-broad test matcher,
+  not a contract change.
 - `design/v0.1-design.md` — §7 "What the Website Renders" is
   updated to describe the two-region shell (forest region +
   deliberate roster placeholder) per the parent-milestone
   Documentation Currency entry; this lands in the implementing
   PR.
 - `docs/plans/workstream-tracker-1-0/m2-expanded-view-and-roster.md`
-  — the parent milestone's Task Status t1 row and the
-  "each task is a … stub" prose were updated by *this drafting
-  change* (row no longer `In draft (stub)`; see Documentation
-  currency). The implementing PR re-touches this file only to
-  advance the t1 row to `Landed`.
+  — the parent milestone's Task Status t1 row + prose (advanced
+  to `Landed` in PR #26) and the Cross-Task Invariant
+  `Verified by:` that named `render.go` as "the single
+  template," reconciled to the file split in this same PR (see
+  Documentation currency).
 
 **New:**
 
-- None beyond this plan doc.
+- `internal/site/forest.go` — the `{{define "forest"}}` and
+  `{{define "node"}}` templates and the `{{define
+  "forest-style"}}` CSS block, relocated byte-for-intent from
+  the prior `render.go`. **t2's** owned surface.
+- `internal/site/roster.go` — the `{{define "roster"}}`
+  placeholder template and the `{{define "roster-style"}}` CSS
+  block. **t4's** owned surface.
+- `internal/site/forest_test.go` — the forest/node render
+  cases (long-desc inline, related-PR anchor/plain-text/escape,
+  the byte-identity field-less node pin) relocated from
+  `render_test.go`, plus the forest-region/empty-state
+  coverage.
+- `internal/site/roster_test.go` — the roster placeholder /
+  roster-region presence coverage.
 
 **Intentionally not touched** *(estimate — where we don't expect
 changes, not a hard prohibition)*:
@@ -381,8 +466,8 @@ changes, not a hard prohibition)*:
   data-path, parser, or handler change; t1 is template/CSS only.
 - The `{{define "node"}}` template body and node-level CSS
   (`.root`, `.badge`, `.status-*`, `.actor-marker`, `.label`,
-  `.long-desc`, `.related-prs`) — moved/wrapped, not restyled
-  (no node-shape change — that is t2).
+  `.long-desc`, `.related-prs`) — **relocated** to `forest.go`,
+  not restyled or reshaped (no node-shape change — that is t2).
 - `internal/api/*`, `internal/db/*` — no API/DB/schema surface.
 - Any caching/file-watch layer — none exists and none is
   introduced (walk-on-every-request invariant).
@@ -474,11 +559,16 @@ breach.
 ## Commit Boundaries
 
 *Estimate of cohesive review chunks — the implementer may
-refine.* Single implementing PR (N = 1). Expected commits:
-(a) the `render.go` shell restructure + CSS; (b) render tests;
-(c) `design/v0.1-design.md` §7 update + this plan's
-`Proposed → Landed` flip and the parent t1 row advance. Order
-lets each commit build and test green.
+refine.* Single implementing PR (N = 1, **PR #26**). Shipped as:
+(a) the two-region shell in `render.go` + render tests
+(original); (b) `design/v0.1-design.md` §7 + plan/parent
+`Landed` flips (original); (c) the Region-ownership file split —
+extract `forest.go`/`roster.go` + split tests, reduce
+`render.go` to the shell, with byte-for-intent identical
+rendered output — plus this plan's contract revision and the
+milestone `Verified by:` reconciliation, folded into the same
+open PR per the Plan-to-PR Completion Gate. Order lets each
+commit build and test green.
 
 ## Self-Review Audits
 
@@ -562,6 +652,17 @@ re-wrapped, the package layout is unchanged).
   around the regions; node-level CSS is in "intentionally not
   touched"; the manual render observation compares the forest
   region against the prior render.
+- **The file split silently changes rendered output.**
+  Relocating the forest/node/roster templates and their CSS
+  into `forest.go`/`roster.go` and composing via `init()` could
+  reorder markup, drop a define, or change the parsed template
+  set. Mitigation: the split is a pure source reorganization
+  with a byte-for-intent identical-output requirement; the
+  byte-identity node pin (`forest_test.go`) and the two-region
+  shell test (`render_test.go`) must pass **unchanged** against
+  the split, and the manual render is re-observed post-split.
+  A test edit *other than relocation* to make them pass is the
+  defect, not the fix.
 
 ## Documentation currency
 
@@ -579,7 +680,14 @@ re-wrapped, the package layout is unchanged).
   reconciled to note t1 is now a drafted plan while t2–t4
   remain stubs. Subsequent row values track this plan's Status
   (`In draft → Proposed → Landed`) and land with the PR that
-  performs each flip.
+  performs each flip. **Cross-doc reconciliation (PR #26):**
+  the milestone's "Cross-Task Invariants" first bullet
+  `Verified by:` named `indexTmpl`/`render.go` as "the single
+  template t1 restructures into the two regions" — the
+  Region-ownership file split makes that stale, so the same PR
+  updates that `Verified by:` to name the shell (`render.go`)
+  composing the `forest.go`/`roster.go` region defines, per the
+  parent-doc currency rule.
 - This plan's `Status` lifecycle: `In draft` while drafted,
   `Proposed` after the promotion-gate self-review (drafting PR
   #25), then `Proposed → Landed` in this implementing PR per the
