@@ -361,11 +361,13 @@ milestone remain estimates pending their planning sessions.
 
 - **m1**: 4 tasks. Landed (all four tasks complete). See
   [`m1-v0-2.md`](m1-v0-2.md).
-- **m2**: 3 tasks proposed (pending review): expanded
-  nested-box render; doc-declared progress stages (spec-first);
-  session roster + work-item enrichment. t2 and t3 each
-  plausibly N ≥ 2; phase splits re-derived at task drafting.
-  See
+- **m2**: 4 tasks proposed (pending review): site skeleton
+  (two-region shell); expanded nested-box render; doc-declared
+  progress stages (spec-first); session roster + work-item
+  enrichment. The skeleton (t1) ships the approved side-by-side
+  shell so t2/t4 build into independently-owned regions in
+  parallel; t2/t3/t4 each plausibly N ≥ 2, phase splits
+  re-derived at task drafting. See
   [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md).
 - **m3**: estimate pending the m3 milestone-drafting session.
   Re-homed deferred pieces: across-roots tier classification
