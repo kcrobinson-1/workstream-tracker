@@ -20,7 +20,14 @@ import re
 import subprocess
 import sys
 
-LINK_RE = re.compile(r"\[(?:[^\]]*)\]\(([^)]+)\)")
+# Destination is either <...>-wrapped, or bare with one level of
+# balanced parentheses tolerated (e.g. `path/task-plan(v2).md`),
+# followed by an optional "title".
+LINK_RE = re.compile(
+    r"\]\(\s*"
+    r"(?:<([^>]*)>|([^\s()]*(?:\([^()]*\)[^\s()]*)*))"
+    r"(?:\s+[^)]*)?\)"
+)
 SKIP_PREFIXES = ("http://", "https://", "mailto:", "tel:", "#")
 
 
@@ -40,9 +47,10 @@ def main() -> int:
         except (OSError, UnicodeDecodeError):
             continue
         for m in LINK_RE.finditer(text):
-            target = m.group(1).strip()
-            if " " in target:  # strip optional (path "title")
-                target = target.split(" ", 1)[0]
+            target = (m.group(1) if m.group(1) is not None
+                      else m.group(2)).strip()
+            if not target:
+                continue
             if target.startswith(SKIP_PREFIXES):
                 continue
             if target.startswith("/"):  # host-absolute; see backlog

@@ -141,6 +141,14 @@ specific commands this repo uses to satisfy that discipline.
 - **Build:** `go build ./...` — every package compiles.
 - **Vet:** `go vet ./...` — static checks pass.
 - **Tests:** `go test ./...` — full unit-test suite.
+- **Doc links:** `scripts/check-md-links.py` — every relative
+  markdown link in a tracked `.md` resolves on disk. Run it after
+  moving, renaming, or re-nesting any doc (the plan tree moves
+  often), and before pushing a change that touches the doc tree.
+  Dependency-free; not CI-wired (single-maintainer repo, no CI
+  today). It deliberately skips `/`-rooted host-absolute links —
+  that class is tracked separately in
+  [`backlog.md`](backlog.md) `repo-rooted-doc-links`.
 
 Run `go test ./...` before any push. Run `go build ./...` after
 any cross-package refactor. The pre-edit-gate's baseline-
