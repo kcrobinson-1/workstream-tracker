@@ -30,10 +30,24 @@ type Result struct {
 // caller's timeout; this client does not retry. A non-2xx status,
 // an unreachable server, or a malformed body is returned as an
 // error — the caller decides it is non-fatal, not this client.
-func Register(ctx context.Context, serverBase, slug, actor string) (Result, error) {
-	body, err := json.Marshal(map[string]string{
-		"exact_slug": slug,
-		"actor":      actor,
+//
+// metadata is forwarded verbatim into the request `metadata`
+// field when non-empty and omitted when empty. The client stays
+// schema-agnostic: it does not know or type the conventionally-
+// read `name` key — the caller (the CLI) owns that convention
+// (scoping SD4; the milestone schema-loose posture). A metadata
+// send failure is not a distinct failure mode: metadata rides
+// this single register request, so it surfaces through the same
+// returned error the caller already narrates.
+func Register(ctx context.Context, serverBase, slug, actor string, metadata json.RawMessage) (Result, error) {
+	body, err := json.Marshal(struct {
+		ExactSlug string          `json:"exact_slug"`
+		Actor     string          `json:"actor"`
+		Metadata  json.RawMessage `json:"metadata,omitempty"`
+	}{
+		ExactSlug: slug,
+		Actor:     actor,
+		Metadata:  metadata,
 	})
 	if err != nil {
 		return Result{}, fmt.Errorf("marshal request: %w", err)

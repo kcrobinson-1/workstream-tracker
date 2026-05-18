@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -40,6 +41,7 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 	slugFlag := fs.String("slug", "", "canonical plan-doc slug to register a work-instance for (or WST_SLUG)")
 	actorFlag := fs.String("actor", "", "actor label (or WST_ACTOR; defaults to a generated per-session id)")
 	serverFlag := fs.String("server", "", "server base URL (or WST_SERVER; default "+defaultServer+")")
+	nameFlag := fs.String("name", "", "human session name to report in the roster (or WST_NAME; optional)")
 	if err := fs.Parse(args); err != nil {
 		fmt.Fprintf(stderr, "register: %v; skipping registration, session proceeds\n", err)
 		return 0
@@ -63,10 +65,22 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 		actor = a
 	}
 
+	// The sole conventionally-read metadata key is the optional
+	// human `name` (the roster's display label). The CLI owns this
+	// convention; the client stays schema-agnostic. When no name
+	// is supplied no metadata is sent at all (not an empty name),
+	// so a v0.2-minimum session still lists and the roster falls
+	// back to the slug. json.Marshal of a one-string-key map
+	// cannot fail, so a name never blocks the best-effort attempt.
+	var metadata json.RawMessage
+	if name := firstNonEmpty(*nameFlag, getenv("WST_NAME")); name != "" {
+		metadata, _ = json.Marshal(map[string]string{"name": name})
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), registerTimeout)
 	defer cancel()
 
-	res, err := registerclient.Register(ctx, server, slug, actor)
+	res, err := registerclient.Register(ctx, server, slug, actor, metadata)
 	if err != nil {
 		fmt.Fprintf(stderr,
 			"register: attempt failed (%v); session proceeds — this session will not appear in the tree. "+

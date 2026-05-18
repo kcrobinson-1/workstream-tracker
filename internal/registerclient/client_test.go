@@ -24,7 +24,7 @@ func TestRegisterSuccess(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	res, err := Register(context.Background(), ts.URL, "epic-m1-t2", "wst-actor")
+	res, err := Register(context.Background(), ts.URL, "epic-m1-t2", "wst-actor", nil)
 	if err != nil {
 		t.Fatalf("Register: %v", err)
 	}
@@ -46,7 +46,7 @@ func TestRegisterTrailingSlashServerBase(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	if _, err := Register(context.Background(), ts.URL+"/", "s", "a"); err != nil {
+	if _, err := Register(context.Background(), ts.URL+"/", "s", "a", nil); err != nil {
 		t.Fatalf("Register: %v", err)
 	}
 }
@@ -58,7 +58,7 @@ func TestRegisterNonSuccessStatus(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	res, err := Register(context.Background(), ts.URL, "s", "a")
+	res, err := Register(context.Background(), ts.URL, "s", "a", nil)
 	if err == nil {
 		t.Fatal("expected error on non-2xx, got nil")
 	}
@@ -77,7 +77,7 @@ func TestRegisterMalformedBody(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	if _, err := Register(context.Background(), ts.URL, "s", "a"); err == nil {
+	if _, err := Register(context.Background(), ts.URL, "s", "a", nil); err == nil {
 		t.Fatal("expected error on malformed body, got nil")
 	}
 }
@@ -89,7 +89,7 @@ func TestRegisterMissingID(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	if _, err := Register(context.Background(), ts.URL, "s", "a"); err == nil {
+	if _, err := Register(context.Background(), ts.URL, "s", "a", nil); err == nil {
 		t.Fatal("expected error when response omits work-instance id, got nil")
 	}
 }
@@ -99,7 +99,7 @@ func TestRegisterServerUnreachable(t *testing.T) {
 	url := ts.URL
 	ts.Close() // nothing is listening now
 
-	if _, err := Register(context.Background(), url, "s", "a"); err == nil {
+	if _, err := Register(context.Background(), url, "s", "a", nil); err == nil {
 		t.Fatal("expected error when server is unreachable, got nil")
 	}
 }
@@ -114,7 +114,51 @@ func TestRegisterContextTimeout(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
 	defer cancel()
 
-	if _, err := Register(ctx, ts.URL, "s", "a"); err == nil {
+	if _, err := Register(ctx, ts.URL, "s", "a", nil); err == nil {
 		t.Fatal("expected error when context deadline exceeded, got nil")
+	}
+}
+
+// TestRegisterForwardsAndOmitsMetadata pins scoping SD4: the
+// client forwards arbitrary metadata verbatim when present and
+// omits the field entirely when empty (it does not send an empty
+// object or a typed name — it is schema-agnostic; the CLI owns
+// the `name` convention).
+func TestRegisterForwardsAndOmitsMetadata(t *testing.T) {
+	var rawBody []byte
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rawBody, _ = io.ReadAll(r.Body)
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write([]byte(`{"id":"wi-1","slug":"s"}`))
+	}))
+	defer ts.Close()
+
+	if _, err := Register(context.Background(), ts.URL, "s", "a",
+		json.RawMessage(`{"name":"Refactor roster"}`)); err != nil {
+		t.Fatalf("Register: %v", err)
+	}
+	var withMeta struct {
+		ExactSlug string          `json:"exact_slug"`
+		Actor     string          `json:"actor"`
+		Metadata  json.RawMessage `json:"metadata"`
+	}
+	if err := json.Unmarshal(rawBody, &withMeta); err != nil {
+		t.Fatalf("unmarshal body: %v", err)
+	}
+	if withMeta.ExactSlug != "s" || withMeta.Actor != "a" {
+		t.Fatalf("base fields lost: %s", rawBody)
+	}
+	var nm struct {
+		Name string `json:"name"`
+	}
+	if err := json.Unmarshal(withMeta.Metadata, &nm); err != nil || nm.Name != "Refactor roster" {
+		t.Fatalf("metadata not forwarded verbatim: %s (err=%v)", rawBody, err)
+	}
+
+	if _, err := Register(context.Background(), ts.URL, "s", "a", nil); err != nil {
+		t.Fatalf("Register (no metadata): %v", err)
+	}
+	if strings.Contains(string(rawBody), "metadata") {
+		t.Fatalf("empty metadata must be omitted from the request body, got: %s", rawBody)
 	}
 }
