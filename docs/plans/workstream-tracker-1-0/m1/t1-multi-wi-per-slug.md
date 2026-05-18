@@ -20,7 +20,7 @@ slug's first work-instance, or attaching an additional one,
 rather than only creating a new root or generating a new
 descendant.
 
-This is the first task of [m1](m1-v0-2.md) and the foundation
+This is the first task of [m1](README.md) and the foundation
 for m1's t2 (automatic agent registration). t2's model is: an
 agent session starts, derives its slug from agent context
 (e.g., the plan-file frontmatter it was told to implement — the
@@ -45,7 +45,7 @@ survive in git history.
 This is an N=1 task plan: the work is one coherent outcome with
 no intermediate point that ships independent value, so phase
 content is absorbed inline per
-[`task-plan.md`](../../../spec/planning/task-plan.md) "N = 1
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "N = 1
 task plan."
 
 ## Goal
@@ -129,11 +129,11 @@ idempotency rule below). Effects:
   Malformed input is a 400. The server does **not** verify the
   slug corresponds to a real plan-tree doc — it cannot, because
   the server never reads the repo (per
-  [`design/v0.1-design.md`](../../../design/v0.1-design.md)).
+  [`design/v0.1-design.md`](../../../../design/v0.1-design.md)).
   A registration at a slug with no corresponding doc (an
   "orphan" work-instance) is permitted by t1 and is the epic's
   deferred triage-zone concern, not t1's to police (see
-  [`README.md`](README.md) "Triage zone in 1.0?").
+  [`README.md`](../README.md) "Triage zone in 1.0?").
 - On success the server appends a `register` event and inserts
   a work-instance row at the given slug with initial state
   active, returning the work-instance id and the slug in the
@@ -141,7 +141,7 @@ idempotency rule below). Effects:
 
 This is the flow m1's t2 consumes for automatic
 first-registration; the milestone's t1/t2 contracts name it
-create-or-attach (see [`m1-v0-2.md`](m1-v0-2.md) t1 and t2
+create-or-attach (see [`m1-v0-2.md`](README.md) t1 and t2
 Interfaces).
 
 ### Idempotency on `(slug, actor, active)`
@@ -208,7 +208,7 @@ range).
 - **Render path stays walk-on-every-request.** No caching, file
   watching, or in-memory build-up is introduced; the website
   continues to walk the plan tree and query work-instance state
-  per request, per [m1-v0-2.md](m1-v0-2.md) Cross-Task
+  per request, per [m1-v0-2.md](README.md) Cross-Task
   Invariants.
 
 ## Naming
@@ -294,7 +294,7 @@ implementation):
 - `go build ./...`, `go vet ./...`, and `go test ./...` all
   pass. These are the three canonical validation commands this
   repo defines (Build / Vet / Tests) — verified by
-  [`docs/dev.md`](../../dev.md) lines 84-86, anchored to
+  [`docs/dev.md`](../../../dev.md) lines 84-86, anchored to
   `agents/shared/validation/philosophy.md`. `go vet` is
   load-bearing for this diff specifically: vet's struct-tag
   check covers the new `exact_slug` JSON tag and vet's printf
@@ -326,7 +326,7 @@ only checking HTTP 201 — cannot slip through.
 ## Self-Review Audits
 
 Run at commit boundary, drawn from
-[`docs/agents/local/self-review-catalog.md`](../../agents/local/self-review-catalog.md):
+[`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md):
 
 - **validation-honesty** — the Validation Gate's idempotency
   and multi-actor checks actually exercise the relaxed schema
@@ -338,13 +338,13 @@ Run at commit boundary, drawn from
 
 ## Documentation Currency
 
-- [`design/v0.1-design.md`](../../../design/v0.1-design.md) §4
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §4
   (API) — document the create-or-attach exact-slug flow and the
   `exact_slug` field.
-- [`design/v0.1-design.md`](../../../design/v0.1-design.md) §5
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §5
   (data model) — record that `work_instances.slug` is no longer
   unique. Both updated in the implementing PR.
-- [`spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
   "Plan-doc identity (slug)" — slug-grammar clarification added
   in this PR (review-driven): root slugs may not contain a bare
   position-segment token (`m1` is never a root), and after the
@@ -378,7 +378,7 @@ Run at commit boundary, drawn from
   no additional locking is in scope.
 - **Exact-slug flow trusts the caller; orphan work-instances
   are possible.** Because the server never reads the repo (per
-  [`design/v0.1-design.md`](../../../design/v0.1-design.md)),
+  [`design/v0.1-design.md`](../../../../design/v0.1-design.md)),
   the exact-slug flow cannot verify the slug names a real
   plan-tree doc; a caller can register at a grammar-valid slug
   with no corresponding doc. This is accepted by design:
@@ -387,19 +387,19 @@ Run at commit boundary, drawn from
   the epic's deferred triage-zone concern, not t1's. Mitigation:
   validate slug grammar only; do not add a doc-existence check
   (it would reintroduce the t1/t2 chicken-and-egg). Tracked via
-  the [`README.md`](README.md) "Triage zone in 1.0?" open
+  the [`README.md`](../README.md) "Triage zone in 1.0?" open
   question.
 
 ## Backlog Impact
 
 No existing backlog entry graduates, is deleted, split, or
 shifted by this task. One new entry,
-[`stub-children-on-parent-promotion`](../../backlog.md#stub-children-on-parent-promotion),
+[`stub-children-on-parent-promotion`](../../../backlog.md#stub-children-on-parent-promotion),
 was captured during this task's review (a capture, not one of
 the four effects): it records the parent-promotion stub-seeding
 idea and explicitly notes it depends on this task's exact-slug
 flow rather than replacing it. A second entry,
-[`promotion-gate-explicit-checklist`](../../backlog.md#promotion-gate-explicit-checklist),
+[`promotion-gate-explicit-checklist`](../../../backlog.md#promotion-gate-explicit-checklist),
 was captured during this plan's promotion walk (also a
 capture): it records that the spec's promotion gate
 under-specifies required-sections / no-implementation-prescription
@@ -409,10 +409,10 @@ work-instances (see Risk Register) remain the epic's deferred
 
 ## Related Docs
 
-- [`m1-v0-2.md`](m1-v0-2.md) — parent milestone; t1 contract
+- [`m1-v0-2.md`](README.md) — parent milestone; t1 contract
   and Cross-Task Invariants.
-- [`README.md`](README.md) — parent epic.
-- [`design/v0.1-design.md`](../../../design/v0.1-design.md) §4,
+- [`README.md`](../README.md) — parent epic.
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §4,
   §5 — API and data model t1 builds on.
-- [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+- [`../../../spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md)
   — the rules this plan is structured against.

@@ -9,7 +9,7 @@ short_description: Inline per-node detail render
 ## Context
 
 This is phase 1 of the t4 task plan
-([`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)) —
+([`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)) —
 the parent task plan owns the Cross-Phase Decisions,
 Cross-Cutting Invariants, and sequencing this phase plan inherits
 by reference rather than restating.
@@ -42,7 +42,7 @@ P1 has no pending input from a prior task: t3's
 current code in the t4 drafting reality-check), and t1/t2 are the
 independent foundation track P1 does not touch. The
 `In draft → Proposed` promotion-gate self-review per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 (end-to-end coherence, contract decision-completeness, universal
 `Verified by:` walk, reality-check re-confirmation) has been run;
 no open inputs remained, so Status is `Proposed`.
@@ -77,7 +77,7 @@ No truncation, no JavaScript, no panel, no expand/collapse
 
 Final shapes. Estimate-shaped sections (Files to touch, Commit
 Boundaries) are labeled as estimates per
-[`shared.md`](../../../spec/planning/shared.md) "Plan content is
+[`shared.md`](../../../../spec/planning/shared.md) "Plan content is
 a mix of rules and estimates." These bullets state the observable
 end-state each surface must reach; implementation technique is
 non-binding guidance under Execution Steps.
@@ -106,7 +106,7 @@ non-binding guidance under Execution Steps.
 - The spec documents `related_prs` as an optional, additive
   field of absolute-URL strings that pre-existing docs and
   vendored consumers remain valid without. `Verified by:`
-  [`spec/planning/shared.md` "Plan-doc identity (slug)"](../../../spec/planning/shared.md)
+  [`spec/planning/shared.md` "Plan-doc identity (slug)"](../../../../spec/planning/shared.md)
   lines ~140-153 carry the `short_description` optional-field
   block; `related_prs` documents adjacent with identical
   posture.
@@ -119,7 +119,7 @@ non-binding guidance under Execution Steps.
   value, or a sequence with non-string elements never errors or
   skips the doc — it yields an empty (or partial) `[]string`.
   `Verified by:`
-  [`parsePlanDoc` in walker.go](../../../internal/site/walker.go)
+  [`parsePlanDoc` in walker.go](../../../../internal/site/walker.go)
   already applies a tolerant comma-ok string assertion when
   reading `Status` from frontmatter (absence yields the zero
   value, never an error); the list field carries the same
@@ -127,7 +127,7 @@ non-binding guidance under Execution Steps.
 - A YAML block sequence decodes from goldmark-meta as
   `[]interface{}` whose elements are `string`. `Verified by:`
   `goldmark-meta v1.1.0` (pinned in
-  [`go.mod`](../../../go.mod)) imports `gopkg.in/yaml.v2 v2.3.0`
+  [`go.mod`](../../../../go.mod)) imports `gopkg.in/yaml.v2 v2.3.0`
   and unmarshals frontmatter into `map[string]interface{}`
   (`goldmark-meta@v1.1.0/meta.go:18,140-141`); under yaml.v2 a
   block sequence into `interface{}` is `[]interface{}` of
@@ -141,7 +141,7 @@ non-binding guidance under Execution Steps.
 - `PlanNode` gains `RelatedPRs []string`, copied from the
   matching `parsedDoc` in the existing `buildTree` node-build
   loop alongside `LongDescription`. No new tree walk. `Verified
-  by:` [`buildTree` in tree.go](../../../internal/site/tree.go)
+  by:` [`buildTree` in tree.go](../../../../internal/site/tree.go)
   builds each `PlanNode` in one loop already copying
   `LongDescription`.
 
@@ -154,7 +154,7 @@ non-binding guidance under Execution Steps.
   non-empty. Both are omitted entirely when their source is
   empty — a node with neither produces output byte-identical to
   today's for that line and its children. `Verified by:`
-  [`indexTmpl` in render.go](../../../internal/site/render.go)
+  [`indexTmpl` in render.go](../../../../internal/site/render.go)
   is `html/template` (auto-escaping in element/attribute
   context), so descriptions and PR strings are
   injection-safe without manual escaping; the existing block
@@ -184,10 +184,10 @@ non-binding guidance under Execution Steps.
 
 This phase plan inherits the task plan's Cross-Cutting
 Invariants by reference (per
-[`task-plan.md`](../../../spec/planning/task-plan.md) "How a
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "How a
 phase plan cites its parent task plan" — cite, do not
 duplicate): see
-[`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+[`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)
 "Cross-Cutting Invariants" (optional-frontmatter-degrades-
 silently, walk-on-every-request, additive-spec-change,
 bare-bones-no-JS). The one with ≥ 2 sites that must agree
@@ -201,7 +201,7 @@ end-to-end self-review walks all three.
 
 *Estimate of expected shape — implementation may revise if a
 structural call requires it; deviations are reported per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Plan-to-PR Completion Gate" with the `## Estimate Deviations`
 PR-body callout.*
 
@@ -262,7 +262,7 @@ No project build/test wrapper exists. `Verified by:` repo root
 has no `Makefile`/`justfile`; `scripts/` contains only
 `assemble.sh` (agent-rules vendoring — unrelated to build/test).
 The canonical Go toolchain is the gate (per
-[`docs/dev.md`](../../dev.md) lines 84-86):
+[`docs/dev.md`](../../../dev.md) lines 84-86):
 
 - `gofmt -l internal` reports no files (formatting clean).
 - `go build ./...` succeeds.
@@ -334,7 +334,7 @@ breach.
     `## Estimate Deviations` section (or `N/A`). In this same
     PR, per the Plan-to-PR Completion Gate: flip this phase
     plan's Status `Proposed → Landed`; flip the **task plan**
-    [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+    [`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)
     `Proposed → In progress` (this is the first phase's
     implementing PR — the task plan does **not** reach `Landed`
     until P2, the last phase, merges); and advance the parent
@@ -352,7 +352,7 @@ lets each commit build and test green.
 ## Self-Review Audits
 
 Audits from
-[`docs/agents/local/self-review-catalog.md`](../../agents/local/self-review-catalog.md)
+[`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md)
 mapped to this PR's diff surfaces, run at step 8:
 
 - **validation-honesty** (validation surface) — the Validation
@@ -437,7 +437,7 @@ survives in git history):
   self-review complete); it flips `Proposed → Landed` in this
   implementing PR per the Plan-to-PR Completion Gate. The
   parent task plan
-  [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+  [`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)
   is `Proposed`; this PR (the first phase's implementing PR)
   flips it `Proposed → In progress` — it reaches `Landed` only
   with P2's (last phase) implementing PR, not here.
@@ -449,15 +449,15 @@ None. No backlog entry graduates, is deleted, split, or shifts
 
 ## Related Docs
 
-- [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+- [`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)
   — parent task plan (Cross-Phase Decisions, Cross-Cutting
   Invariants, sequencing this plan inherits by reference).
-- [`m1-v0-2.md`](m1-v0-2.md) — parent milestone.
-- [`m1-t3-descriptive-labels.md`](m1-t3-descriptive-labels.md)
+- [`m1-v0-2.md`](README.md) — parent milestone.
+- [`m1-t3-descriptive-labels.md`](t3-descriptive-labels.md)
   — t3 (Landed); supplies the `LongDescription` carry P1
   renders.
-- [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+- [`../../../spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md)
   — the rules this plan is structured against.
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — cross-level planning rules; the `related_prs` spec edit
   lands here in this PR.

@@ -106,7 +106,7 @@ rule mandates: that rule's threshold is two or more docs of the
 waiting for each per-type variance to recur. Verified by:
 [`../../../spec/planning/shared.md:443-446`](../../../spec/planning/shared.md);
 [`../workstream-tracker-1-0/README.md:120-128`](../workstream-tracker-1-0/README.md);
-[`../workstream-tracker-1-0/m1-v0-2.md:77-85`](../workstream-tracker-1-0/m1-v0-2.md).
+[`../workstream-tracker-1-0/m1-v0-2.md:77-85`](../workstream-tracker-1-0/m1/README.md).
 
 ### C3 — Anti-scope rules permit WHAT, forbid HOW
 
@@ -180,7 +180,7 @@ require a variance disclosure after this lands. Verified by:
 [`../../../spec/planning/shared.md:97-106`](../../../spec/planning/shared.md);
 [`../../../spec/planning/task-plan.md:22-37`](../../../spec/planning/task-plan.md);
 [`../../../spec/planning/milestone.md:99-105`](../../../spec/planning/milestone.md);
-[`../workstream-tracker-1-0/m1-v0-2.md:25-31`](../workstream-tracker-1-0/m1-v0-2.md).
+[`../workstream-tracker-1-0/m1-v0-2.md:25-31`](../workstream-tracker-1-0/m1/README.md).
 
 ## Cross-Cutting Invariants
 
@@ -271,7 +271,7 @@ require a variance disclosure after this lands. Verified by:
   unallocated, and Open Questions remain open), so the gate's
   "child set locked + each child WHAT decision-complete"
   precondition fails.
-- [`../workstream-tracker-1-0/m1-v0-2.md`](../workstream-tracker-1-0/m1-v0-2.md)
+- [`../workstream-tracker-1-0/m1-v0-2.md`](../workstream-tracker-1-0/m1/README.md)
   — Task Contracts variance disclosure removed (now cites the
   codified `milestone.md` + `shared.md` rule); the Task Status /
   Cross-Task section naming now matches `milestone.md` after C6,
@@ -305,7 +305,7 @@ build-based. Before the implementing PR opens:
 2. **Acceptance-oracle check.** Re-read
    [`../workstream-tracker-1-0/README.md`](../workstream-tracker-1-0/README.md)
    and
-   [`../workstream-tracker-1-0/m1-v0-2.md`](../workstream-tracker-1-0/m1-v0-2.md);
+   [`../workstream-tracker-1-0/m1-v0-2.md`](../workstream-tracker-1-0/m1/README.md);
    confirm every section those docs disclosed as a variance is
    now spec-covered, and that the disclosures are removed in the
    same PR. The falsifier: if any of those docs still needs a
@@ -415,7 +415,7 @@ entry is deliberately untouched (see Out of Scope). Verified by:
   `plan-doc-child-contracts` entry.
 - [`../workstream-tracker-1-0/README.md`](../workstream-tracker-1-0/README.md)
   and
-  [`../workstream-tracker-1-0/m1-v0-2.md`](../workstream-tracker-1-0/m1-v0-2.md)
+  [`../workstream-tracker-1-0/m1-v0-2.md`](../workstream-tracker-1-0/m1/README.md)
   — the live docs whose disclosed variances are this task's
   acceptance oracle.
 - [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)

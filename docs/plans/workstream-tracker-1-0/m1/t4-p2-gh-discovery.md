@@ -9,7 +9,7 @@ short_description: gh pr list auto-discovery
 ## Context
 
 This is phase 2 (the last phase) of the t4 task plan
-([`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)) —
+([`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)) —
 the parent task plan owns the Cross-Phase Decisions,
 Cross-Cutting Invariants, and sequencing this phase plan
 inherits by reference rather than restating.
@@ -92,7 +92,7 @@ is introduced; the render path stays walk-on-every-request.
 
 Final shapes. Estimate-shaped sections (Files to touch, Commit
 Boundaries) are labelled as estimates per
-[`shared.md`](../../../spec/planning/shared.md) "Plan content is
+[`shared.md`](../../../../spec/planning/shared.md) "Plan content is
 a mix of rules and estimates." These bullets state the
 observable end-state; technique is non-binding guidance under
 Execution Steps.
@@ -185,7 +185,7 @@ Execution Steps.
   attempt discovery, augment the roots in place, render. A
   discovery failure is non-fatal — the same `roots` render
   unaugmented. `Verified by:`
-  [`Server.index` in site.go](../../../internal/site/site.go)
+  [`Server.index` in site.go](../../../../internal/site/site.go)
   already sequences `walkPlans → loadActiveWorkInstances →
   buildTree → renderIndex` per request; P2 inserts one
   best-effort step before `renderIndex` and changes no existing
@@ -194,17 +194,17 @@ Execution Steps.
   already renders `.RelatedPRs` as the absolute-URL-or-text
   list; discovered URLs flow through the existing block with no
   template edit. `Verified by:`
-  [`indexTmpl` in render.go](../../../internal/site/render.go)
+  [`indexTmpl` in render.go](../../../../internal/site/render.go)
   ranges `.RelatedPRs` with the `isURL` link/text split shipped
   in P1 (#15).
 
 ## Cross-Cutting Invariants
 
 Inherited from the parent task plan by reference (per
-[`task-plan.md`](../../../spec/planning/task-plan.md) "How a
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "How a
 phase plan cites its parent task plan" — cite, don't duplicate):
 see
-[`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+[`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)
 "Cross-Cutting Invariants" (optional-frontmatter-degrades-
 silently, walk-on-every-request, additive-spec-change,
 bare-bones-no-JS). The one P2 most directly carries:
@@ -218,7 +218,7 @@ here; no JavaScript; the P1 render block is unchanged.
 
 *Estimate of expected shape — implementation may revise if a
 structural call requires it; deviations are reported per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Plan-to-PR Completion Gate" with the `## Estimate Deviations`
 PR-body callout.*
 
@@ -251,7 +251,7 @@ PR-body callout.*
   reconciliation here — m1 was not yet terminal when P2 landed
   (see Documentation currency).
 - The t4 scoping doc — **NOT deleted in P2's PR.** Per
-  [`task-plan.md`](../../../spec/planning/task-plan.md) path
+  [`task-plan.md`](../../../../spec/planning/task-plan.md) path
   conventions the `scoping/` contents delete in batch at the
   **m1-terminal PR** (with the other m1 per-task scoping
   docs); when P2 landed, m1 still had `…-m1-t2` undrafted, so
@@ -276,7 +276,7 @@ expect changes, not a hard prohibition)*:
 No build wrapper exists. `Verified by:` repo root has no
 `Makefile`/`justfile`; `scripts/` is only `assemble.sh`
 (unrelated). The Go toolchain is the gate (per
-[`docs/dev.md`](../../dev.md)):
+[`docs/dev.md`](../../../dev.md)):
 
 - `gofmt -l internal` reports no files.
 - `go build ./...` succeeds.
@@ -336,7 +336,7 @@ callout), not a contract breach.
    actually run them).
 9. **t4 task-terminal close-out (this is t4's task-terminal
    PR, NOT the m1-milestone-terminal PR).** Per
-   [`task-plan.md`](../../../spec/planning/task-plan.md)
+   [`task-plan.md`](../../../../spec/planning/task-plan.md)
    "Plan-to-PR Completion Gate" / "Task plan terminal state
    when N ≥ 2": flip this plan `Proposed → Landed`; flip the
    task plan `In progress → Landed`; flip the `m1-v0-2.md` t4
@@ -345,7 +345,7 @@ callout), not a contract breach.
    Documentation Currency: m1 was not yet terminal when P2
    landed — its Task Status table still carried `…-m1-t2` at
    `—` (undrafted), and per
-   [`task-plan.md`](../../../spec/planning/task-plan.md) path
+   [`task-plan.md`](../../../../spec/planning/task-plan.md) path
    conventions the `scoping/` batch deletion + milestone
    reconciliation happen at the **m1-terminal PR** (whichever
    PR lands m1's last remaining task), not in P2's PR. Leaving
@@ -377,7 +377,7 @@ keeps each commit building and test-green.
 ## Self-Review Audits
 
 From
-[`docs/agents/local/self-review-catalog.md`](../../agents/local/self-review-catalog.md),
+[`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md),
 run at step 7:
 
 - **effect-cleanup** (subprocess/timeout surface) — P2 opens a
@@ -436,7 +436,7 @@ milestone-terminal close-out, in git history):
   Backlog / Documentation-Currency reconciliation were out of
   scope for P2's PR and deferred to whichever PR landed m1's
   last remaining task, per
-  [`task-plan.md`](../../../spec/planning/task-plan.md) path
+  [`task-plan.md`](../../../../spec/planning/task-plan.md) path
   conventions; that deferred batch deletion and reconciliation
   has since been performed in the m1 milestone-terminal
   close-out PR. Leaving the t4 scoping doc in place after P2
@@ -480,7 +480,7 @@ milestone-terminal close-out, in git history):
   Documentation-Currency reconciliation was **not** performed
   in P2's PR — it happened at the later m1-terminal PR.
 - The t4 scoping doc — **NOT deleted** in P2's PR. Per
-  [`task-plan.md`](../../../spec/planning/task-plan.md) path
+  [`task-plan.md`](../../../../spec/planning/task-plan.md) path
   conventions the `scoping/` contents delete in batch at the
   **m1-terminal PR** (with the other m1 per-task scoping
   docs); m1 was not yet terminal when P2 landed, so the doc
@@ -498,12 +498,12 @@ association is wanted post-1.0 it would be raised then.
 
 ## Related Docs
 
-- [`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+- [`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)
   — parent task plan (Cross-Phase Decisions, Cross-Cutting
   Invariants, sequencing inherited by reference).
-- [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
+- [`m1-t4-p1-inline-detail-render.md`](t4-p1-inline-detail-render.md)
   — P1 (Landed, #15); supplies the `RelatedPRs` carry and the
   render block P2 augments.
-- [`m1-v0-2.md`](m1-v0-2.md) — parent milestone.
-- [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+- [`m1-v0-2.md`](README.md) — parent milestone.
+- [`../../../spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md)
   — the rules this plan and its terminal close-out follow.

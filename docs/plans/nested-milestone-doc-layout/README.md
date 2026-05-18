@@ -1,6 +1,6 @@
 ---
 slug: nested-milestone-doc-layout
-Status: In progress
+Status: Landed
 short_description: Nest milestone docs under per-milestone m<N>/ folders
 ---
 
@@ -63,21 +63,20 @@ slug-preserving relocation already covered by C5 and Validation
 step 4), so no separate phase plan file is created — the work is
 tracked here.
 
-- **Phase 1 — convention + tool tolerance (this PR).** The
-  layout-convention spec prose (C1–C4), the consumer-migration
-  policy statement (C5, consumer half), and the dogfood walker
-  test. No existing plan docs move. Reaches `Landed` when this
-  PR merges.
-- **Phase 2 — this repo's own tree migration (deferred).**
-  Relocate `docs/plans/workstream-tracker-1-0/**` and
-  `docs/plans/demo-workstream/**` into `m<N>/` folders
-  (slug-preserving), satisfying the repo-self-migration half of
-  C5 and Validation step 4. **Deferred at the repo owner's
-  explicit instruction** ("hold off on moving existing plan docs
-  until I say"); it has no upstream blocker and is unblocked by
-  an owner go-ahead, not by other work. Until Phase 2 lands the
-  task plan stays `In progress` and the scoping doc is **not**
-  deleted (task-terminal is Phase 2's PR, not this one).
+- **Phase 1 — convention + tool tolerance (landed, PR #28).**
+  The layout-convention spec prose (C1–C4), the
+  consumer-migration policy statement (C5, consumer half), and
+  the dogfood walker test. No existing plan docs moved.
+- **Phase 2 — this repo's own tree migration (this PR;
+  task-terminal).** Relocated all 22 descendant docs of
+  `workstream-tracker-1-0/` and `demo-workstream/` into `m<N>/`
+  folders via `git mv` (slug-preserving — every frontmatter slug
+  verified byte-identical to pre-move), satisfying the
+  repo-self-migration half of C5 and Validation step 4. All
+  ~290 relative links into/out of the moved files were
+  re-relativized so every link that resolved pre-move resolves
+  post-move. This is the task-terminal PR: Status flips to
+  `Landed` and the scoping doc is deleted here.
 
 ## Contracts
 
@@ -196,12 +195,18 @@ are migrated to the nested shape in this task's implementing PR.
   — added `TestWalkPlansNestedMilestoneLayout` asserting the
   nested doc set and the `m<N>/scoping/` skip (C4).
 
-**Phase 2 — deferred (repo owner hold; see Phases):**
+**Phase 2 — this repo's tree migration (this PR; what shipped):**
 
 - `docs/plans/workstream-tracker-1-0/**` and
-  `docs/plans/demo-workstream/**` — relocate milestone/task/phase
-  docs into `m<N>/` folders; frontmatter slugs unchanged. Not
-  touched in this PR.
+  `docs/plans/demo-workstream/**` — 22 descendant docs `git mv`d
+  into `m<N>/` folders (milestone docs → `m<N>/README.md`;
+  task/phase docs → `m<N>/<suffix-after-mN>.md`). Frontmatter
+  slugs byte-identical to pre-move (verified).
+- Relative links across the repo re-relativized so every link
+  that resolved pre-move still resolves post-move (inbound links
+  from the epic `README.md`s, standalone plans, and backlog;
+  outbound links from moved files to spec/sibling/cross-milestone
+  targets).
 
 **Not touched:**
 
@@ -234,16 +239,26 @@ Before the implementing PR opens:
    equivalent and `m<N>/scoping/` is skipped. Falsifier: the test
    is absent, or asserts tolerance in a comment rather than by
    execution.
-4. **Repo-tree conformance (Phase 2 — deferred).** Every file
-   under `workstream-tracker-1-0/` and `demo-workstream/` sits at
-   its convention path; `go test ./...` is green; the rendered
-   roots-and-children set is unchanged pre/post move. Falsifier:
-   a moved file's slug changed, or the rendered tree diff is
-   non-empty. **Not run in this PR** — Phase 2 is deferred at the
-   repo owner's instruction (see Phases); this gate runs in
-   Phase 2's PR.
-5. **Link-resolution check.** Every relative link added or moved
-   resolves from its editing file's location.
+4. **Repo-tree conformance (Phase 2 — satisfied this PR).**
+   Every file under `workstream-tracker-1-0/` and
+   `demo-workstream/` sits at its convention path; `go test
+   ./...` green; rendered roots-and-children set unchanged
+   pre/post move (slugs byte-identical → the slug-driven tree is
+   identical by construction, and `TestWalkPlansNestedMilestone
+   Layout` proves walker tolerance of the nested shape).
+   Falsifier (a moved file's slug changed, or the tree diff is
+   non-empty): checked — 22/22 slugs byte-identical to
+   origin/main, tests green.
+5. **Link-resolution check (satisfied this PR).** Every relative
+   link in the repo was resolved against the post-move tree.
+   Result: zero migration-caused broken links. The only
+   unresolved links are pre-existing (present on origin/main,
+   unrelated to this migration): five `docs/agents/**` links and
+   one `stub-children-on-parent-promotion` link in the old m2
+   milestone doc that was broken before the move and was
+   faithfully re-relativized to the same intended (still-missing)
+   target — neither introduced nor fixed here (out of scope; see
+   Out of Scope).
 6. **Exact-match token check.** Every cited section title and
    Status token is verbatim against its canonical definition.
 
@@ -264,6 +279,15 @@ Gate.
 - **Project-customizable layout (`workstream.toml`).** Already
   deferred by the layout convention; untouched.
 - **Backlog and standalone-task scoping conventions.** Unchanged.
+- **Pre-existing broken links.** Six links broken on
+  origin/main before this migration (five under `docs/agents/**`,
+  one `stub-children-on-parent-promotion` reference in the old
+  m2 milestone doc) are not fixed here. They are unrelated to
+  per-milestone nesting; the migration only re-relativizes them
+  so a moved file's pre-existing broken link points at the same
+  intended (still-missing) target rather than a newly-wrong one.
+  Fixing them is tracked separately, not bundled into this
+  layout change.
 
 ## Backlog Impact
 
@@ -297,10 +321,10 @@ the diff surface is documentation/spec plus a mass file move:
 
 ## Related Docs
 
-- [`scoping/README.md`](scoping/README.md) — the transient
-  scoping deliberation (D1–D7, rejected alternatives, the open
-  D6); deleted at this task's terminal PR, survives in git
-  history.
+- `scoping/README.md` — the transient scoping deliberation
+  (D1–D7, rejected alternatives, the resolved D6); deleted in
+  this task-terminal PR per "Scoping owns / plan owns", survives
+  in git history.
 - [`../../../spec/planning-doc-location.md`](../../../spec/planning-doc-location.md),
   [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md),
   [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
