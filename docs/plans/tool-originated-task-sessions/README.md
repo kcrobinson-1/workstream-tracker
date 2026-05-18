@@ -276,11 +276,11 @@ merged code.*
   [`tool-originated-task-sessions`](../../backlog.md#tool-originated-task-sessions)
   capability and the determinism-resolution home. Milestone
   count and structure are the milestone-planning sessions'
-  output, not fixed here, and cannot lock until the remaining
-  Open Questions resolve — the spawn-shape choice and the
-  level/mode matrix. (One-way-invariant reconciliation and
-  workspace origin are resolved; see Open Questions Resolved By
-  This Epic.)
+  output, not fixed here, and cannot lock until the one
+  remaining scope-locking Open Question resolves — the
+  spawn-shape choice. (One-way-invariant reconciliation,
+  workspace origin, and the level/mode matrix are resolved; see
+  Open Questions Resolved By This Epic.)
 
 ## Milestone Contracts
 
@@ -362,6 +362,25 @@ Long-standing deferrals this epic's existence settles.
   hand over the prompt) and the two-phase split (worktree is
   agent-reported enrichment, not a tool concern). The tool never
   provisions, selects, or acts on the workspace.
+- **Which node levels offer "Begin planning" vs "Begin
+  implementation," and how does the mode map to the session
+  that starts?** Resolved minimally. The mode *is* the prompt:
+  "Begin planning" hands over a scoping/investigation prompt
+  for the node, "Begin implementation" hands over an
+  implementation prompt — the tool decides nothing about how
+  the session then plans or implements (launch-not-leash). Which
+  mode(s) a node offers is a **shallow static map over two
+  values the tool already holds** — the node-type it already
+  walks the tree to render, and the plan-doc Status it already
+  parses to color the node: parents (epic/milestone) are never
+  "implement" targets (their work is their children); a node
+  with no doc or `In draft` offers planning; `Proposed` offers
+  implementation; `In progress` / `Validating` / `Landed` offer
+  neither. This is a lookup table, not inference. **Bound:** if
+  a milestone finds it needs deep logic to pick the button,
+  that is a signal to revisit this resolution, not to add
+  inference power to the tool — the minimal-tool posture is the
+  invariant, the table is the means.
 
 ## Open Questions Newly Opened
 
@@ -420,15 +439,6 @@ the substance of the "settle vision first" framing.
   Whether m1 is a thin slug-passing invocation over that path
   or new registration surface is a technical-direction call for
   m1's milestone-planning session against merged code.
-- **Which node levels offer "Begin planning" vs "Begin
-  implementation," and how does the mode map to the session
-  that starts?** Planning a node produces its children;
-  implementing a node builds it — so the two modes don't apply
-  uniformly at every level (you plan a task to get its phases;
-  you implement a phase). The level/mode matrix and how each
-  cell maps to the session type and opening prompt is a
-  product-vision call to settle before the UX milestone's scope
-  locks.
 - **How do the spec and agent rules express a deterministic,
   handshake-free registration path?** A tool-originated session
   skips the best-effort grounded narration handshake because
@@ -546,10 +556,10 @@ each milestone-planning session's output.*
   A slug-carried deterministic registration entrypoint plus a
   manual slug producer to exercise it.
 - **Tool-originated session UX milestone(s)**: count and split
-  are an estimate that cannot firm up until the remaining Open
-  Questions resolve — the spawn-shape choice and the level/mode
-  matrix. (One-way reconciliation and workspace origin are
-  resolved.)
+  are an estimate that cannot firm up until the one remaining
+  scope-locking Open Question resolves — the spawn-shape choice.
+  (One-way reconciliation, workspace origin, and the level/mode
+  matrix are resolved.)
 
 ## Related Docs
 
