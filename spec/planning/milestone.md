@@ -133,6 +133,14 @@ A milestone doc carries the following sections.
 
 - Pending Inputs From `<prior milestone>` — when drafting
   depends on outputs of a prior milestone not yet merged
+- Out of Scope — when the milestone records boundary calls as
+  final answers (e.g. deferred pieces re-homed to a later
+  milestone). Promoted from a recurring disclosed variance: it
+  appeared in `m1-v0-2.md` and again in
+  `m2-expanded-view-and-roster.md` under the
+  [`shared.md`](./shared.md) "Section variance disclosure"
+  recurrence rule, so it is listed here rather than
+  re-disclosed per doc.
 
 Variance from this list — an unlisted section is appropriate,
 or a required section genuinely doesn't apply — follows the
