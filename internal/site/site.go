@@ -104,11 +104,20 @@ func loadActiveWorkInstances(ctx context.Context, db *sql.DB) (map[string][]*Act
 // RosterEntry is one active work-instance in the session roster,
 // classified by plan-tree membership. p1 (bare roster) carries
 // only the slug — the entry's display label, since p1 has no
-// reported-name source — the actor (the identity key and the
-// deterministic secondary sort key; never rendered as a label in
-// p1, per scoping SD2), and the bound flag. p2 enriches the same
-// loader output with the event-log-joined reported name and
-// detail; it does not need to reshape this struct's identity.
+// reported-name source — the actor, and the bound flag. The
+// actor is never rendered in p1 (scoping SD2); it is here purely
+// as the deterministic secondary sort key, so the
+// walk-on-every-request page renders a stable (slug, actor)
+// order when a slug carries several active work-instances.
+//
+// Actor is NOT a work-instance identity. The event log is keyed
+// by events.work_instance_id -> work_instances.id (the generated
+// PRIMARY KEY); (slug, actor, state=active) is only the
+// idempotency lookup. p1 deliberately does not carry
+// work_instances.id (it is unused here); p2's event-log join
+// extends loadActiveWorkInstances and this struct to surface
+// that id as the join key (recorded for p2 per the task-plan
+// Cross-PR coordination rule, not pre-built here).
 type RosterEntry struct {
 	Slug  string
 	Actor string

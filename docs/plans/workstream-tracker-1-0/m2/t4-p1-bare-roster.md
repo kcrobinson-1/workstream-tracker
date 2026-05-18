@@ -76,8 +76,18 @@ parsed-doc set and the already-loaded active-work-instance map;
 (b) the roster field on the shared `indexData`; (c) the
 `roster.go` region body with the bound/unbound classification. p2
 enriches the loader with the event-log join and adds the reported
-name + expandable raw-JSON detail to the same region; it does not
-need to restructure p1's loader signature or the region.
+name + expandable raw-JSON detail to the same region. p2 **will
+extend** `loadActiveWorkInstances` and `RosterEntry` to carry
+`work_instances.id` — the key the event log is joined on
+(`events.work_instance_id` → `work_instances.id`); p1 does **not**
+carry that id (it is unused in p1, so pre-carrying it would be
+speculative pre-coordination per
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "Cross-PR
+coordination"). What p2 reuses without restructuring is the
+bound/unbound classification, the `indexData` plumbing, and the
+region; the loader's *selected columns and the entry struct* are
+the p2-extended surface, recorded here for p2 to verify at its
+drafting.
 
 ## Contracts
 
@@ -138,23 +148,34 @@ is a mix of rules and estimates."
 
 - An entry's display label is the work-instance **slug**. The
   internal `wst-<uuid>` actor is **never rendered** in the roster
-  region in p1 (it is carried in the loader output only as the
-  identity key and the deterministic secondary sort key). p1 has
-  no reported-name source — that arrives with p2's client change
-  and event-log join — so every p1 label is the slug-fallback arm
-  of the task-level name-then-slug rule. `Verified by:` the t4
-  task plan Contracts "Session identity and naming" (label is
-  reported name else slug, never the `wst-<uuid>` actor);
+  region in p1 (it is carried in the loader output **only as the
+  deterministic secondary sort key**, below). p1 has no
+  reported-name source — that arrives with p2's client change and
+  event-log join — so every p1 label is the slug-fallback arm of
+  the task-level name-then-slug rule. `Verified by:` the t4 task
+  plan Contracts "Session identity and naming" (label is reported
+  name else slug, never the `wst-<uuid>` actor);
   [`work_instances` in schema.go](../../../../internal/db/schema.go)
   declares `slug TEXT NOT NULL`, so the slug fallback is always
   available; scoping SD2.
 - Roster order is **deterministic across requests**: entries are
-  ordered by `(slug, actor)` so the walk-on-every-request page
-  does not reshuffle between loads. `Verified by:`
+  ordered by the `(slug, actor)` tuple so the walk-on-every-request
+  page does not reshuffle between loads. `(slug, actor)` is a
+  stable *sort* tuple, **not** a work-instance identity: the event
+  log is keyed by `work_instances.id`
+  (`events.work_instance_id` → `work_instances.id`, the PRIMARY
+  KEY), so p1's actor field is purely the sort key and p2 — not
+  p1 — extends the loader to carry `work_instances.id` as the
+  event-join key (scoping SD2; recorded for p2 per the Cross-PR
+  coordination rule). `Verified by:`
   [`activeWorkInstanceID` in handlers.go](../../../../internal/api/handlers.go)
-  keys idempotency on `(slug, actor, state=active)`, so `(slug,
-  actor)` is a stable per-instance identity available without the
-  event log.
+  keys the idempotency lookup on `(slug, actor, state=active)` and
+  returns the matched row's `id`;
+  [`events` / `work_instances` in schema.go](../../../../internal/db/schema.go)
+  shows `events.work_instance_id` references `work_instances.id`,
+  indexed by `idx_events_work_instance_id`;
+  [`loadActiveWorkInstances` in site.go](../../../../internal/site/site.go)
+  selects only `slug, actor` (no `id`).
 
 ### Empty state
 

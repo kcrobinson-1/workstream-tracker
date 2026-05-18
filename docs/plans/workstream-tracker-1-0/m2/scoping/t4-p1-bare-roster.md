@@ -95,18 +95,38 @@ a node whose parent is absent — that join is the current
 unbound/parent-gap drop site the roster bypasses by classifying
 against the parsed-doc set directly.
 
-### SD2 — p1 entry label is the slug; the `wst-<uuid>` actor is carried for ordering/identity but never rendered
+### SD2 — p1 entry label is the slug; the `wst-<uuid>` actor is carried as the secondary sort key only, never rendered
 
 p1 has no name source (the reported-`name` metadata arrives only
 with p2's client change + event-log join). Under the t4
 task-level naming contract the label is the reported name else the
 work-instance slug, **never** the `wst-<uuid>` actor; with no name
 source in p1, every p1 entry's label is therefore the slug
-fallback. The actor is still needed in the loader output as the
-identity key (p2 joins the event log on it) and as the
-deterministic secondary sort key (multiple active work-instances
-can share a slug under `(slug, actor)` idempotency, and the
-walk-on-every-request page must render a stable order).
+fallback. The actor is carried in the loader output **only as the
+deterministic secondary sort key** — multiple active
+work-instances can share a slug (`(slug, actor, state=active)`
+idempotency permits concurrent co-working actors and serial
+resume), and the walk-on-every-request page must render a stable
+order, so `(slug, actor)` is the sort tuple.
+
+**Actor is not a work-instance identity, and p1 does not carry the
+event-join key.** The event log is keyed by
+`events.work_instance_id`, a foreign key onto
+`work_instances.id` (the per-row PRIMARY KEY the registration path
+generates as `wid`) — *not* by actor and *not* by
+`(slug, actor)`. `(slug, actor, state=active)` is only the
+idempotency lookup used to *find* an existing active row's `id`;
+the durable identity events reference is `work_instances.id`. p1's
+loader (`loadActiveWorkInstances`) selects only `slug, actor` and
+does **not** carry `work_instances.id`, so p2's event-log join
+**will** extend both `loadActiveWorkInstances` and `RosterEntry`
+to surface `work_instances.id` as the join key. This is recorded
+as the cross-phase assumption p2 verifies at its own drafting per
+[`task-plan.md`](../../../../../spec/planning/task-plan.md)
+"Cross-PR coordination" (record the assumption, do not pre-build a
+field p1 does not use); p1 deliberately does not pre-carry the id
+(it is unused in p1 and adding it would be speculative
+pre-coordination).
 
 - **Rejected alternative — render the actor as secondary entry
   text in p1.** It would surface the `wst-<uuid>` the task-level
@@ -124,9 +144,20 @@ show as a label);
 declares `slug TEXT NOT NULL`, so every active row the roster
 lists has a slug to fall back to;
 [`activeWorkInstanceID` in handlers.go](../../../../../internal/api/handlers.go)
-keys idempotency on `(slug, actor, state=active)`, so `(slug,
-actor)` is the per-instance identity the loader sorts and p2
-later joins on.
+keys the idempotency *lookup* on `(slug, actor, state=active)` and
+returns the matched row's `id` — so `(slug, actor)` is the loader's
+stable sort tuple, not the event-join key;
+[`events` / `work_instances` in schema.go](../../../../../internal/db/schema.go)
+shows `events.work_instance_id` is a foreign key onto
+`work_instances.id` (the PRIMARY KEY), indexed by
+`idx_events_work_instance_id` — that id, not actor, is the p2
+event-join key;
+[`insertRegister` in handlers.go](../../../../../internal/api/handlers.go)
+generates `wid` and writes it as both `work_instances.id` and
+`events.work_instance_id`, and
+[`loadActiveWorkInstances` in site.go](../../../../../internal/site/site.go)
+selects only `slug, actor` (no `id`), confirming p2 must extend
+the loader to carry `work_instances.id`.
 
 ## Decisions resolved at the task-plan level (not re-opened here)
 
