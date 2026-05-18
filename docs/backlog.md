@@ -164,29 +164,53 @@ remember the adjacent always-on rules.
 
 ### deterministic-interactive-registration
 
+**Status:** Graduated — tool-originated-task-sessions
+
+**Plan:** [`docs/plans/tool-originated-task-sessions/README.md`](plans/tool-originated-task-sessions/README.md)
+
+The determinism-resolution thread for interactive registration.
+
+Interactive registration is *not* deterministic and provably
+cannot be: resolving natural-language intent to a canonical slug
+requires agent cognition, which postdates session start, while a
+deterministic trigger must run before it (the "registration
+circularity"). Its only resolution home is changing who the
+launcher is — which is exactly the
+[`tool-originated-task-sessions`](#tool-originated-task-sessions)
+epic ([`docs/plans/tool-originated-task-sessions/README.md`](plans/tool-originated-task-sessions/README.md)),
+where the tool launches the agent so the slug is known by
+construction. That epic now carries this thread; this entry is
+Graduated to it.
+
+**Three-way split.** This entry originally bundled three
+threads; they are now separated so each binds where it actually
+fires. (1) *Determinism resolution* — this entry, graduated
+above. (2) *The best-effort tripwire* — carved into
+[`interactive-registration-tripwire`](#interactive-registration-tripwire),
+which stays **Open**: it binds the 1.0 epic's neighborly-events
+integration milestone *independently of and earlier than* the
+post-1.0 epic above, so it must not be folded into a graduated
+post-1.0 entry. (3) *The observability residual* — carved into
+[`unregistered-work-unobservable`](#unregistered-work-unobservable),
+which stays **Open**; the session-roster work
+(`workstream-tracker-1-0-m2-t4`) later *shifts* it to its
+roster-informed narrowing, it does not create it. The slug is preserved so
+inbound anchors from 1.0-epic plan docs still resolve; readers
+who reached this anchor for the tripwire or observability
+threads follow the pointers above.
+
+### interactive-registration-tripwire
+
 **Status:** Open
 
-Deterministic work-instance registration for interactive,
-natural-language sessions.
+The best-effort interactive-registration tripwire — re-deliberate
+before the neighborly-events integration milestone.
 
 m1-t2 ships interactive registration as an observable
-best-effort grounded narration handshake. It is *not*
-deterministic, and provably cannot be: resolving natural-language
-intent to a canonical slug requires agent cognition, which
-postdates session start, while a deterministic trigger must run
-before it (the "registration circularity"). Observable
-best-effort is the accepted, vision-faithful posture, not a
-stopgap: the m1-t2 decision (locked at t2 drafting) treats the
-grounded narration handshake as a faithful operationalization of
-the long-term vision's prescribed mitigation, and "deterministic"
-was never an upstream promise for registration. Achieving
-determinism is therefore **not a 1.0 requirement** — its only
-resolution home is the post-v0.2
-[`tool-originated-task-sessions`](#tool-originated-task-sessions)
-capability (the tool itself launches the agent, so the slug is
-known by construction), which is well beyond this epic's scope;
-the registration circularity is dissolved only by changing who
-the launcher is, and that is where it gets dissolved. What *does*
+best-effort grounded narration handshake. Observable best-effort
+is the accepted, vision-faithful posture, not a stopgap, and
+"deterministic" was never an upstream promise for registration;
+achieving determinism is **not a 1.0 requirement**. What *does*
 bind: best-effort's acceptability rests on sole-consumer
 compensation (the lone producer can notice and hand-fix a missed
 marker), and that compensation evaporates when an external
@@ -198,22 +222,54 @@ whether best-effort is still acceptable at that point or whether
 a backstop must be pulled forward, and is not a commitment that
 registration becomes deterministic for 1.0.
 
-This entry also tracks the **observability residual**: a missed
-registration is unobservable from the rendered tree by
-construction (an unregistered session emits no signal the tool
-ever sees, so the tree cannot distinguish unregistered work from
-no work). t2's only backstop is the in-session narration
-handshake, which works solely while a contributor is present to
-notice it — the same sole-consumer compensation the tripwire is
-about. A tree-side heuristic ("a node with an active/Proposed
+This thread was carved out of
+[`deterministic-interactive-registration`](#deterministic-interactive-registration)
+in its three-way split. It stays **Open** and is deliberately
+**not graduated**: the
+[`tool-originated-task-sessions`](#tool-originated-task-sessions)
+epic lands post-1.0, while this tripwire fires *before* the 1.0
+epic's neighborly-events integration milestone — folding it into
+that graduated post-1.0 entry would move an earlier-binding
+obligation somewhere it would not fire in time. It is also
+distinct from the observability residual
+([`unregistered-work-unobservable`](#unregistered-work-unobservable)).
+The 1.0 epic's Risk Register references
+the determinism entry's anchor for this tripwire; that reference
+target is this entry.
+
+### unregistered-work-unobservable
+
+**Status:** Open
+
+A missed registration is unobservable from the rendered tree.
+
+A missed/unregistered session emits no signal the tool ever
+sees, so the rendered tree cannot distinguish unregistered work
+from no work. The only backstop today is the in-session
+narration handshake, which works solely while a contributor is
+present to notice it — the same sole-consumer compensation the
+[`interactive-registration-tripwire`](#interactive-registration-tripwire)
+is about. A tree-side heuristic ("a node with an active/Proposed
 plan doc but no work-instance") is the candidate future
-affordance, deferred under the same tripwire. This entry tracks
-both the determinism gap and the observability gap until
-resolved.
+affordance, deferred.
+
+This thread was carved out of
+[`deterministic-interactive-registration`](#deterministic-interactive-registration)
+in its three-way split and stays **Open** (not graduated, not
+the determinism entry, not the tripwire). It is created here at
+its current broad framing so the split is self-contained per
+[`spec/backlog.md`](../spec/backlog.md) ("the PR that lands the
+plan also updates the backlog file accordingly"). The
+session-roster work (`workstream-tracker-1-0-m2-t4`) later
+**shifts** it: once the roster surfaces registered-but-unbound
+work, the residual narrows to *unregistered* work only. That is
+a shift of an existing entry, not a create.
 
 ### tool-originated-task-sessions
 
-**Status:** Open
+**Status:** Graduated — tool-originated-task-sessions
+
+**Plan:** [`docs/plans/tool-originated-task-sessions/README.md`](plans/tool-originated-task-sessions/README.md)
 
 The tool's own UX originates a planning/implementation session
 from a plan-tree node.
