@@ -115,7 +115,7 @@ the walk-on-every-request render path is unchanged.
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [Proposed](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [Landed](t4-p1-bare-roster.md) |
-| `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
+| `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [Proposed](t4-p2-enrichment.md) |
 
 t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
 `Landed` (drafted, promoted, and implemented — the two-region
@@ -140,8 +140,13 @@ promoted, and implemented — the bare bound/unbound roster shipped:
 every active session listed and classified against the
 in-request walked parsed-doc set, replacing t1's placeholder, no
 event join / no client change); phase 2
-[`t4-p2`](t4-p2-enrichment.md) remains a seeded parent-promotion
-**stub**, scoped just-in-time at its own drafting. **t3**
+[`t4-p2`](t4-p2-enrichment.md) is now a **`Proposed`** drafted
+phase plan (scoped just-in-time against merged p1 code: the
+client/CLI metadata + `name` affordance, the event-log join
+keyed on `work_instances.id`, and the expandable raw-JSON
+detail; its implementing PR is t4-terminal and carries the
+backlog shift + new entries and the p2/t4/milestone-row
+`Landed` flips). **t3**
 ([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md)) is now
 a **`Proposed` N = 1 task plan**: a spawned just-in-time drafting
 session replaced the stub with a full task plan and a paired
@@ -160,14 +165,15 @@ universal `Verified by:`, reality-check re-confirmation, always-on
 rules, the D6 branch-test sketch resolving N = 1) and the plan
 flipped to `Proposed`; phase split N = 1 so no phase stubs to
 seed (see the t3 plan's Status section and the "Doc-declared-stages
-frontmatter shape" Cross-Task Decisions entry below). The
-remaining not-yet-drafted child (t4-p2) is scoped just-in-time at
-its own drafting session per
+frontmatter shape" Cross-Task Decisions entry below). With t3 and
+t4-p2 now both drafted and `Proposed`, no m2 child remains a
+seeded parent-promotion stub; each not-yet-drafted child was
+scoped just-in-time at its own drafting session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-"Just-in-time scoping and plan drafting"; a remaining stub is
-exempt from the required-sections rule until then per
-[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
-child contracts." The Task Contracts below are the locked WHAT
+"Just-in-time scoping and plan drafting" — the parent-promotion
+stub exemption in [`shared.md`](../../../../spec/planning/shared.md)
+"Parent-doc child contracts" no longer applies now that every m2
+child is drafted. The Task Contracts below are the locked WHAT
 each task inherited.
 
 ## Sequencing
