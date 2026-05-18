@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4-p2
-Status: In draft
+Status: Proposed
 short_description: Client/CLI metadata + named sessions + event-log join + expandable raw-JSON detail
 ---
 
