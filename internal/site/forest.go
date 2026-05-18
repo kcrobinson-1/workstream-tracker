@@ -3,13 +3,22 @@ package site
 import "html/template"
 
 // forestTemplates owns the forest region: the "forest" template
-// (roots stacked, descendants nested as bullet lists, the
-// no-roots empty-state), the recursive "node" template (Status
-// badge, actor markers, long description, related PRs, children),
-// and "forest-style" (the node-level CSS the shell injects into
-// <head>). This is the surface m2 t2 (expanded nested-box render)
-// grows; it is relocated byte-for-intent from the pre-split
-// render.go and must not change node shape here (t2's call).
+// (roots stacked, the no-roots empty-state), the recursive "node"
+// template (each node a nested, independently-collapsible box —
+// header with the Status badge and actor markers, body with long
+// description, related PRs, and child boxes), and "forest-style"
+// (the node-level CSS the shell injects into <head>). This is m2
+// t2's owned surface (expanded nested-box render); the shell
+// (render.go) and roster (roster.go) are not t2's.
+//
+// A box with children is a native <details>/<summary> (no
+// JavaScript, no route — m2 t2 C2): its summary is the clickable
+// header and its children render as nested boxes inside the body.
+// A leaf box (no children) has no disclosure control and no
+// expand state (C5) — its header and detail are always visible.
+// node-header / node-detail are factored out so both the
+// collapsible and leaf branches render the identical preserved
+// surfaces (C5: actor markers, long description, related PRs).
 const forestTemplates = `
 {{define "forest"}}{{if .Roots}}
   {{range .Roots}}
@@ -21,30 +30,48 @@ const forestTemplates = `
   <p class="empty">No plan-tree roots found at <code>{{.PlansPath}}</code>.</p>
   {{end}}{{end}}
 
-{{define "node"}}
-<span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span><span class="label" title="{{.Slug}}">{{.Label}}</span>
-{{- range .WorkInstances }} <span class="actor-marker">{{.Actor}}</span>{{end}}
+{{define "node-header"}}<span class="label-group"><span class="label" title="{{.Slug}}">{{.Label}}</span>{{range .WorkInstances}}<span class="actor-marker">{{.Actor}}</span>{{end}}</span><span class="status-group"><span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span></span>{{end}}
+
+{{define "node-detail"}}
 {{- if .LongDescription}}
 <div class="long-desc">{{.LongDescription}}</div>
 {{- end}}
 {{- if .RelatedPRs}}
 <ul class="related-prs">
-  {{range .RelatedPRs}}<li>{{if isURL .}}<a href="{{.}}">{{.}}</a>{{else}}{{.}}{{end}}</li>
-  {{end}}
-</ul>
+{{range .RelatedPRs}}<li>{{if isURL .}}<a href="{{.}}">{{.}}</a>{{else}}{{.}}{{end}}</li>
+{{end}}</ul>
 {{- end}}
+{{- end}}
+
+{{define "node"}}
 {{- if .Children}}
-<ul>
-  {{range .Children}}<li>{{template "node" .}}</li>
-  {{end}}
-</ul>
-{{end}}
+<details class="box box-{{.NodeType}}" open>
+<summary><span class="box-header">{{template "node-header" .}}</span></summary>
+<div class="box-body">
+{{- template "node-detail" .}}
+{{range .Children}}{{template "node" .}}
+{{end}}</div>
+</details>
+{{- else}}
+<div class="box box-{{.NodeType}} box-leaf">
+<div class="box-header">{{template "node-header" .}}</div>
+{{- template "node-detail" .}}
+</div>
+{{- end}}
 {{end}}
 
-{{define "forest-style"}}    .root { margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: #f9fafb; border-radius: 0.5rem; }
-    ul { padding-left: 1.5rem; list-style: none; margin: 0.25rem 0; }
-    li { padding: 0.25rem 0; }
-    .badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 0.25rem; font-size: 0.85em; margin-right: 0.5rem; font-weight: 500; }
+{{define "forest-style"}}    .root { margin-bottom: 1.5rem; }
+    .box { border: 1px solid #e5e7eb; border-radius: 0.5rem; margin: 0.4rem 0; background: #fff; }
+    .box-root { background: #f9fafb; border-color: #d1d5db; }
+    .box-milestone { background: #fcfcfd; }
+    .box-phase { border-style: dashed; }
+    .box-body { padding: 0 0.75rem 0.5rem 1rem; }
+    summary { cursor: pointer; }
+    summary .box-header { display: flex; }
+    .box-header { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; padding: 0.4rem 0.75rem; }
+    .label-group { display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; min-width: 0; }
+    .status-group { flex: 0 0 auto; }
+    .badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 0.25rem; font-size: 0.85em; font-weight: 500; }
     .status-in-draft    { background: #fef3c7; color: #78350f; }
     .status-proposed    { background: #dbeafe; color: #1e3a8a; }
     .status-in-progress { background: #fed7aa; color: #7c2d12; }
@@ -52,11 +79,11 @@ const forestTemplates = `
     .status-landed      { background: #d1fae5; color: #065f46; }
     .status-deferred    { background: #e5e7eb; color: #374151; }
     .status-unknown     { background: #f3f4f6; color: #6b7280; }
-    .actor-marker { display: inline-block; background: #fef9c3; color: #713f12; padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.75em; margin-left: 0.4rem; }
+    .actor-marker { display: inline-block; background: #fef9c3; color: #713f12; padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.75em; }
     .label { font-weight: 500; cursor: help; }
     .empty { color: #6b7280; font-style: italic; }
     .long-desc { white-space: pre-wrap; margin: 0.25rem 0 0.25rem 0; color: #374151; font-size: 0.9em; }
-    .related-prs { margin: 0.25rem 0 0.25rem 0; padding-left: 1.25rem; font-size: 0.85em; }
+    .related-prs { list-style: none; margin: 0.25rem 0 0.25rem 0; padding-left: 1.25rem; font-size: 0.85em; }
     .related-prs li { padding: 0.1rem 0; }{{end}}`
 
 func init() {

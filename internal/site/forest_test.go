@@ -60,39 +60,109 @@ func TestRenderRelatedPRsNonURLIsPlainText(t *testing.T) {
 	}
 }
 
-// TestRenderNoFieldNodeUnchanged pins the exact node-line markup
-// for a node carrying neither a long description nor related PRs.
-// The literal below is today's output for that line and its
-// children; the conditional detail blocks must add nothing, so a
-// regression here means the additive contract was broken. This is
-// also the byte-identity falsifier for the region-ownership
-// split: relocating the node template into forest.go must not
-// change this output.
-func TestRenderNoFieldNodeUnchanged(t *testing.T) {
+// TestRenderNestedBoxesReplaceBulletList asserts the m2 t2 C1/C6
+// structural contract: a node with children renders as a native
+// <details> box whose summary carries the node header, the child
+// renders as a nested box inside the body, and the old
+// <ul>/<li> descendant nesting is gone. Semantic/structural, not
+// a byte-identity pin (C6 — the prior byte pin is replaced, not
+// re-ratcheted, because t2 deliberately rewrites the node shape).
+func TestRenderNestedBoxesReplaceBulletList(t *testing.T) {
 	roots := buildTree([]parsedDoc{
 		{Slug: "alpha", Status: "Proposed"},
 		{Slug: "alpha-m1", Status: "Landed"},
 	}, nil)
 	html := renderTree(t, roots)
 
-	// Exact pre-change node region, captured by rendering the
-	// original template (the `  ` after `</li>` is the range
-	// trailing indent — preserved verbatim to pin byte-identity).
-	const wantNode = "<span class=\"badge status-proposed\">Proposed</span><span class=\"label\" title=\"alpha\">alpha</span>\n" +
-		"<ul>\n" +
-		"  <li>\n" +
-		"<span class=\"badge status-landed\">Landed</span><span class=\"label\" title=\"alpha-m1\">m1</span>\n" +
-		"</li>\n" +
-		"  \n" +
-		"</ul>"
-	if !strings.Contains(html, wantNode) {
-		t.Errorf("field-less node line changed (additive contract broken).\nwant substring:\n%q\ngot:\n%s", wantNode, html)
+	// Parent with children is a collapsible box; child is a nested
+	// leaf box, not an <li>.
+	if !strings.Contains(html, `<details class="box box-root" open>`) {
+		t.Errorf("parent node not rendered as a collapsible box; html:\n%s", html)
 	}
+	if !strings.Contains(html, `<summary><span class="box-header">`) {
+		t.Errorf("collapsible box missing summary header; html:\n%s", html)
+	}
+	if !strings.Contains(html, `<div class="box box-milestone box-leaf">`) {
+		t.Errorf("child node not rendered as a nested leaf box; html:\n%s", html)
+	}
+	if !strings.Contains(html, `<span class="label" title="alpha-m1">m1</span>`) {
+		t.Errorf("child node label lost; html:\n%s", html)
+	}
+	// The flat descendant-nesting <ul>/<li> is fully removed (no
+	// related PRs here, so any <li> would be the old nesting).
+	if strings.Contains(html, "<li>") {
+		t.Errorf("descendant <ul>/<li> nesting not removed; html:\n%s", html)
+	}
+}
+
+// TestRenderFieldlessNodeEmitsNoDetailMarkup is the preserved
+// additive guard (C5): a node carrying neither a long description
+// nor related PRs emits no detail markup. The semantic
+// replacement for the retired byte-identity pin.
+func TestRenderFieldlessNodeEmitsNoDetailMarkup(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed"},
+		{Slug: "alpha-m1", Status: "Landed"},
+	}, nil)
+	html := renderTree(t, roots)
+
 	// Guard the emitted detail markup, not the CSS rule names (the
 	// stylesheet legitimately defines `.long-desc`/`.related-prs`).
 	if strings.Contains(html, `<div class="long-desc">`) ||
 		strings.Contains(html, `<ul class="related-prs">`) {
 		t.Errorf("field-less render emitted detail markup; html:\n%s", html)
+	}
+}
+
+// TestRenderLeafAndStubBox asserts the C5 leaf/stub contract: a
+// node with no children renders as a valid box with NO disclosure
+// control (no <details>/<summary> for that node), and a bare
+// `slug` + `Status: In draft` stub still renders as a leaf box
+// with just its badge and label.
+func TestRenderLeafAndStubBox(t *testing.T) {
+	// Single root, no children: a leaf box, no disclosure control.
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed"},
+	}, nil)
+	html := renderTree(t, roots)
+	if !strings.Contains(html, `<div class="box box-root box-leaf">`) {
+		t.Errorf("childless root not rendered as a leaf box; html:\n%s", html)
+	}
+	if strings.Contains(html, "<details") || strings.Contains(html, "<summary") {
+		t.Errorf("leaf box must have no disclosure control; html:\n%s", html)
+	}
+
+	// A `slug` + `Status: In draft` stub renders as a valid leaf
+	// box with its badge and label, nothing dropped or errored.
+	stub := renderTree(t, buildTree([]parsedDoc{
+		{Slug: "beta", Status: "In draft"},
+	}, nil))
+	if !strings.Contains(stub, `<div class="box box-root box-leaf">`) {
+		t.Errorf("stub not rendered as a valid leaf box; html:\n%s", stub)
+	}
+	if !strings.Contains(stub, `<span class="badge status-in-draft">In draft</span>`) ||
+		!strings.Contains(stub, `<span class="label" title="beta">beta</span>`) {
+		t.Errorf("stub box lost its badge or label; html:\n%s", stub)
+	}
+}
+
+// TestRenderActorMarkersOnBox asserts the cross-cutting invariant
+// (v0.1 actor tags on nodes must not regress): every box still
+// renders the active-work actor markers in its header.
+func TestRenderActorMarkersOnBox(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "In progress"},
+		{Slug: "alpha-m1", Status: "Proposed"},
+	}, map[string][]*ActiveWorkInstance{
+		"alpha":    {{Actor: "agent-1"}},
+		"alpha-m1": {{Actor: "agent-2"}},
+	})
+	html := renderTree(t, roots)
+	if !strings.Contains(html, `<span class="actor-marker">agent-1</span>`) {
+		t.Errorf("actor marker on parent box lost; html:\n%s", html)
+	}
+	if !strings.Contains(html, `<span class="actor-marker">agent-2</span>`) {
+		t.Errorf("actor marker on child box lost; html:\n%s", html)
 	}
 }
 

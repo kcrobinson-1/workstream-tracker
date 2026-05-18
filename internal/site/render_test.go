@@ -36,9 +36,13 @@ func TestRenderTwoRegionShell(t *testing.T) {
 			t.Errorf("two-region shell missing %q; html:\n%s", want, html)
 		}
 	}
-	// Forest region still renders the existing node output.
-	if !strings.Contains(html, `<span class="badge status-proposed">Proposed</span><span class="label" title="alpha">alpha</span>`) {
-		t.Errorf("forest region lost the existing node render; html:\n%s", html)
+	// Forest region still renders the node (m2 t2: now a nested
+	// per-node box, not the flat bullet line). One sanctioned
+	// cross-file sub-assertion update — node shape is t2's surface
+	// (m2 t2 C6), not a shell-region boundary violation.
+	if !strings.Contains(html, `<div class="box box-root box-leaf">`) ||
+		!strings.Contains(html, `<span class="label" title="alpha">alpha</span>`) {
+		t.Errorf("forest region lost the node render; html:\n%s", html)
 	}
 	// The forest region opens before the roster region.
 	if i, j := strings.Index(html, `class="forest"`), strings.Index(html, `class="roster"`); i < 0 || j < 0 || i > j {
