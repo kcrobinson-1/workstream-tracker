@@ -473,10 +473,11 @@ m1's locked contract.
   in the implementing PR, not contracted here.
 - **The tree-side observability heuristic.** A tree-side
   "node with an active plan doc but no work-instance" heuristic
-  belongs to the observability-residual thread, which the
-  session-roster work (`workstream-tracker-1-0-m2-t4`) owns as
-  its own separate backlog entry — not the
-  `deterministic-interactive-registration` entry and not a
+  belongs to the
+  [`unregistered-work-unobservable`](../../backlog.md#unregistered-work-unobservable)
+  entry (created Open in this PR; the session-roster work
+  `workstream-tracker-1-0-m2-t4` later shifts/narrows it) — not
+  the `deterministic-interactive-registration` entry and not a
   deliverable of this epic.
 
 ## Backlog Impact
@@ -504,16 +505,26 @@ Per the effect taxonomy in
   neighborly-events integration milestone independently of and
   *earlier* than this post-1.0 epic, so it is deliberately not
   graduated and not folded into the graduated entry. (3) *The
-  observability residual* — a separate entry the session-roster
-  work owns and creates in its implementing PR (its narrowing
-  is roster-informed); this epic neither creates nor carries it.
+  observability residual* — carved into a new
+  [`unregistered-work-unobservable`](../../backlog.md#unregistered-work-unobservable)
+  Open entry **created in this PR** at its current broad
+  framing, so the split is self-contained per
+  [`spec/backlog.md`](../../../spec/backlog.md) ("the PR that
+  lands the plan also updates the backlog file accordingly") —
+  the thread is never homeless. The session-roster work
+  (`workstream-tracker-1-0-m2-t4`) later **shifts** it to its
+  roster-informed narrowing (registered-but-unbound work now
+  surfaced ⇒ residual narrows to *unregistered* work only); a
+  shift of an existing entry, not a create.
   The `deterministic-interactive-registration` slug is preserved
   so the many 1.0-epic plan-doc anchors still resolve; that
   entry now carries forward pointers to the other two threads.
   Cross-PR note: m2-t4's scoping D2 still reads "determinism-only
-  entry, stays Open" (written before this epic existed); when
-  t4-p2 lands it reconciles that one line to "graduated; tripwire
-  is its own Open entry." This epic does not edit m2-t4's plan.
+  entry stays Open" + "create new observability entry" (written
+  before this epic existed); when t4-p2 lands it reconciles those
+  to "determinism graduated; tripwire is its own Open entry;
+  observability already exists — shift, not create." This epic
+  does not edit m2-t4's plan.
 
 ## Risk Register
 

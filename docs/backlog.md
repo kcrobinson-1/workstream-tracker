@@ -190,10 +190,11 @@ above. (2) *The best-effort tripwire* — carved into
 which stays **Open**: it binds the 1.0 epic's neighborly-events
 integration milestone *independently of and earlier than* the
 post-1.0 epic above, so it must not be folded into a graduated
-post-1.0 entry. (3) *The observability residual* — tracked by a
-separate entry the session-roster work
-(`workstream-tracker-1-0-m2-t4`) owns and creates in its
-implementing PR; not carried here. The slug is preserved so
+post-1.0 entry. (3) *The observability residual* — carved into
+[`unregistered-work-unobservable`](#unregistered-work-unobservable),
+which stays **Open**; the session-roster work
+(`workstream-tracker-1-0-m2-t4`) later *shifts* it to its
+roster-informed narrowing, it does not create it. The slug is preserved so
 inbound anchors from 1.0-epic plan docs still resolve; readers
 who reached this anchor for the tripwire or observability
 threads follow the pointers above.
@@ -230,10 +231,39 @@ epic lands post-1.0, while this tripwire fires *before* the 1.0
 epic's neighborly-events integration milestone — folding it into
 that graduated post-1.0 entry would move an earlier-binding
 obligation somewhere it would not fire in time. It is also
-distinct from the observability residual (the session-roster
-work's separate entry). The 1.0 epic's Risk Register references
+distinct from the observability residual
+([`unregistered-work-unobservable`](#unregistered-work-unobservable)).
+The 1.0 epic's Risk Register references
 the determinism entry's anchor for this tripwire; that reference
 target is this entry.
+
+### unregistered-work-unobservable
+
+**Status:** Open
+
+A missed registration is unobservable from the rendered tree.
+
+A missed/unregistered session emits no signal the tool ever
+sees, so the rendered tree cannot distinguish unregistered work
+from no work. The only backstop today is the in-session
+narration handshake, which works solely while a contributor is
+present to notice it — the same sole-consumer compensation the
+[`interactive-registration-tripwire`](#interactive-registration-tripwire)
+is about. A tree-side heuristic ("a node with an active/Proposed
+plan doc but no work-instance") is the candidate future
+affordance, deferred.
+
+This thread was carved out of
+[`deterministic-interactive-registration`](#deterministic-interactive-registration)
+in its three-way split and stays **Open** (not graduated, not
+the determinism entry, not the tripwire). It is created here at
+its current broad framing so the split is self-contained per
+[`spec/backlog.md`](../spec/backlog.md) ("the PR that lands the
+plan also updates the backlog file accordingly"). The
+session-roster work (`workstream-tracker-1-0-m2-t4`) later
+**shifts** it: once the roster surfaces registered-but-unbound
+work, the residual narrows to *unregistered* work only. That is
+a shift of an existing entry, not a create.
 
 ### tool-originated-task-sessions
 
