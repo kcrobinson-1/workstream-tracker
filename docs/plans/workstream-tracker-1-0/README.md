@@ -72,18 +72,32 @@ them.
 
 ## Milestone Structure
 
-One landed milestone, two proposed middle milestones, and a
-final integration milestone whose slug is allocated at
-registration time.
+One landed milestone, one in-draft middle milestone, one
+early-estimate middle milestone, and a final integration
+milestone whose slug is allocated at registration time.
+
+The original `m2` ("activity-first ordering") and `m3`
+("sub-stage cells + richer actor presence") were early
+estimates made before m1 landed. They are superseded here: the
+new `m2` is the in-root expanded view, doc-declared progress
+boxes, and session roster (drafted in
+[`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md));
+the across-roots tier ordering and cell-level actor presence
+the old estimates named are re-homed to a later milestone
+rather than lost.
 
 **Sequencing rationale** — sequential dependency, not parallel:
 
 - **m1 first** because it unblocks accurate dogfood (multiple
   work-instances per slug, automatic registration) and lays the
   descriptive-label foundation that m2 and m3 both consume.
-- **m2 before m3** because tier-based forest ordering frames
-  where the eye looks first; sub-stage cells are leaf-level
-  detail that's more useful once the forest reads correctly.
+- **m2 before m3** because m2 makes a single root's internal
+  structure legible — expanded per-node Status boxes,
+  doc-driven progress boxes, and a session roster. m3's
+  across-roots tier ordering and cell-level actor presence sit
+  on top of m2's per-node box and roster; the forest-level
+  framing is more useful once each root reads correctly
+  internally.
 - **Final integration last** by definition: it tests the whole
   stack against a real external consumer.
 
@@ -96,19 +110,31 @@ registration time.
   parsing as a phase), expanded per-node display. Full task
   list and contracts in [`m1-v0-2.md`](m1-v0-2.md).
 
-- `workstream-tracker-1-0-m2` (proposed). **Activity-first
-  ordering.** Tier-based sorting (active surfaces top, in-flight
-  middle, landed/abandoned compressed), expand active-work paths
-  inside active roots, collapse inactive branches. The change
-  that surfaces "what's live now."
+- `workstream-tracker-1-0-m2` (Proposed — task scope locked at
+  4 tasks; parent-promotion stubs seeded). **v0.3 — In-root
+  expanded view, doc-declared progress boxes, and session
+  roster.** A root's contents
+  render as nested epic → milestone → task → phase boxes with
+  per-node Status, collapsible, inside the active-work surface;
+  every node level shows progress boxes whose count and order
+  come from the doc itself (a stub showing only the Drafting
+  box, which requires an additive spec change); and a new
+  roster lists bound + unbound active sessions with an
+  expandable deliberately-unstructured-JSON detail view. Full
+  task list and contracts in
+  [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md).
 
-- `workstream-tracker-1-0-m3` (proposed). **Sub-stage cells and
-  richer actor presence.** Per-leaf `D`/`P`/`I`/`V` cells colored
-  by state (none / active / in-review / complete). Actor icons
-  sit on specific cells rather than as bare chips on the node.
-  Requires richer work-instance state vocabulary
-  (`awaiting-user`, `awaiting-external`, `backgrounded`) in the
-  API and DB.
+- `workstream-tracker-1-0-m3` (early estimate — scope not yet
+  locked). **Activity-first forest ordering and richer actor
+  presence.** The re-homed deferred pieces: across-roots
+  tier-based sorting (active surfaces top, in-flight middle,
+  landed/abandoned compressed) with collapse of inactive
+  branches; actor icons positioned on individual progress boxes
+  (assuming m2's node-level actor tags remain); and the richer
+  work-instance state vocabulary (`awaiting-user`,
+  `awaiting-external`, `backgrounded`) in the API and DB. This
+  is an estimate made before m2 lands; its task breakdown is
+  the m3 milestone-drafting session's output, not fixed here.
 
 - **Final integration milestone** (slug allocated at
   registration). **Neighborly-events integration.** Vendor
@@ -144,33 +170,55 @@ optional sections" and [`shared.md`](../../../spec/planning/shared.md)
   fallback shape; spec changes are additive (no breaking
   changes to vendored consumers).
 
-### m2 — Activity-first ordering
+### m2 — In-root expanded view, doc-declared progress boxes, and session roster
 
-- **End result.** The forest renders with tier-based sorting:
-  active surfaces top, in-flight middle, landed/abandoned
-  compressed. Active-work paths inside active roots expand by
-  default; inactive branches collapse.
-- **Interfaces.** Consumes work-instance state from m1's
-  multi-WI schema. Provides the visual ordering context that
-  m3's per-cell rendering sits within.
-- **Preserves.** m1's labels and detail rendering. The
-  alphabetical ordering m1 ships with remains the fallback
-  when no work-instance state distinguishes roots.
+- **End result.** A root's descendants render as nested
+  epic → milestone → task → phase boxes with per-node Status,
+  collapsible, inside the active-work surface; every node level
+  renders progress boxes whose count and order come from the
+  plan doc itself (a stub renders only the Drafting box); and a
+  session roster lists bound + unbound active sessions with an
+  expandable, deliberately-unstructured-JSON detail view. An
+  additive `spec/` change introduces the doc-declared-stages
+  affordance (spec-first).
+- **Interfaces.** Consumes m1's multi-work-instance schema,
+  descriptive labels, and per-node detail. Provides the
+  per-node expanded box and the doc-declared-stages spec field
+  that m3's across-roots ordering and on-box actor presence
+  build upon. The roster is the observability surface the
+  `deterministic-interactive-registration` backlog entry's
+  mitigation direction names.
+- **Preserves.** m1's labels, per-node detail, and
+  multi-work-instance schema; v0.1's actor tags on nodes (the
+  no-regress invariant m3's on-box actor work depends on); the
+  walk-on-every-request render path; the additive-spec posture
+  (a doc without the new field still renders).
 
-### m3 — Sub-stage cells and richer actor presence
+### m3 — Activity-first forest ordering and richer actor presence
 
-- **End result.** Each leaf renders `D`/`P`/`I`/`V` cells
-  colored by state (none / active / in-review / complete).
-  Actor icons sit on specific cells. The work-instance state
-  vocabulary expands to include `awaiting-user`,
-  `awaiting-external`, and `backgrounded`.
-- **Interfaces.** Consumes m1's multi-WI schema and m2's tier
-  ordering. Adds richer work-instance states to the API and
-  DB; agent rules from m1's t2 carry the new state-transition
-  surface.
-- **Preserves.** Existing render path for nodes without cell
-  data; v0.1's actor-marker chip shape remains as the
-  fallback when cells aren't populated.
+*Scope not yet locked — early estimate, superseding the
+original `m2`/`m3` estimates. The m3 milestone-drafting session
+locks the contract and re-derives the task breakdown against
+the code m2 actually lands; per
+[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+child contracts," this names the milestone without sealing its
+contract until that session runs.*
+
+- **End result (estimated).** The forest renders with
+  across-roots tier-based sorting (active top, in-flight
+  middle, landed/abandoned compressed) with inactive branches
+  collapsed; actor icons sit on specific progress boxes rather
+  than only as node-level tags; the work-instance state
+  vocabulary expands to `awaiting-user`, `awaiting-external`,
+  `backgrounded`.
+- **Interfaces (estimated).** Consumes m1's multi-WI schema,
+  m2's per-node expanded box, doc-declared progress boxes, and
+  session roster. Adds richer work-instance states to the API
+  and DB.
+- **Preserves (estimated).** m2's per-node boxes and roster;
+  v0.1's node-level actor tags remain as the fallback when
+  on-box actor placement isn't populated; existing render path
+  for nodes without the richer state vocabulary.
 
 ### Final integration milestone — Neighborly-events integration
 
@@ -191,12 +239,19 @@ optional sections" and [`shared.md`](../../../spec/planning/shared.md)
 Calls deferred until m1-m3 are sized — the answers may shift
 once the surface area is clearer.
 
-- **Triage zone in 1.0?** Distinct from the intent layer — the
-  triage zone is where uncategorized work-instances sit until
-  attached to a plan-tree node. Could land in 1.0 even if the
-  broader intent layer doesn't, since it solves a narrower
-  registration problem (exploratory sessions that don't yet
-  know their slug).
+- **Triage zone in 1.0? — RESOLVED (split).** Resolved when
+  m2's scope was locked. The **session roster** — a surface
+  listing bound + unbound active sessions so every session
+  *can* be accounted for — **is a committed 1.0 goal**,
+  delivered by `m2`
+  ([`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md)).
+  The **triage *action*** (acting on an unbound session to
+  promote it into the tree or dismiss it) is **deferred past
+  1.0**: the roster makes unbound work visible; deciding its
+  home is a later capability. Reflected in
+  [`design/vision.md`](../../../design/vision.md) §4 (the
+  narrow "triage zone" framing replaced by the broader
+  best-effort "session presence" concept).
 - **Actor lineage in 1.0?** Probably no — single contributor
   carries the lineage in their head — but flag so the call is
   conscious.
@@ -271,11 +326,16 @@ entries at that moment.
   milestone is explicitly the gap-closing step; expect at
   least some feedback loop rather than treating it as
   schedule slip.
-- **Deferred open questions re-open after m1 lands.** If intent
-  layer or triage zone become 1.0-blocking only after m1
-  merges, the milestone set grows retroactively and m2/m3
-  priorities may flip. Mitigation: revisit open questions
-  explicitly at m1 retrospective, not passively.
+- **Deferred open questions re-open after m1 lands.** The two
+  highest-weight questions are now resolved at the m1
+  retrospective: the intent layer is deferred past 1.0 (recorded
+  in Out of Scope), and the triage-zone question is split (the
+  session roster is committed to m2; the triage *action* is
+  deferred past 1.0). The residual risk is the remaining
+  lower-weight questions (actor lineage, multi-repo/hosted,
+  "1.0 done" criterion). Mitigation: revisit the remaining open
+  questions explicitly at the m1/m2 retrospective, not
+  passively.
 - **Mid-epic spec changes break vendor consumers.** Additive
   posture is the invariant, but a milestone that doesn't
   realize it's introducing a breaking change is a real
@@ -296,16 +356,26 @@ entries at that moment.
 
 ## Sizing Summary
 
-Per-milestone task counts. Estimates pending milestone
-planning sessions for m2, m3, and the final milestone.
+Per-milestone task counts. m2's count is proposed by its
+drafted milestone doc (pending review); m3 and the final
+milestone remain estimates pending their planning sessions.
 
 - **m1**: 4 tasks. Landed (all four tasks complete). See
   [`m1-v0-2.md`](m1-v0-2.md).
-- **m2**: 2-4 tasks estimated. Render-layer tier classification
-  and sort, plus collapse/expand affordances.
-- **m3**: 3-5 tasks estimated. Schema and API for richer
-  states, cell-level data parsing, cell renderer, actor-icon
-  positioning.
+- **m2**: 4 tasks, scope locked (Proposed; stubs seeded): site skeleton
+  (two-region shell); expanded nested-box render; doc-declared
+  progress stages (spec-first); session roster + work-item
+  enrichment. The skeleton (t1) ships the approved side-by-side
+  shell so t2/t4 build into independently-owned regions in
+  parallel; t2/t3/t4 each plausibly N ≥ 2, phase splits
+  re-derived at task drafting. See
+  [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md).
+- **m3**: estimate pending the m3 milestone-drafting session.
+  Re-homed deferred pieces: across-roots tier classification
+  and sort, collapse of inactive branches, on-box actor-icon
+  positioning, richer work-instance state vocabulary in
+  schema/API. Task count is the m3 session's output, not fixed
+  here.
 - **Final integration**: 1-3 tasks estimated. Vendoring,
   population, first-real-session validation, gap-fix cleanup.
 
