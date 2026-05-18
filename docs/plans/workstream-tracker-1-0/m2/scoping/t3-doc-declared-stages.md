@@ -22,8 +22,10 @@ not part of the plan-doc lifecycle.
 
 t3 adds an additive, optional `spec/` frontmatter affordance that
 lets a plan doc declare its own progress stages, teaches the
-plan-tree walker to read it, and renders a row of progress boxes —
-one row per node at every level (root, milestone, task, phase) —
+plan-tree walker to read it, and renders a row of progress cells
+(D2's rendered-element name; the m2 milestone's umbrella term
+stays "progress boxes") — one row per node at every level (root,
+milestone, task, phase) —
 whose box count and order come from the doc. A doc that omits the
 field (the already-supported `slug` + `Status: In draft` stub)
 renders only the Drafting box and is never errored or skipped. The
@@ -73,30 +75,59 @@ apply and the default "scoping first" path is taken:
 This S1 is the deliberate invocation of the default path, mirroring
 t2's S5; it is not a deferred decision.
 
-### S2 — The field-shape decision is decomposed but NOT locked here
+### S2 — The field-shape decision is decomposed here; the human resolved it 2026-05-18
 
 The m2 milestone routed the field name/structure/per-stage-counts-
 vs-ordered-list call to "when t3 drafts" under the
 [`shared.md`](../../../../../spec/planning/shared.md) "Decompose
 options into shapes" and exact-match-label discipline. This
-spawned session decomposes it (OQ1–OQ4, OQ7 below) with trade-off
-analysis and a recommendation, then leaves it OPEN for the human
-per the session's scope bound. Recording the decomposition is the
-scoping-method act; choosing the shape is the human's. `Verified
-by:` [m2 README "Cross-Task Decisions" → "Doc-declared-stages
-frontmatter shape (decide when t3 drafts)"](../README.md);
+spawned session decomposed it (D1–D5 below) with trade-off
+analysis; the human resolved it in-loop on 2026-05-18 (aligned
+with the recommendations). Recording the decomposition is the
+scoping-method act; the choices are the human's. The plan stays
+`Status: In draft`: the spawned session's scope bound stops at
+`In draft` and does not run the `` `In draft` → `Proposed` ``
+promotion gate — a resolving drafting session runs that gate.
+`Verified by:` [m2 README "Cross-Task Decisions" →
+"Doc-declared-stages frontmatter shape"](../README.md);
 [`shared.md` "Decompose options into shapes before
 analyzing"](../../../../../spec/planning/shared.md).
 
-## Open questions for the human
+## Decisions resolved by human input (2026-05-18)
 
-Each question is decomposed into shapes with trade-offs grounded
-in cited code/spec. A recommendation is offered where the analysis
-points clearly, but the choice is the human's; the paired task
-plan stays `Status: In draft` until they are resolved, and its
-Contracts that depend on them are written conditionally.
+Each decision was decomposed into shapes with trade-offs grounded
+in cited code/spec, then resolved by the human in-loop (aligned
+with the recommendations). The verdicts below are the durable
+rationale the paired plan's Contracts realize; rejected shapes are
+retained as the decision record. The plan's Contracts are now
+locked to these choices. The plan nonetheless stays `Status: In
+draft`: per the spawned session's scope bound the
+`` `In draft` → `Proposed` `` promotion gate is **not** run here —
+a resolving drafting session re-confirms reality-check inputs and
+runs that gate.
 
-### OQ1 (central) — Field shape: ordered stage list vs. per-stage counts
+**Conceptual model the human set (load-bearing for D1).** A
+rendered progress unit corresponds to **one PR in the typical
+case**. A node's declared list is therefore the ordered sequence
+of shippable steps (≈ PRs) it expects, each with a short label;
+the typical single-PR phase declares a length-1 list. The human
+explicitly noted the one-box-per-PR assumption "may break"
+someday — i.e. a step that needs more than one PR. That case is
+exactly D1 shape B2 and is **deferred, not designed-out**; the
+A2 → B2 migration is **additive and linear, not a cliff**: a
+sequence of label strings can later gain an optional per-entry
+count by becoming a sequence of {label, count} records without
+breaking docs that authored the string form (the tolerant decoder
+already drops non-conforming entries rather than erroring). This
+keeps the deferral cheap and is recorded as a Risk Register entry
+and an Out-of-Scope note in the plan. `Verified by:`
+[`stringList` in walker.go](../../../../../internal/site/walker.go)
+(the tolerant decoder whose drop-don't-error posture makes the
+later record form additive);
+[`design/vision.md` §7](../../../../../design/vision.md) (the
+per-phase-PR-count axis B2 would later serve).
+
+### D1 (was OQ1, central) — Field shape — RESOLVED: A2
 
 The locked WHAT (m2 README t3 contract) requires only: a doc
 declares its own progress stages; **box count and order come from
@@ -186,18 +217,23 @@ decoder, giving the strongest alignment with the cited
 optional/additive precedent and the lowest absent-case risk; B2/C
 add a net-new sequence-of-maps decoder with its own
 absence-tolerance surface. The crux is a product question the code
-cannot answer: **does one progress box represent a stage, or a PR
+cannot answer: **does one progress unit represent a stage, or a PR
 within a stage?** That is exactly the vision §7 open question
 ("structured fields for the load-bearing numbers" vs. softer
 signal) and is the per-stage-counts-vs-ordered-list axis the
-milestone deferred here. **Recommendation: A2** (ordered list of
-stage-label strings, Drafting reserved render-side) as the
-lowest-cost shape satisfying every locked clause and reusing the
-`stringList` precedent, with **B2 explicitly deferred to a later
-milestone unless the human's product intent is that progress boxes
-count PRs**. This is a recommendation, not a resolution — **OPEN**.
+milestone deferred here. **RESOLVED by the human (2026-05-18):
+A2** — an ordered list of stage-label strings, Drafting reserved
+render-side, reusing the `stringList` precedent; one rendered
+unit ≈ one PR in the typical case (see the conceptual-model note
+above). **Rejected:** A1 (no reserved Drafting box — forces the
+absent/stub case into a second code path); A3 (doc-visible
+`Drafting` magic token + two code paths); B1 (YAML map loses
+order); **B2 (per-stage counts) deferred — not designed out**, it
+is the additive future migration if the one-PR-per-unit
+assumption breaks; C (record richness no current clause
+justifies).
 
-### OQ2 — Field name and reserved-token spelling (exact-match discipline)
+### D2 (was OQ2) — Field name and element name — RESOLVED
 
 The field name, and any reserved stage token, become exact-match-
 checked identifiers the parser and consumers key off, governed by
@@ -207,7 +243,7 @@ field names: `progress_stages`, `stages`, `declared_stages`,
 `progress`. Candidate Drafting treatment: a render-side reserved
 box with **no doc-visible token** (preferred — keeps the magic
 string out of authored docs and out of the exact-match surface)
-vs. a literal `Drafting` token (couples to OQ1 shape A3).
+vs. a literal `Drafting` token (couples to D1 shape A3).
 `Verified by:`
 [`shared.md` "Quote labels whose enforcement depends on exact-match
 matching"](../../../../../spec/planning/shared.md) (the discipline
@@ -216,13 +252,26 @@ this naming is bound by);
 (the frontmatter key the chosen name is read at, alongside the
 existing `slug` / `Status` / `short_description` reads). The
 milestone says the token is "decided here … not invented at
-milestone level," but per this session's scope bound it is
-surfaced with a recommendation (name: `progress_stages`; Drafting:
-render-side, no token), not locked — **OPEN**.
+milestone level." **RESOLVED (2026-05-18):** frontmatter key
+**`progress_stages`**; the rendered element is named a **"progress
+cell"**, not "progress box" — the human flagged "progress box" as
+needing a better name, and "cell" is the established vision
+vocabulary ([`design/vision.md`
+§7](../../../../../design/vision.md) uses "sub-stage cells" /
+"cell count"), so "progress cell" reconciles the m2 wording toward
+an existing term rather than inventing one and reads correctly at
+PR granularity. Drafting: render-side reserved, **no doc-visible
+token**. The element-name call is the one judgment call the
+resolving turn made under the "make the reasonable call and
+continue" instruction; it is overridable without reopening D1.
+**Rejected:** field keys `stages` (overloaded), `declared_stages`,
+`progress` (vague); retaining "progress box" (the human rejected
+it); a literal `Drafting` token (couples to the rejected D1 shape
+A3).
 
-### OQ3 — Is the Drafting box render-side-reserved or doc-declared?
+### D3 (was OQ3) — Drafting box render-side-reserved — RESOLVED
 
-Tied to OQ1 A2 vs. A3. The contract requires a field-omitting stub
+Tied to D1 A2 vs. A3. The contract requires a field-omitting stub
 to render exactly the Drafting box; a stub has no field, so the
 Drafting box must be synthesizable from absence regardless. Open:
 does the render always prepend a reserved Drafting box (declared
@@ -233,10 +282,12 @@ paths + magic token)? `Verified by:`
 (absent field ⇒ zero value, so a stub's Drafting box cannot derive
 from the field);
 [m2 README "Task Contracts" t3 row](../README.md) (stub ⇒ Drafting
-only). **Recommendation: render-side reserved Drafting box** —
-**OPEN** (resolves jointly with OQ1).
+only). **RESOLVED (2026-05-18): render-side reserved Drafting
+box** — declared list = post-drafting stages, one synthesis path
+serves both the absent/stub case and a drafted doc's leading cell;
+no doc-visible token (resolved jointly with D1/D2).
 
-### OQ4 — Per-level applicability: independent or inherited?
+### D4 (was OQ4) — Per-level applicability: no inheritance — RESOLVED
 
 The contract says every node level renders a row whose count/order
 come from "the doc." Open: must each level's own doc carry the
@@ -254,9 +305,12 @@ precedent);
 [`buildTree` / `PlanNode` in
 tree.go](../../../../../internal/site/tree.go) (per-doc fields are
 attached per node; no field today inherits across parent/child).
-**Recommendation: no inheritance** — **OPEN**.
+**RESOLVED (2026-05-18): no inheritance** — each node's own doc
+governs its row; absence ⇒ Drafting cell only, even under a
+declaring ancestor. **Rejected:** inheritance (adds a render-time
+parent/child walk; breaks the per-doc absence-benign precedent).
 
-### OQ7 — Box row gated by field-presence or by Status?
+### D5 (was OQ7) — Row gated by field-presence (α) — RESOLVED
 
 The milestone sentence "a stub … renders only the Drafting box;
 the rest appear once the doc reaches `Proposed`" admits two
@@ -293,11 +347,14 @@ directly — render placeholder cells for not-yet-committed nodes
 (friendlier) vs. render only what the plan committed to (stricter,
 never misleading). `Verified by:`
 [`design/vision.md` §7 "Smaller open
-questions"](../../../../../design/vision.md). **Recommendation: α**
-(field-presence gated; simpler, matches the cited additive
-precedent, no Status coupling) — **OPEN**.
+questions"](../../../../../design/vision.md). **RESOLVED
+(2026-05-18): α** — field-presence gated, Status-independent, no
+coupling to the exact-match Status lifecycle token. **Rejected:**
+β (Status-gated; adds a Status-token coupling into the progress
+render that must also satisfy "Unknown Status values render
+gracefully").
 
-### OQ5 — Phase split (N = 1 vs N ≥ 2)
+### D6 (was OQ5) — Phase split — ASSESSED N = 1; branch test at the resolving drafting
 
 The m2 "Per-task phase splits" estimate guesses t3 plausibly N ≥ 2
 (spec/parser, then progress-box render). Candidate boundaries
@@ -306,7 +363,7 @@ enumerated: (a) spec-field + parser read | progress-box render;
 [`task-plan.md`](../../../../../spec/planning/task-plan.md)
 "PR-count predictions need a branch test," run at the resolving
 drafting after human input — not here. The split **hinges on
-OQ1**: under A2 the substantive logic is tiny (one tolerant field
+D1**: under A2 the substantive logic is tiny (one tolerant field
 read reusing `stringList`, plus a render loop in the forest node
 template), pointing strongly to N = 1, single subsystem
 (`internal/site`) plus additive spec-doc prose; under B2 the
@@ -320,10 +377,13 @@ logic);
 markup, not subsystem count);
 [m2 README "Cross-Task Decisions" → "Per-task phase
 splits"](../README.md) (estimate, not contract; re-derived at the
-branch test). **Assessment: most likely N = 1 regardless of OQ1**,
-but left **OPEN** because it is downstream of OQ1 and the branch
-test runs at the post-input resolving drafting, per the session
-scope bound.
+branch test). With D1 = A2 the substantive logic is tiny (one
+tolerant block-sequence read reusing `stringList`, plus a render
+loop in the forest node template), so **assessment: N = 1**, one
+subsystem (`internal/site`) plus additive spec-doc prose. Not
+locked here: the branch-test sketch is run at the resolving
+drafting that also runs the promotion gate, per the spawned
+session's scope bound.
 
 ## Plan structure handoff
 
@@ -332,17 +392,19 @@ scope bound.
   with a full task plan at `Status: In draft` per
   [`task-plan.md`](../../../../../spec/planning/task-plan.md)
   "Required and optional sections": Status, context preamble,
-  Goal, Contracts (written **conditionally** where they depend on
-  OQ1–OQ5/OQ7), Files to touch (estimate-prefaced), Validation
-  Gate.
+  Goal, Contracts (**now locked to D1–D5**; D6 phase split
+  assessed N = 1, branch test at the resolving drafting), Files to
+  touch (estimate-prefaced), Validation Gate.
 - Optional sections that apply: Cross-Cutting Invariants
   (inherited m2 invariants — additive-spec, posture-tension,
   stub-render-preserved, walk-on-every-request, file boundary),
-  Naming (conditional — the new frontmatter field + any new
-  `PlanNode` field, spelled only once OQ1/OQ2 resolve), Self-Review
+  Naming (locked per D2 — frontmatter key `progress_stages`,
+  rendered element "progress cell" + any new `PlanNode` field),
+  Self-Review
   Audits (`validation-honesty` + general checklist), Risk Register
   (additive-breaking-a-vendored-consumer; homogenization pressure;
-  shape churn if OQ1 reopens), Out of Scope (t4's roster; on-box
+  the box≈PR assumption breaking → B2 as the additive-linear
+  migration), Out of Scope (t4's roster; on-box
   actor icons; AI prose extraction), Backlog Impact (none — state
   explicitly; reference the vision §7 prose-to-data and sub-stage-
   cell open questions as deliberated intersections, not resolved),
@@ -350,12 +412,16 @@ scope bound.
 - **Same change** updates the m2 README parent doc for currency:
   the t3 Task Status row off "In draft (stub)" and the t3 prose to
   reflect a drafted `In draft` plan (NOT `Proposed`); the
-  "Doc-declared-stages frontmatter shape (decide when t3 drafts)"
-  Cross-Task Decisions entry points at this scoping section and is
-  marked **OPEN pending human input** (NOT resolved).
-- Status stays `In draft`; no promotion gate is run and the plan
-  is not promoted to `Proposed` — the open questions above are the
-  blockers, surfaced for the human.
+  "Doc-declared-stages frontmatter shape" Cross-Task Decisions
+  entry points at this scoping section and records the decision as
+  **RESOLVED by human input (D1–D5)**, with the promotion gate
+  still pending a resolving drafting.
+- Status stays `In draft`; per the spawned session's scope bound
+  no promotion gate is run and the plan is not promoted to
+  `Proposed`. The design decisions are resolved; the remaining
+  gate (end-to-end coherence re-read, universal `Verified by:`
+  walk, reality-check re-confirmation, D6 branch-test sketch, then
+  the flip) is the resolving drafting session's work.
 
 ## Reality-check inputs (the plan must re-verify before any future promotion)
 
@@ -369,7 +435,7 @@ promotion (this session does not promote).
   goldmark-meta read where the new optional field is added,
   alongside `slug` / `Status` / `short_description` /
   `related_prs`; `stringList` is the tolerant block-sequence
-  decoder OQ1 A1/A2 reuse.
+  decoder D1 (A2) reuses.
 - **Render host.**
   [`forest.go`](../../../../../internal/site/forest.go) — the
   recursive `node` template (`node-header`, `node-detail`, the
@@ -383,7 +449,7 @@ promotion (this session does not promote).
   [`PlanNode` in tree.go](../../../../../internal/site/tree.go) —
   the struct threaded to the template; the `ActiveInSubtree`
   additive-field + post-order pass is the precedent for any
-  additive field a chosen OQ1 shape needs (e.g. a parsed
+  additive field the D1 = A2 shape needs (the parsed
   stage list carried to the template).
 - **Walk-on-every-request.**
   [`Server.index` in site.go](../../../../../internal/site/site.go)
@@ -399,8 +465,8 @@ promotion (this session does not promote).
   field"](../../../../../spec/planning/shared.md), "Optional
   `related_prs` field", and "Quote labels whose enforcement
   depends on exact-match matching" — the optional/additive home
-  the new field documents adjacent to, and the naming discipline
-  OQ2 is bound by.
+  `progress_stages` documents adjacent to, and the naming
+  discipline D2 is bound by.
 - **Validation commands + UI capture.**
   [`docs/dev.md`](../../../../../docs/dev.md) — `go build ./...`,
   `go vet ./...`, `go test ./...`; UI capture is manual
