@@ -29,12 +29,12 @@ lets a plan doc declare its own progress stages, teaches the
 plan-tree walker to read it, and renders a row of progress cells
 (D2's rendered-element name; the m2 milestone's umbrella term
 stays "progress boxes") — one row per node at every level (root,
-milestone, task, phase) —
-whose box count and order come from the doc. A doc that omits the
-field (the already-supported `slug` + `Status: In draft` stub)
-renders only the Drafting box and is never errored or skipped. The
-box row renders inside the per-node box t2 (Landed) established in
-the forest region; t3 does not touch the shell or the roster, and
+milestone, task, phase) — whose declared cell count and order come
+from the doc. A doc that omits the field (the already-supported
+`slug` + `Status: In draft` stub) renders only the reserved
+Drafting cell and is never errored or skipped. The cell row
+renders inside the per-node box t2 (Landed) established in the
+forest region; t3 does not touch the shell or the roster, and
 t4 deliberately does not consume or schematize this field
 (posture-tension invariant). The exact field shape is the
 spec-change surface itself and is the central deferred decision
@@ -453,8 +453,8 @@ promotion (this session does not promote).
   [`forest.go`](../../../../../internal/site/forest.go) — the
   recursive `node` template (`node-header`, `node-detail`, the
   collapsible/leaf box) is t2's Landed surface and the host the
-  progress-box row renders inside; `forest-style` is where any
-  box-row CSS lives. t3 stays in the forest region —
+  progress-cell row renders inside; `forest-style` is where any
+  cell-row CSS lives. t3 stays in the forest region —
   [`render.go`](../../../../../internal/site/render.go) shell and
   [`roster.go`](../../../../../internal/site/roster.go) are
   off-limits per the m2 file-boundary invariant.
@@ -472,7 +472,7 @@ promotion (this session does not promote).
 - **Node levels.**
   [`internal/slugs/slugs.go`](../../../../../internal/slugs/slugs.go)
   — `root` / `milestone` / `task` / `phase` (no `epic` node; the
-  root is the top box); the box row renders at every level.
+  root is the top box); the cell row renders at every level.
 - **Additive precedent + exact-match discipline.**
   [`shared.md` "Optional `short_description`
   field"](../../../../../spec/planning/shared.md), "Optional

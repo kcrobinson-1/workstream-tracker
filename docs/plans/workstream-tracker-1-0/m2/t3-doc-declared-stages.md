@@ -112,9 +112,9 @@ field is unaffected.
 A plan doc may optionally declare its own ordered progress stages
 in frontmatter. The plan-tree walker reads the field with the same
 absence-tolerance the existing optional fields have. Every node in
-the forest renders, on every node, a reserved Drafting cell
-followed by one cell per declared stage in the doc's order (so the
-declared count and order come from that node's doc). A doc that
+the forest renders a reserved Drafting cell followed by one cell
+per declared stage in the doc's order (so the declared count and
+order come from that node's doc). A doc that
 omits the field — including the already-supported `slug` +
 `Status: In draft` stub — renders the Drafting cell only, with no
 error, skip, or broken layout. The
@@ -133,8 +133,10 @@ unchanged; and the walk-on-every-request render path is unchanged.
 
 ## Contracts
 
-Final WHAT shape — **locked to the human-resolved decisions
-D1–D5** (2026-05-18); no clause remains conditional. HOW
+Final WHAT shape — **locked to the human-resolved WHAT decisions
+D1–D5** (2026-05-18); D6 (phase split, N = 1) is structural and
+lives in the Status section, not a Contract clause; no clause
+remains conditional. HOW
 grounding and the decomposition with rejected shapes live in
 [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
 "Decisions resolved by human input."
@@ -202,7 +204,7 @@ grounding and the decomposition with rejected shapes live in
   render case that stays valid; seeding it creates no
   work-instance and does not resolve the deferred triage
   question).
-- **C4 — Progress-box row renders inside t2's per-node box, all
+- **C4 — Progress-cell row renders inside t2's per-node box, all
   levels.** The row renders at every node level (root, milestone,
   task, phase — there is no `epic` node; the root is the top box)
   inside the per-node box t2 established, in the forest region
@@ -247,9 +249,9 @@ grounding and the decomposition with rejected shapes live in
   attached per node today; no field inherits across parent/child).
 - **C7 — Render-side tests are semantic/structural.** The
   progress-cell row is asserted by structure and presence (the row
-  is present with the expected box count/order for a declaring
+  is present with the expected cell count/order for a declaring
   doc; a field-omitting doc and a stub render exactly the Drafting
-  box; absent/malformed field never errors or drops the node;
+  cell; absent/malformed field never errors or drops the node;
   preserved t2 surfaces still present), not a byte-identity
   literal — consistent with t2's C6 semantic-assertion posture so
   a fresh byte pin does not just break at the next render task.
@@ -413,7 +415,7 @@ PR opens.
 - **Drafting-cell-only is observed, not assumed.** Per
   [`task-plan.md`](../../../../spec/planning/task-plan.md) "Bans on
   surface require rendering the consequence," the absent-field
-  Drafting-box render is verified by observing a field-omitting
+  Drafting-cell render is verified by observing a field-omitting
   doc / stub render as an intentional state, not inferred from the
   diff — a required gate step.
 - Self-review audits below run at the implementing commit
@@ -514,7 +516,8 @@ D5; surfaced, not decided here).
 - [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
   — the decision-space decomposition (D1–D6 with shapes,
   trade-offs, `Verified by:` grounding, rejected alternatives, and
-  the human resolutions) this plan's Contracts realize.
+  the human resolutions) this plan realizes (Contracts realize the
+  WHAT decisions D1–D5; D6 fixes the phase split at N = 1).
 - [`t2-expanded-render.md`](t2-expanded-render.md) and
   [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
   — the Landed sibling whose per-node box hosts the progress-cell
