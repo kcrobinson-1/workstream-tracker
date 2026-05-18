@@ -20,6 +20,7 @@ type PlanNode struct {
 	ShortDescription string
 	LongDescription  string
 	RelatedPRs       []string
+	ProgressStages   []string
 	Children         []*PlanNode
 	WorkInstances    []*ActiveWorkInstance
 
@@ -143,6 +144,7 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 			ShortDescription: d.ShortDescription,
 			LongDescription:  d.LongDescription,
 			RelatedPRs:       d.RelatedPRs,
+			ProgressStages:   d.ProgressStages,
 			WorkInstances:    active[d.Slug],
 		}
 	}

@@ -230,6 +230,42 @@ additive**: a doc that omits it (or carries an empty list) remains
 valid and renders with no warning, error, or skip, and pre-existing
 docs and vendored spec consumers are unaffected by its absence.
 
+**Optional `progress_stages` field.** A plan-tree doc may carry an
+optional `progress_stages` list in frontmatter — a YAML block
+sequence of stage-label strings, in the order the work is expected
+to move through them:
+
+```yaml
+---
+slug: <slug>
+Status: <status>
+progress_stages:
+  - <first post-drafting stage label>
+  - <next stage label>
+---
+```
+
+It renders the doc's plan-tree node with a row of progress cells:
+a render-side-reserved **Drafting** cell followed by one cell per
+declared entry, in document order (so a doc declaring N stages
+renders N + 1 cells). The declared entries are the *post-drafting*
+stages only — the leading Drafting cell is reserved by the
+renderer and is never written into the field, so there is no
+doc-visible `Drafting` token. In the typical case one declared
+stage corresponds to one pull request. Like `short_description`
+and `related_prs`, the field is **optional and additive**: a doc
+that omits it — including the already-supported `slug` +
+`Status: In draft` stub — remains valid and renders with no
+warning, error, or skip, falling back to **exactly the one
+reserved Drafting cell** as an intentional rendered state.
+Pre-existing docs and vendored spec consumers are unaffected by
+its absence, and an absent / wrong-typed / partially-malformed
+value never errors or drops the node (a non-string element is
+dropped). The progress row is gated by field presence only and is
+independent of the doc's `Status`; it renders at every node level
+and a node's own doc governs its own row (no inheritance from an
+ancestor that declares stages).
+
 ## Plan-doc Status
 
 Every plan-tree doc carries a `Status` field in frontmatter, alongside

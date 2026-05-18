@@ -112,7 +112,7 @@ the walk-on-every-request render path is unchanged.
 |-----------------------------------|------------------------------------------------------|--------|
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Landed](t2-expanded-render.md) |
-| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [Proposed](t3-doc-declared-stages.md) |
+| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [Landed](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Landed](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [Landed](t4-p1-bare-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [Landed](t4-p2-enrichment.md) |
@@ -144,7 +144,7 @@ metadata + the `name` affordance, the event-log join keyed on
 t4-terminal implementing PR also co-located the backlog shift +
 the new entries and the p2/t4/milestone-row `Landed` flips).
 **t3** ([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md))
-is now a **`Proposed` N = 1 task plan**: a spawned just-in-time
+is **`Landed`** (an N = 1 task plan): a spawned just-in-time
 drafting session replaced the stub with a full task plan and a
 paired
 [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
@@ -161,11 +161,16 @@ gate was walked (end-to-end coherence, decision-completeness,
 universal `Verified by:`, reality-check re-confirmation, always-on
 rules, the D6 branch-test sketch resolving N = 1) and the plan
 flipped to `Proposed`; phase split N = 1 so no phase stubs to
-seed (see the t3 plan's Status section and the "Doc-declared-stages
-frontmatter shape" Cross-Task Decisions entry below). With t3
-(`Proposed`) and the t4 phases (`Landed`), no m2 child remains a
-seeded parent-promotion stub; each not-yet-drafted child was
-scoped just-in-time at its own drafting session per
+seed. The implementing PR then shipped it — the additive
+`progress_stages` frontmatter field, its tolerant parser read,
+the per-node progress-cell row in the forest render, the
+`spec/planning/shared.md` entry, and the design §7 update — and
+flipped the plan (and this row) to `Landed` (see the t3 plan's
+Status section and the "Doc-declared-stages frontmatter shape"
+Cross-Task Decisions entry below). With t3 and the t4 phases all
+`Landed`, no m2 child remains a seeded parent-promotion stub;
+each not-yet-drafted child was scoped just-in-time at its own
+drafting session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Just-in-time scoping and plan drafting" — the parent-promotion
 stub exemption in [`shared.md`](../../../../spec/planning/shared.md)
@@ -416,7 +421,9 @@ their tasks draft.
   the vision's own open question on prose-to-data extraction in
   [`design/vision.md` §7](../../../../design/vision.md).
   **Status: RESOLVED by human input (2026-05-18); promotion gate
-  walked in-session, t3 plan now `Proposed`.** t3's just-in-time
+  walked in-session, t3 plan flipped to `Proposed`, then
+  implemented and `Landed` by the t3 implementing PR.** t3's
+  just-in-time
   drafting session decomposed
   this into candidate shapes (ordered stage-label list A1/A2/A3
   vs. per-stage counts B1/B2 vs. richer records C) with cited
@@ -440,9 +447,11 @@ their tasks draft.
   to these; the contributor directed the
   `` `In draft` → `Proposed` `` promotion gate to be walked
   in-session (extending past the spawn's original "stop at
-  `In draft`" bound at the contributor's explicit direction), and
-  the plan is now `Proposed`. No PR is opened by this session
-  (separately out of scope).
+  `In draft`" bound at the contributor's explicit direction); the
+  plan flipped to `Proposed` and was then implemented and
+  `Landed` by its implementing PR (the additive `progress_stages`
+  field + tolerant parser + per-node progress-cell render + the
+  `shared.md` spec entry).
 - **Where richer session data is stored/read — RESOLVED at t4
   drafting: join the event log (no schema change).** A free-form
   `metadata` JSON column already exists on `events` but not on

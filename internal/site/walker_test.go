@@ -258,6 +258,86 @@ func TestParsePlanDocRelatedPRsNonSequence(t *testing.T) {
 	}
 }
 
+func TestParsePlanDocProgressStagesPopulated(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	content := "---\nslug: epic-a-m1-t3\nStatus: Proposed\nprogress_stages:\n  - Spec\n  - Parser\n  - Render\n---\n# body\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	want := []string{"Spec", "Parser", "Render"}
+	if len(doc.ProgressStages) != len(want) {
+		t.Fatalf("ProgressStages = %v, want %v", doc.ProgressStages, want)
+	}
+	for i := range want {
+		if doc.ProgressStages[i] != want[i] {
+			t.Errorf("ProgressStages[%d] = %q, want %q (document order preserved)", i, doc.ProgressStages[i], want[i])
+		}
+	}
+}
+
+func TestParsePlanDocProgressStagesAbsent(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	// A `slug` + `Status: In draft` stub: the field is absent and
+	// the doc must parse with no error and an empty stage list.
+	if err := os.WriteFile(path, []byte("---\nslug: epic-a-m1-t3\nStatus: In draft\n---\n"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	if len(doc.ProgressStages) != 0 {
+		t.Errorf("ProgressStages = %v, want empty for absent field", doc.ProgressStages)
+	}
+}
+
+func TestParsePlanDocProgressStagesDropsNonStringElement(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	// A YAML integer in the middle of the sequence: dropped, never
+	// erroring or skipping the doc (the additive-tolerance posture).
+	content := "---\nslug: epic-a-m1-t3\nprogress_stages:\n  - Spec\n  - 7\n  - Render\n---\n# x\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	want := []string{"Spec", "Render"}
+	if len(doc.ProgressStages) != len(want) {
+		t.Fatalf("ProgressStages = %v, want %v (non-string dropped)", doc.ProgressStages, want)
+	}
+	for i := range want {
+		if doc.ProgressStages[i] != want[i] {
+			t.Errorf("ProgressStages[%d] = %q, want %q", i, doc.ProgressStages[i], want[i])
+		}
+	}
+}
+
+func TestParsePlanDocProgressStagesNonSequence(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "doc.md")
+	// A scalar where a sequence is expected: tolerated as an empty
+	// list, no error, the doc is not skipped.
+	if err := os.WriteFile(path, []byte("---\nslug: epic-a\nprogress_stages: not-a-list\n---\n# x\n"), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	doc, err := parsePlanDoc(path)
+	if err != nil {
+		t.Fatalf("parsePlanDoc: %v", err)
+	}
+	if len(doc.ProgressStages) != 0 {
+		t.Errorf("ProgressStages = %v, want empty for non-sequence value", doc.ProgressStages)
+	}
+}
+
 func TestParsePlanDocMissingSlug(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "no-slug.md")

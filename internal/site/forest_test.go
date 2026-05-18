@@ -1,6 +1,8 @@
 package site
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -232,6 +234,152 @@ func TestRenderDefaultOpenByActiveWork(t *testing.T) {
 	// The active leaf alpha-m1 has no disclosure control at all.
 	if !strings.Contains(html, `<div class="box box-milestone box-leaf">`) {
 		t.Errorf("leaf box must have no expand state; html:\n%s", html)
+	}
+}
+
+// declaredCellCount counts the declared (non-Drafting) progress
+// cells in the rendered HTML. The Drafting cell carries the
+// extra progress-cell-drafting class, so a declared cell is the
+// bare `<span class="progress-cell">` opening tag.
+func declaredCellCount(html string) int {
+	return strings.Count(html, `<span class="progress-cell">`)
+}
+
+func draftingCellCount(html string) int {
+	return strings.Count(html, `<span class="progress-cell progress-cell-drafting">Drafting</span>`)
+}
+
+// TestRenderProgressRowDeclaredStages asserts m2 t3 C2: a doc
+// declaring N stages renders the reserved Drafting cell followed
+// by one cell per declared stage, in document order (N + 1 cells).
+func TestRenderProgressRowDeclaredStages(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed", ProgressStages: []string{"Spec", "Parser", "Render"}},
+	}, nil)
+	html := renderTree(t, roots)
+
+	if got := draftingCellCount(html); got != 1 {
+		t.Errorf("Drafting cell count = %d, want exactly 1; html:\n%s", got, html)
+	}
+	if got := declaredCellCount(html); got != 3 {
+		t.Errorf("declared cell count = %d, want 3 (N declared ⇒ N+1 cells); html:\n%s", got, html)
+	}
+	// Reserved Drafting cell precedes the declared cells, and the
+	// declared cells appear in document order.
+	iDrafting := strings.Index(html, `progress-cell-drafting`)
+	iSpec := strings.Index(html, `<span class="progress-cell">Spec</span>`)
+	iParser := strings.Index(html, `<span class="progress-cell">Parser</span>`)
+	iRender := strings.Index(html, `<span class="progress-cell">Render</span>`)
+	if !(iDrafting >= 0 && iDrafting < iSpec && iSpec < iParser && iParser < iRender) {
+		t.Errorf("progress cells out of order: drafting=%d Spec=%d Parser=%d Render=%d; html:\n%s",
+			iDrafting, iSpec, iParser, iRender, html)
+	}
+}
+
+// TestRenderProgressRowFieldlessOnlyDrafting asserts m2 t3 C3: a
+// field-omitting doc renders exactly the one reserved Drafting
+// cell as an intentional observed state — no declared cells, no
+// errored or empty row.
+func TestRenderProgressRowFieldlessOnlyDrafting(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed"},
+	}, nil)
+	html := renderTree(t, roots)
+
+	if !strings.Contains(html, `<div class="progress-row">`) {
+		t.Errorf("field-omitting doc must still render the progress row; html:\n%s", html)
+	}
+	if got := draftingCellCount(html); got != 1 {
+		t.Errorf("Drafting cell count = %d, want exactly 1; html:\n%s", got, html)
+	}
+	if got := declaredCellCount(html); got != 0 {
+		t.Errorf("declared cell count = %d, want 0 for a field-omitting doc; html:\n%s", got, html)
+	}
+}
+
+// TestRenderProgressRowStubOnlyDrafting asserts m2 t3 C3 for the
+// already-supported `slug` + `Status: In draft` stub: it renders
+// exactly the one Drafting cell, Status-independently (C5 — the
+// gating is field presence, never the Status token).
+func TestRenderProgressRowStubOnlyDrafting(t *testing.T) {
+	stub := renderTree(t, buildTree([]parsedDoc{
+		{Slug: "beta", Status: "In draft"},
+	}, nil))
+
+	if got := draftingCellCount(stub); got != 1 {
+		t.Errorf("stub Drafting cell count = %d, want exactly 1; html:\n%s", got, stub)
+	}
+	if got := declaredCellCount(stub); got != 0 {
+		t.Errorf("stub declared cell count = %d, want 0; html:\n%s", got, stub)
+	}
+	// The stub still renders its badge and label (preserved t2
+	// surface) alongside the new progress row.
+	if !strings.Contains(stub, `<span class="badge status-in-draft">In draft</span>`) ||
+		!strings.Contains(stub, `<span class="label" title="beta">beta</span>`) {
+		t.Errorf("stub lost its badge or label; html:\n%s", stub)
+	}
+}
+
+// TestRenderProgressRowMalformedNeverDropsNode ties the parser's
+// tolerance (m2 t3 C1) to the render: a doc whose progress_stages
+// is partially malformed (a non-string element) never errors or
+// drops the node — the node still renders, with the Drafting cell
+// and only the well-formed declared entries.
+func TestRenderProgressRowMalformedNeverDropsNode(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "epic-a", "README.md")
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	content := "---\nslug: epic-a\nStatus: Proposed\nprogress_stages:\n  - Spec\n  - 7\n  - Render\n---\n# x\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("write: %v", err)
+	}
+	docs, err := walkPlans(dir)
+	if err != nil {
+		t.Fatalf("walkPlans: %v", err)
+	}
+	if len(docs) != 1 {
+		t.Fatalf("walkPlans dropped the malformed doc: got %v", docs)
+	}
+	html := renderTree(t, buildTree(docs, nil))
+
+	if !strings.Contains(html, `<span class="label" title="epic-a">epic-a</span>`) {
+		t.Errorf("node with partially-malformed progress_stages was dropped; html:\n%s", html)
+	}
+	if got := draftingCellCount(html); got != 1 {
+		t.Errorf("Drafting cell count = %d, want exactly 1; html:\n%s", got, html)
+	}
+	if got := declaredCellCount(html); got != 2 {
+		t.Errorf("declared cell count = %d, want 2 (non-string dropped); html:\n%s", got, html)
+	}
+}
+
+// TestRenderProgressRowCoexistsWithPreservedSurfaces asserts m2 t3
+// C4: the progress row renders alongside — not in place of — the
+// preserved t2 surfaces (Status badge, actor markers, long
+// description, related-PR list).
+func TestRenderProgressRowCoexistsWithPreservedSurfaces(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "In progress",
+			LongDescription: "The long body.",
+			RelatedPRs:      []string{"https://github.com/o/r/pull/9"},
+			ProgressStages:  []string{"Spec", "Render"}},
+	}, map[string][]*ActiveWorkInstance{
+		"alpha": {{Actor: "agent-1"}},
+	})
+	html := renderTree(t, roots)
+
+	for _, want := range []string{
+		`<span class="badge status-in-progress">In progress</span>`,
+		`<span class="actor-marker">agent-1</span>`,
+		`<div class="long-desc">The long body.</div>`,
+		`<a href="https://github.com/o/r/pull/9">https://github.com/o/r/pull/9</a>`,
+		`<div class="progress-row">`,
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("preserved/added surface missing %q; html:\n%s", want, html)
+		}
 	}
 }
 

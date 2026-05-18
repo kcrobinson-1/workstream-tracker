@@ -5,11 +5,21 @@ import "html/template"
 // forestTemplates owns the forest region: the "forest" template
 // (roots stacked, the no-roots empty-state), the recursive "node"
 // template (each node a nested, independently-collapsible box —
-// header with the Status badge and actor markers, body with long
-// description, related PRs, and child boxes), and "forest-style"
-// (the node-level CSS the shell injects into <head>). This is m2
-// t2's owned surface (expanded nested-box render); the shell
-// (render.go) and roster (roster.go) are not t2's.
+// header with the Status badge and actor markers, body with the
+// progress-cell row, long description, related PRs, and child
+// boxes), and "forest-style" (the node-level CSS the shell injects
+// into <head>). This is m2 t2's owned surface (expanded
+// nested-box render); the shell (render.go) and roster
+// (roster.go) are not t2's.
+//
+// m2 t3 adds the progress-cell row: every node renders a
+// render-side-reserved Drafting cell followed by one cell per
+// entry in its own doc's optional `progress_stages` frontmatter,
+// in document order (N declared ⇒ N + 1 cells; a field-omitting
+// doc or a `slug` + `Status: In draft` stub ⇒ exactly the one
+// Drafting cell). Gating is by field presence only and is
+// Status-independent; there is no inheritance — each node's own
+// doc governs its own row.
 //
 // A box with children is a native <details>/<summary> (no
 // JavaScript, no route — m2 t2 C2): its summary is the clickable
@@ -34,7 +44,10 @@ const forestTemplates = `
 
 {{define "node-header"}}<span class="label-group"><span class="label" title="{{.Slug}}">{{.Label}}</span>{{range .WorkInstances}}<span class="actor-marker">{{.Actor}}</span>{{end}}</span><span class="status-group"><span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span></span>{{end}}
 
+{{define "node-progress"}}<div class="progress-row"><span class="progress-cell progress-cell-drafting">Drafting</span>{{range .ProgressStages}}<span class="progress-cell">{{.}}</span>{{end}}</div>{{end}}
+
 {{define "node-detail"}}
+{{- template "node-progress" .}}
 {{- if .LongDescription}}
 <div class="long-desc">{{.LongDescription}}</div>
 {{- end}}
@@ -87,6 +100,12 @@ const forestTemplates = `
     .long-desc { white-space: pre-wrap; margin: 0.25rem 0 0.25rem 0; color: #374151; font-size: 0.9em; }
     .related-prs { list-style: none; margin: 0.25rem 0 0.25rem 0; padding-left: 1.25rem; font-size: 0.85em; }
     .related-prs li { padding: 0.1rem 0; }
+    /* m2 t3: the doc-declared progress-cell row. A
+       render-side-reserved Drafting cell followed by one cell per
+       declared progress_stages entry, in document order. */
+    .progress-row { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.25rem 0 0.25rem 0; }
+    .progress-cell { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 0.25rem; font-size: 0.8em; background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .progress-cell-drafting { background: #f3f4f6; color: #4b5563; border-color: #d1d5db; }
     /* m2 t2 C4: t2 owns the per-node-row narrow-window degrade.
        When the forest column is narrow the right-aligned Status
        group reflows below the label group as an intentional
