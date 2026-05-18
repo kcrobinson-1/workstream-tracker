@@ -112,7 +112,7 @@ the walk-on-every-request render path is unchanged.
 |-----------------------------------|------------------------------------------------------|--------|
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Landed](t2-expanded-render.md) |
-| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft](t3-doc-declared-stages.md) |
+| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [Proposed](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [In draft (stub)](t4-p1-bare-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
@@ -137,22 +137,25 @@ the plan's Status history). Its two phases —
 [`t4-p1`](t4-p1-bare-roster.md) and
 [`t4-p2`](t4-p2-enrichment.md) — were seeded as parent-promotion
 **stubs** and are scoped just-in-time at their own drafting. **t3**
-([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md)) is now a
-**drafted `In draft` task plan** (no longer a bare stub): a
-spawned just-in-time drafting session replaced the stub with a
-full task plan and a paired
+([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md)) is a
+**`Proposed` N = 1 task plan**: a spawned just-in-time drafting
+session replaced the stub with a full task plan and a paired
 [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
 that decomposed the deferred frontmatter-shape decision into
-candidate shapes with trade-offs. The human resolved the decisions
-in-loop (2026-05-18; D1 = shape A2, `progress_stages` key,
-render-side Drafting cell, field-presence-gated, no inheritance;
-per-stage counts deferred as an additive future migration), and
-the plan's Contracts are locked to them. It stays at `In draft` —
-not `Proposed`, **no promotion gate run** — because the spawned
-session's scope bound stops at `In draft`; a resolving drafting
-session runs the promotion gate (see the t3 plan's Status section
-and the "Doc-declared-stages frontmatter shape" Cross-Task
-Decisions entry below). The t4 phase stubs remain
+candidate shapes with trade-offs; the contributor resolved the
+decisions in-loop (2026-05-18; D1 = shape A2, `progress_stages`
+key, render-side Drafting cell, field-presence-gated, no
+inheritance; per-stage counts deferred as an additive future
+migration) and then directed the session to walk the
+`` `In draft` → `Proposed` `` promotion gate in-session,
+consciously extending past the spawn's original "stop at
+`In draft`" bound at the contributor's explicit direction. The
+gate was walked (end-to-end coherence, decision-completeness,
+universal `Verified by:`, reality-check re-confirmation, always-on
+rules, the D6 branch-test sketch resolving N = 1) and the plan
+flipped to `Proposed`; phase split N = 1 so no phase stubs to
+seed (see the t3 plan's Status section and the "Doc-declared-stages
+frontmatter shape" Cross-Task Decisions entry below). The t4 phase stubs remain
 parent-promotion stubs scoped just-in-time at their own drafting
 session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
@@ -404,8 +407,9 @@ their tasks draft.
   (goldmark-meta frontmatter read this field is added to);
   the vision's own open question on prose-to-data extraction in
   [`design/vision.md` §7](../../../../design/vision.md).
-  **Status: RESOLVED by human input (2026-05-18) — promotion gate
-  still pending.** t3's just-in-time drafting session decomposed
+  **Status: RESOLVED by human input (2026-05-18); promotion gate
+  walked in-session, t3 plan now `Proposed`.** t3's just-in-time
+  drafting session decomposed
   this into candidate shapes (ordered stage-label list A1/A2/A3
   vs. per-stage counts B1/B2 vs. richer records C) with cited
   trade-offs in
@@ -421,13 +425,16 @@ their tasks draft.
   term — the contract language is not churned, only the
   rendered-element name is t3's); **D3** render-side reserved Drafting cell,
   no doc-visible token; **D4** no inheritance; **D5** row gated by
-  field-presence (Status-independent); **D6** phase split assessed
-  N = 1. Per-stage counts (B2) are deferred as an additive-linear
-  future migration, not designed out. The t3 plan's Contracts are
-  locked to these; it stays `In draft` because the spawned
-  session's scope bound does not run the `` `In draft` →
-  `Proposed` `` promotion gate — a resolving drafting session
-  does.
+  field-presence (Status-independent); **D6** phase split resolved
+  **N = 1** by the branch-test sketch at the in-session gate.
+  Per-stage counts (B2) are deferred as an additive-linear future
+  migration, not designed out. The t3 plan's Contracts are locked
+  to these; the contributor directed the
+  `` `In draft` → `Proposed` `` promotion gate to be walked
+  in-session (extending past the spawn's original "stop at
+  `In draft`" bound at the contributor's explicit direction), and
+  the plan is now `Proposed`. No PR is opened by this session
+  (separately out of scope).
 - **Where richer session data is stored/read — RESOLVED at t4
   drafting: join the event log (no schema change).** A free-form
   `metadata` JSON column already exists on `events` but not on

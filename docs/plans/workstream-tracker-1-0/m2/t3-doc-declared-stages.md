@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t3
-Status: In draft
+Status: Proposed
 short_description: Additive spec field + parser + per-node progress-cell render driven by the doc
 ---
 
@@ -8,38 +8,56 @@ short_description: Additive spec field + parser + per-node progress-cell render 
 
 ## Status
 
-`In draft` — **design decisions resolved by human input
-(2026-05-18); promotion gate not yet run; not promoted.** A
-spawned just-in-time planning session decomposed the genuine
-decisions into shapes and surfaced them; the human resolved them
-in-loop, aligned with the recommendations. The Contracts below are
-now **locked** to those choices (no longer conditional). The plan
-stays `Status: In draft` because the spawned session's scope bound
-stops at `In draft` and does **not** run the
+`Proposed`. Drafting is complete and the
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`` `In draft` → `Proposed` `` promotion gate; this plan makes no
-claim that the gate has run. A resolving drafting session re-reads
-the plan + scoping end-to-end, walks the universal `Verified by:`
-rule, re-confirms the reality-check inputs against current code,
-sketches the D6 branch test, and only then flips to `Proposed`.
+`` `In draft` → `Proposed` `` promotion gate was walked before
+this flip. History: a spawned just-in-time planning session
+decomposed the genuine decisions into shapes and surfaced them;
+the contributor resolved them in-loop (2026-05-18, aligned with
+the recommendations) and then directed this session to walk the
+promotion gate — consciously extending past the spawn's original
+"stop at `In draft`" scope bound at the contributor's explicit
+direction. The gate walk:
+
+- **End-to-end coherence** — plan + scoping re-read in order; no
+  contradiction between Contracts (C1–C7), the inherited
+  Cross-Cutting Invariants, the Validation Gate, and scoping
+  D1–D6.
+- **Decision-completeness on Contracts** — no clause defers to
+  "plan-drafting"; every C-clause is locked to a resolved D-number
+  (no `[conditional — …]` remains). D6 is made decision-complete
+  by the branch-test sketch below, not deferred onward.
+- **Universal `Verified by:` walk** — every load-bearing claim
+  carries a code/spec citation (walker.go, forest.go, tree.go,
+  site.go, slugs.go, shared.md, vision.md §7, v0.1-design.md §7,
+  the stub-children landed artifact); symbol/section anchored per
+  the anchor-preference rule.
+- **Reality-check inputs re-confirmed** — the parser, forest
+  render, tree builder, request handler, slug levels, and the
+  additive/exact-match spec precedent were re-read against current
+  branch code (off the t2-Landed merge `b606933`); no drift; no
+  `internal/` change exists on this branch (plan-only).
+- **Always-on rules** — required sections present (Status,
+  Context, Goal, Contracts, Files to touch, Validation Gate); no
+  section variance to disclose; no descent to implementation
+  prescription (no fenced blocks / predicate spellings); no
+  soft-commitment language.
+- **Phase skeletons** — N = 1 (below); none to seed.
 
 Resolved decisions (full decomposition, rejected shapes, and
 `Verified by:` grounding in
 [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
 "Decisions resolved by human input"):
 
-- **D1 (central, was OQ1)** — field shape: **A2**, an ordered
+- **D1 (was OQ1, central)** — field shape: **A2**, an ordered
   list of stage-label strings, Drafting cell reserved render-side.
   One rendered cell ≈ one PR in the typical case. Per-stage counts
   (B2) deferred as an additive-linear future migration, not
   designed out.
 - **D2 (was OQ2)** — frontmatter key **`progress_stages`**;
-  rendered element named a **"progress cell"** (reconciles m2
-  "progress box" toward the established `design/vision.md` §7
-  "cell" vocabulary); no doc-visible Drafting token. The
-  element-name spelling is the one judgment call made under the
-  "make the reasonable call and continue" instruction — overridable
-  by the human without reopening D1.
+  rendered element named a **"progress cell"** (reconciles the m2
+  "progress box" wording toward `design/vision.md` §7's
+  established "cell" vocabulary); no doc-visible Drafting token.
 - **D3 (was OQ3)** — Drafting cell is render-side-reserved (one
   synthesis path serves the absent/stub case and a drafted doc's
   leading cell).
@@ -47,9 +65,18 @@ Resolved decisions (full decomposition, rejected shapes, and
   each node's own doc governs its row.
 - **D5 (was OQ7)** — row gated by **field-presence (α)**,
   Status-independent.
-- **D6 (was OQ5)** — phase split assessed **N = 1** under D1 = A2;
-  the branch-test sketch and the promotion gate are the resolving
-  drafting session's work, not run here.
+- **D6 (was OQ5) — phase split: N = 1, confirmed by the
+  branch-test sketch at this gate.** Sketched file list: the
+  frontmatter parser + its test, the forest render template + CSS
+  + its test, the tree builder + its test (all one subsystem,
+  `internal/site`), plus the additive spec-doc prose and the
+  design §7 update. Substantive logic is a tolerant field read
+  reusing the existing block-sequence decoder pattern plus a
+  render loop and one `buildTree` assignment — one subsystem, well
+  under the >5-subsystem / >300-LOC split thresholds per
+  [`task-plan.md`](../../../../spec/planning/task-plan.md)
+  "PR-count predictions need a branch test." One phase, one
+  implementing PR; no phase plan files.
 
 ## Context
 
@@ -278,10 +305,9 @@ box" wording toward `design/vision.md` §7's established "cell"
 vocabulary). `progress_stages` is an exact-match-checked token per
 [`shared.md` "Quote labels whose enforcement depends on exact-match
 matching"](../../../../spec/planning/shared.md) and is copied
-verbatim into the spec, not paraphrased. The element-name spelling
-("progress cell") is the one judgment call the resolving turn made
-under the "make the reasonable call and continue" instruction and
-is human-overridable without reopening D1. `Verified by:`
+verbatim into the spec, not paraphrased. The decomposition,
+rejected names, and resolution rationale for both identifiers are
+in scoping D2. `Verified by:`
 [`PlanNode` in tree.go](../../../../internal/site/tree.go)
 (the additive-field precedent);
 [`shared.md` exact-match-label
@@ -314,14 +340,14 @@ what shipped._
   Drafting-only for a field-omitting doc and a stub; absent /
   malformed field never errors); the parser test file (the new
   field's tolerant read, absence/wrong-type/partial-malformed).
-- **Modify (docs):** the m2 README parent doc — Task Status t3
-  row and t3 prose to a drafted `In draft` plan, and the
-  "Doc-declared-stages frontmatter shape" Cross-Task Decisions
-  entry pointed at the scoping section and recorded RESOLVED by
-  human input (D1–D5), promotion gate still pending (this drafting
-  change, per parent-doc currency); `design/v0.1-design.md`
-  §7 updated to describe the doc-driven progress-cell row on the PR
-  that lands the implementation.
+- **Modify (docs):** the m2 README parent-doc currency (Task
+  Status t3 row, t3 prose, the "Doc-declared-stages frontmatter
+  shape" Cross-Task Decisions entry) was handled in the
+  drafting/gate change, not the implementing PR. The implementing
+  PR updates `design/v0.1-design.md` §7 to describe the
+  doc-driven progress-cell row, and flips the m2 README t3 Task
+  Status row `Proposed` → `Landed` (and this plan's Status) at the
+  implementation-terminal per the Plan-to-PR Completion Gate.
 - **Intentionally not touched:** the shell render file
   (`render.go`) and the roster render file (`roster.go`) — m2
   file boundary; the API, DB schema, register client, routing;
@@ -331,10 +357,9 @@ what shipped._
 
 ## Validation Gate
 
-The design decisions are locked; the resolving drafting session
-runs the promotion-gate self-review and finalizes the flip (this
-session does neither). The gate below is the implementing PR's
-Validation Gate.
+The promotion gate has been walked (see Status). The gate below
+is the implementing PR's Validation Gate, satisfied before that
+PR opens.
 
 - `go build ./...`, `go vet ./...`, `go test ./...` all pass (per
   [`docs/dev.md`](../../../../docs/dev.md)).
@@ -449,9 +474,9 @@ D5; surfaced, not decided here).
 
 - [`README.md`](README.md) — parent milestone; its Task Status t3
   row, t3 prose, and "Doc-declared-stages frontmatter shape"
-  Cross-Task Decisions entry are reconciled to this drafting in
-  the same change (pointed at scoping, recorded RESOLVED by human
-  input D1–D5, promotion gate still pending).
+  Cross-Task Decisions entry are reconciled to this drafting and
+  the in-session gate flip (pointed at scoping; RESOLVED by human
+  input D1–D6; gate walked; t3 row `Proposed`).
 - [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
   — the decision-space decomposition (D1–D6 with shapes,
   trade-offs, `Verified by:` grounding, rejected alternatives, and

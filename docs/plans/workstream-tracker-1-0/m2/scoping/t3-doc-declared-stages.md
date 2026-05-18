@@ -81,14 +81,15 @@ The m2 milestone routed the field name/structure/per-stage-counts-
 vs-ordered-list call to "when t3 drafts" under the
 [`shared.md`](../../../../../spec/planning/shared.md) "Decompose
 options into shapes" and exact-match-label discipline. This
-spawned session decomposed it (D1–D5 below) with trade-off
+spawned session decomposed it (D1–D6 below) with trade-off
 analysis; the human resolved it in-loop on 2026-05-18 (aligned
-with the recommendations). Recording the decomposition is the
-scoping-method act; the choices are the human's. The plan stays
-`Status: In draft`: the spawned session's scope bound stops at
-`In draft` and does not run the `` `In draft` → `Proposed` ``
-promotion gate — a resolving drafting session runs that gate.
-`Verified by:` [m2 README "Cross-Task Decisions" →
+with the recommendations) and then directed the session to walk
+the `` `In draft` → `Proposed` `` promotion gate, consciously
+extending past the spawn's original "stop at `In draft`" bound at
+the contributor's explicit direction. Recording the decomposition
+is the scoping-method act; the choices are the human's; the gate
+was walked in-session and the plan is now `Proposed`. `Verified
+by:` [m2 README "Cross-Task Decisions" →
 "Doc-declared-stages frontmatter shape"](../README.md);
 [`shared.md` "Decompose options into shapes before
 analyzing"](../../../../../spec/planning/shared.md).
@@ -100,11 +101,12 @@ in cited code/spec, then resolved by the human in-loop (aligned
 with the recommendations). The verdicts below are the durable
 rationale the paired plan's Contracts realize; rejected shapes are
 retained as the decision record. The plan's Contracts are now
-locked to these choices. The plan nonetheless stays `Status: In
-draft`: per the spawned session's scope bound the
-`` `In draft` → `Proposed` `` promotion gate is **not** run here —
-a resolving drafting session re-confirms reality-check inputs and
-runs that gate.
+locked to these choices. After resolving them the contributor
+directed the session to walk the
+`` `In draft` → `Proposed` `` promotion gate in-session
+(consciously extending past the spawn's original "stop at
+`In draft`" bound, at the contributor's explicit direction); the
+gate was walked and the plan is now `Proposed`.
 
 **Conceptual model the human set (load-bearing for D1).** A
 rendered progress unit corresponds to **one PR in the typical
@@ -354,7 +356,7 @@ coupling to the exact-match Status lifecycle token. **Rejected:**
 render that must also satisfy "Unknown Status values render
 gracefully").
 
-### D6 (was OQ5) — Phase split — ASSESSED N = 1; branch test at the resolving drafting
+### D6 (was OQ5) — Phase split — RESOLVED N = 1 (branch-test sketch at the in-session gate)
 
 The m2 "Per-task phase splits" estimate guesses t3 plausibly N ≥ 2
 (spec/parser, then progress-box render). Candidate boundaries
@@ -362,11 +364,12 @@ enumerated: (a) spec-field + parser read | progress-box render;
 (b) single phase. The resolver is the
 [`task-plan.md`](../../../../../spec/planning/task-plan.md)
 "PR-count predictions need a branch test," run at the resolving
-drafting after human input — not here. The split **hinges on
-D1**: under A2 the substantive logic is tiny (one tolerant field
-read reusing `stringList`, plus a render loop in the forest node
-template), pointing strongly to N = 1, single subsystem
-(`internal/site`) plus additive spec-doc prose; under B2 the
+drafting after human input. **RESOLVED at the in-session gate
+walk: N = 1.** The split hinges on D1: under A2 the substantive
+logic is tiny (one tolerant field read reusing `stringList`, plus
+a render loop in the forest node template), pointing strongly to
+N = 1, single subsystem (`internal/site`) plus additive spec-doc
+prose; under the deferred B2 the
 net-new sequence-of-maps decoder enlarges it but still likely N =
 1. `Verified by:`
 [`stringList` in walker.go](../../../../../internal/site/walker.go)
@@ -379,22 +382,23 @@ markup, not subsystem count);
 splits"](../README.md) (estimate, not contract; re-derived at the
 branch test). With D1 = A2 the substantive logic is tiny (one
 tolerant block-sequence read reusing `stringList`, plus a render
-loop in the forest node template), so **assessment: N = 1**, one
-subsystem (`internal/site`) plus additive spec-doc prose. Not
-locked here: the branch-test sketch is run at the resolving
-drafting that also runs the promotion gate, per the spawned
-session's scope bound.
+loop in the forest node template), so **RESOLVED: N = 1**, one
+subsystem (`internal/site`) plus additive spec-doc prose, well
+under the >5-subsystem / >300-LOC thresholds. The branch-test
+sketch was run at the in-session promotion-gate walk; the plan's
+Status section carries the sketched file list.
 
 ## Plan structure handoff
 
 - Replace the parent-promotion stub at
   [`../t3-doc-declared-stages.md`](../t3-doc-declared-stages.md)
-  with a full task plan at `Status: In draft` per
+  with a full task plan (now `Status: Proposed` after the
+  in-session gate walk) per
   [`task-plan.md`](../../../../../spec/planning/task-plan.md)
   "Required and optional sections": Status, context preamble,
-  Goal, Contracts (**now locked to D1–D5**; D6 phase split
-  assessed N = 1, branch test at the resolving drafting), Files to
-  touch (estimate-prefaced), Validation Gate.
+  Goal, Contracts (locked to D1–D5; D6 phase split resolved
+  N = 1 by the branch-test sketch), Files to touch
+  (estimate-prefaced), Validation Gate.
 - Optional sections that apply: Cross-Cutting Invariants
   (inherited m2 invariants — additive-spec, posture-tension,
   stub-render-preserved, walk-on-every-request, file boundary),
@@ -409,19 +413,21 @@ session's scope bound.
   explicitly; reference the vision §7 prose-to-data and sub-stage-
   cell open questions as deliberated intersections, not resolved),
   Related Docs.
-- **Same change** updates the m2 README parent doc for currency:
-  the t3 Task Status row off "In draft (stub)" and the t3 prose to
-  reflect a drafted `In draft` plan (NOT `Proposed`); the
-  "Doc-declared-stages frontmatter shape" Cross-Task Decisions
-  entry points at this scoping section and records the decision as
-  **RESOLVED by human input (D1–D5)**, with the promotion gate
-  still pending a resolving drafting.
-- Status stays `In draft`; per the spawned session's scope bound
-  no promotion gate is run and the plan is not promoted to
-  `Proposed`. The design decisions are resolved; the remaining
-  gate (end-to-end coherence re-read, universal `Verified by:`
-  walk, reality-check re-confirmation, D6 branch-test sketch, then
-  the flip) is the resolving drafting session's work.
+- The m2 README parent doc was updated for currency across the
+  drafting and the gate flip: the t3 Task Status row
+  `In draft (stub)` → `In draft` → `Proposed`, the t3 prose, and
+  the "Doc-declared-stages frontmatter shape" Cross-Task Decisions
+  entry (decomposed → RESOLVED by human input D1–D6 → gate
+  walked).
+- The plan is now `Proposed`: the contributor resolved the
+  decisions in-loop and directed the in-session promotion-gate
+  walk (end-to-end coherence, decision-completeness, universal
+  `Verified by:`, reality-check re-confirmation, always-on rules,
+  D6 branch-test sketch, then the flip), consciously extending
+  past the spawn's original "stop at `In draft`" bound at the
+  contributor's explicit direction. No PR is opened by this
+  session (separately out of scope); the flip is a doc-only
+  commit on the worktree branch.
 
 ## Reality-check inputs (the plan must re-verify before any future promotion)
 
