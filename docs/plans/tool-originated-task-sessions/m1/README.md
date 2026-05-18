@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m1
-Status: In draft
+Status: Proposed
 short_description: Unwired deterministic slug-carried registration path
 ---
 
@@ -92,7 +92,7 @@ flowchart LR
   epic[epic: tool-originated-task-sessions / Proposed] --> t1
   t1[t1: deterministic-path contract expression] --> t2
   t2[t2: determinism proof harness]
-  t2 -. consumed by .-> m2[m2: tool-originated session UX / downstream, dependency-only]
+  t1 -. contract consumed by .-> m2[m2: tool-originated session UX / downstream, dependency-only]
 ```
 
 **Ship order and rationale.** t1 before t2. The dependency is
