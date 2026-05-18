@@ -352,34 +352,16 @@ Long-standing deferrals this epic's existence settles.
     [`design/vision.md` §5](../../../design/vision.md).)
 
 - **Where does a tool-originated session's workspace come
-  from?** Resolved: *the tool does not provision it — the agent
-  self-provisions its working context and reports it as
-  enrichment.* Three shapes were considered: (1) the tool
-  creates the worktree itself (directly, or by delegating to a
-  launcher's native isolation); (2) the tool attaches the
-  session to an existing workspace the contributor selects or
-  the tracker's own repo; (3) the tool spawns the session in
-  the contributor's existing repo context and the agent creates
-  its own worktree/branch as an early step, reporting it through
-  the best-effort enrichment phase. Shape 3 is the only one
-  coherent with the already-locked determinism scoping, which
-  classifies branch/worktree as best-effort enrichment the
-  agent reports — so workspace provisioning belongs on the
-  agent side *by construction*, not the tool's. It also keeps
-  the tool's action minimal (launch-not-leash; single-local),
-  keeps the agent-adapter seam free of per-adapter worktree
-  policy, and reuses existing agent behavior. Shape 1 would
-  re-expand the tool's action into filesystem/git mutation
-  right after the epic worked to minimize it and would
-  contradict classifying worktree as agent-reported enrichment;
-  Shape 2 either breaks the parallel-sessions model (shared
-  working directory) or pushes isolation onto the contributor.
-  The brief pre-self-provision window (a session exists before
-  it has its own worktree) is not a correctness issue: identity
-  registration is already deterministic and independent of the
-  worktree. Whether a launcher's native per-session isolation
-  should later assist provisioning is a milestone-time HOW
-  refinement, not a change to this vision answer.
+  from?** Dissolved: *the tool has no workspace role.* The
+  opening prompt tells the session to start its work in a fresh
+  worktree off the latest `origin/main`; the agent does so as
+  ordinary agent behavior, and the resulting worktree name comes
+  back as display-only best-effort enrichment. This is not a
+  tool decision among options — it is already fully covered by
+  the launch-not-leash invariant (the tool's only action is
+  hand over the prompt) and the two-phase split (worktree is
+  agent-reported enrichment, not a tool concern). The tool never
+  provisions, selects, or acts on the workspace.
 
 ## Open Questions Newly Opened
 
