@@ -184,7 +184,9 @@ brushes against them.
   (Verified by [`internal/registerclient/client.go`
   `Register`](../../../../internal/registerclient/client.go)); the
   CLI already carries `--slug`/`WST_SLUG`,
-  `--actor`/`WST_ACTOR`, `--server`/`WST_SERVER`, prints the real
+  `--actor`/`WST_ACTOR`, `--server`/`WST_SERVER` (and, since PR
+  [#38](https://github.com/kcrobinson-1/workstream-tracker/pull/38),
+  an optional `--name`/`WST_NAME`), prints the real
   receipt, and exits success regardless (Verified by
   [`cmd/workstream-tracker/register.go`
   `runRegister`](../../../../cmd/workstream-tracker/register.go)); an
@@ -197,7 +199,21 @@ brushes against them.
   determinism-specific proof — not new registration surface. This
   satisfies the locked WHAT without loosening it and is the
   resolution the epic's Open Question #1 anticipated; **no epic
-  reopen.**
+  reopen.** Re-verified against the rebased base after PR
+  [#38](https://github.com/kcrobinson-1/workstream-tracker/pull/38)
+  (m2-t4 enrichment): #38 added the epic's *best-effort
+  enrichment* leg (an optional `--name`/`WST_NAME` carried as
+  request metadata) to the **interactive** path only, riding the
+  pre-existing optional `metadata` blob with no schema change
+  (Verified by [`design/v0.1-design.md` §5: "no `work_instances`
+  column, no schema change"](../../../../design/v0.1-design.md)
+  and [`internal/registerclient/client.go` `Register` metadata
+  param](../../../../internal/registerclient/client.go)). The
+  deterministic identity step m1 reuses, and the §4 exact-slug
+  "pure consumer — no endpoint, request/response field, or schema
+  change" posture, are unchanged; the enrichment leg is the
+  orthogonal second phase of the epic's two-phase split, not new
+  identity surface — D1 stands.
 
 - **D2 — The spec + agent-rule expression of the deterministic
   path is m1's, not deferred to m2.** *Resolved this session.* m1
