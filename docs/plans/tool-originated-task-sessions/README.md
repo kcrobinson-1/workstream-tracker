@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions
-Status: In draft
+Status: Proposed
 short_description: Tool originates plan-tree sessions; deterministic registration falls out
 ---
 
