@@ -41,8 +41,9 @@ gitignored symlink + bootstrap script (deferred to v0.1).
 - **[planning-doc-location.md](planning-doc-location.md)** —
   the in-repo layout convention: every plan-tree root in its
   own folder under `docs/plans/<root-slug>/`, the root doc at
-  `<root-slug>/README.md`, descendants as siblings, scoping
-  docs in a transient `scoping/` subfolder.
+  `<root-slug>/README.md`, each epic milestone nested in its own
+  `m<N>/` folder, scoping docs in a transient `scoping/`
+  subfolder.
 - **[backlog.md](backlog.md)** — the backlog format: flat list
   of pre-plan work items at `docs/backlog.md`, stable
   kebab-case slugs in a separate namespace from plan-tree

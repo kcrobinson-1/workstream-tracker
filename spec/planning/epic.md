@@ -86,10 +86,11 @@ or a required section genuinely doesn't apply — follows the
 ## Path conventions
 
 An epic gets its own folder at `docs/plans/<epic-slug>/`, with
-the epic doc at `docs/plans/<epic-slug>/README.md` and
-per-milestone / per-task / per-phase docs as siblings inside the
-same folder (filename patterns named in
-[`milestone.md`](./milestone.md) and
+the epic doc at `docs/plans/<epic-slug>/README.md`. Each
+milestone nests in its own `docs/plans/<epic-slug>/m<N>/` folder
+(milestone doc at `m<N>/README.md`), with that milestone's task
+and phase docs as siblings inside the `m<N>/` folder (filename
+patterns named in [`milestone.md`](./milestone.md) and
 [`task-plan.md`](./task-plan.md)). The full layout convention is in
 [`planning-doc-location.md`](../planning-doc-location.md).
 
