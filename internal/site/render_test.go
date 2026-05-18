@@ -58,7 +58,7 @@ func TestRenderRelatedPRsNonURLIsPlainText(t *testing.T) {
 	if strings.Contains(html, `href="#123"`) {
 		t.Errorf("non-URL related PR must not produce a broken in-page anchor; html:\n%s", html)
 	}
-	if strings.Contains(html, "<a") {
+	if strings.Contains(html, "<a ") || strings.Contains(html, "<a>") {
 		t.Errorf("non-URL related PR must not be wrapped in an anchor; html:\n%s", html)
 	}
 }
@@ -93,6 +93,64 @@ func TestRenderNoFieldNodeUnchanged(t *testing.T) {
 	if strings.Contains(html, `<div class="long-desc">`) ||
 		strings.Contains(html, `<ul class="related-prs">`) {
 		t.Errorf("field-less render emitted detail markup; html:\n%s", html)
+	}
+}
+
+// TestRenderTwoRegionShell pins the m2 t1 two-region shell: the
+// forest region carries the existing forest render verbatim and
+// the roster region carries the deliberate placeholder (observed,
+// not asserted from template source — Bans-on-surface).
+func TestRenderTwoRegionShell(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed"},
+	}, nil)
+	html := renderTree(t, roots)
+
+	for _, want := range []string{
+		`<div class="layout">`,
+		`<main class="forest">`,
+		`<aside class="roster">`,
+		`<section class="roster-panel">`,
+		`<h2 class="roster-title">Sessions</h2>`,
+		"The session roster lands in a later task.",
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("two-region shell missing %q; html:\n%s", want, html)
+		}
+	}
+	// Forest region still renders the existing node output.
+	if !strings.Contains(html, `<span class="badge status-proposed">Proposed</span><span class="label" title="alpha">alpha</span>`) {
+		t.Errorf("forest region lost the existing node render; html:\n%s", html)
+	}
+	// The forest region opens before the roster region.
+	if i, j := strings.Index(html, `class="forest"`), strings.Index(html, `class="roster"`); i < 0 || j < 0 || i > j {
+		t.Errorf("forest region must precede roster region (forest=%d roster=%d)", i, j)
+	}
+}
+
+// TestRenderEmptyStateInForestRegion confirms the no-roots
+// empty-state renders inside the forest region while the roster
+// placeholder still renders — the empty forest is not a blank
+// region and the roster is not lost.
+func TestRenderEmptyStateInForestRegion(t *testing.T) {
+	html := renderTree(t, nil)
+
+	empty := `<p class="empty">No plan-tree roots found at <code>docs/plans</code>.</p>`
+	if !strings.Contains(html, empty) {
+		t.Errorf("empty-state not rendered; html:\n%s", html)
+	}
+	// Empty-state sits inside the forest region (between the
+	// forest open tag and the roster open tag).
+	forestOpen := strings.Index(html, `<main class="forest">`)
+	rosterOpen := strings.Index(html, `<aside class="roster">`)
+	emptyAt := strings.Index(html, empty)
+	if forestOpen < 0 || rosterOpen < 0 || emptyAt < 0 ||
+		!(forestOpen < emptyAt && emptyAt < rosterOpen) {
+		t.Errorf("empty-state must render inside the forest region (forest=%d empty=%d roster=%d)",
+			forestOpen, emptyAt, rosterOpen)
+	}
+	if !strings.Contains(html, "The session roster lands in a later task.") {
+		t.Errorf("roster placeholder must still render when the forest is empty; html:\n%s", html)
 	}
 }
 

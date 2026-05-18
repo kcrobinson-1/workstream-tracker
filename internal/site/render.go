@@ -21,8 +21,20 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
   <meta charset="utf-8">
   <title>workstream-tracker</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; padding: 1rem; max-width: 60rem; margin: 0 auto; color: #111827; }
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 1rem; max-width: 80rem; margin: 0 auto; color: #111827; }
     h1 { margin-top: 0; }
+    /* Two-region shell (m2 t1): forest ~2/3 left, roster ~1/3
+       right, top-aligned so the roster shows without scrolling on
+       a tall window; the page itself is the only scroll. Below a
+       desktop-narrow width the regions stack (roster under
+       forest) — mobile is out of scope. */
+    .layout { display: flex; gap: 1.5rem; align-items: flex-start; }
+    .forest { flex: 2 1 0; min-width: 0; }
+    .roster { flex: 1 1 0; min-width: 0; }
+    @media (max-width: 60rem) { .layout { flex-direction: column; } }
+    .roster-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.75rem 1rem; }
+    .roster-title { margin: 0 0 0.25rem 0; font-size: 0.95rem; font-weight: 600; color: #0f172a; }
+    .roster-placeholder { margin: 0; color: #6b7280; font-style: italic; font-size: 0.9em; }
     .root { margin-bottom: 1.5rem; padding: 0.75rem 1rem; background: #f9fafb; border-radius: 0.5rem; }
     ul { padding-left: 1.5rem; list-style: none; margin: 0.25rem 0; }
     li { padding: 0.25rem 0; }
@@ -44,6 +56,8 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
 </head>
 <body>
   <h1>workstream-tracker</h1>
+  <div class="layout">
+  <main class="forest">
   {{if .Roots}}
   {{range .Roots}}
   <div class="root">
@@ -53,6 +67,14 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
   {{else}}
   <p class="empty">No plan-tree roots found at <code>{{.PlansPath}}</code>.</p>
   {{end}}
+  </main>
+  <aside class="roster">
+  <section class="roster-panel">
+    <h2 class="roster-title">Sessions</h2>
+    <p class="roster-placeholder">The session roster lands in a later task. Once built, this region will list every registered active session — bound and unbound — alongside the forest.</p>
+  </section>
+  </aside>
+  </div>
 </body>
 </html>
 
