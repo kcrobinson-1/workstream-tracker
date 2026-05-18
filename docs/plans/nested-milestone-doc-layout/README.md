@@ -1,6 +1,6 @@
 ---
 slug: nested-milestone-doc-layout
-Status: Proposed
+Status: In progress
 short_description: Nest milestone docs under per-milestone m<N>/ folders
 ---
 
@@ -48,6 +48,36 @@ paragraph is corrected to match the recursive slug-driven walker;
 a walker test exercises the nested shape and asserts the rendered
 doc set plus scoping-skip match the flat equivalent; and the
 consumer-migration policy is stated explicitly.
+
+## Phases
+
+This task drafted N = 1 (one PR: spec prose + dogfood test +
+this repo's own tree migration). During implementation the repo
+owner directed that this repo's own existing plan-tree docs are
+**not** to be moved yet. That splits the work along a phase
+boundary per
+[`task-plan.md`](../../../spec/planning/task-plan.md) "N = 1 →
+N ≥ 2 transition": Phase 2 fits cleanly under this doc's existing
+Contracts and Validation apparatus (it is a mechanical,
+slug-preserving relocation already covered by C5 and Validation
+step 4), so no separate phase plan file is created — the work is
+tracked here.
+
+- **Phase 1 — convention + tool tolerance (this PR).** The
+  layout-convention spec prose (C1–C4), the consumer-migration
+  policy statement (C5, consumer half), and the dogfood walker
+  test. No existing plan docs move. Reaches `Landed` when this
+  PR merges.
+- **Phase 2 — this repo's own tree migration (deferred).**
+  Relocate `docs/plans/workstream-tracker-1-0/**` and
+  `docs/plans/demo-workstream/**` into `m<N>/` folders
+  (slug-preserving), satisfying the repo-self-migration half of
+  C5 and Validation step 4. **Deferred at the repo owner's
+  explicit instruction** ("hold off on moving existing plan docs
+  until I say"); it has no upstream blocker and is unblocked by
+  an owner go-ahead, not by other work. Until Phase 2 lands the
+  task plan stays `In progress` and the scoping doc is **not**
+  deleted (task-terminal is Phase 2's PR, not this one).
 
 ## Contracts
 
@@ -140,24 +170,38 @@ are migrated to the nested shape in this task's implementing PR.
 > Deviations are handled per the Estimate Deviations callout in
 > the implementing PR body.
 
-**Modify:**
+**Modify (Phase 1 — what shipped, reconciled to actual):**
 
 - [`../../../spec/planning-doc-location.md`](../../../spec/planning-doc-location.md)
-  — the layout convention, its layout tree, the slug-to-path
-  mapping table, and the stale "v0.0 hardcoded [flat]" paragraph
-  (C1, C3, C4).
+  — the layout convention, its layout tree + concrete examples,
+  the "Why this shape" rationale, the slug-to-path mapping table,
+  the per-epic-numbering note, and the stale "v0.0 hardcoded
+  [flat]" paragraph (rewritten as a "Tool behavior" section);
+  added a "Migration of pre-existing flat trees" section
+  (C1, C3, C4, C5).
 - [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
   — the "Path conventions" epic-with-milestones and scoping
   bullets (C1, C2).
+- [`../../../spec/planning/epic.md`](../../../spec/planning/epic.md),
+  [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md),
+  [`../../../spec/README.md`](../../../spec/README.md) — the
+  per-level path-convention pointers and the spec index summary,
+  which also stated the old flat shape and would otherwise drift
+  from the convention. **Estimate deviation:** the original
+  estimate named only `planning-doc-location.md` +
+  `task-plan.md`; the layout shape is restated in three more
+  rule-bearing places that had to move in lockstep (C1/C3
+  coherence). Called out in the PR body.
 - [`../../../internal/site/walker_test.go`](../../../internal/site/walker_test.go)
-  — add a nested-shape test asserting parity with the flat
-  layout and the `m<N>/scoping/` skip (C4).
+  — added `TestWalkPlansNestedMilestoneLayout` asserting the
+  nested doc set and the `m<N>/scoping/` skip (C4).
 
-**Migrate (this repo's own trees, per scoping D6 hybrid):**
+**Phase 2 — deferred (repo owner hold; see Phases):**
 
 - `docs/plans/workstream-tracker-1-0/**` and
   `docs/plans/demo-workstream/**` — relocate milestone/task/phase
-  docs into `m<N>/` folders; frontmatter slugs unchanged.
+  docs into `m<N>/` folders; frontmatter slugs unchanged. Not
+  touched in this PR.
 
 **Not touched:**
 
@@ -190,12 +234,14 @@ Before the implementing PR opens:
    equivalent and `m<N>/scoping/` is skipped. Falsifier: the test
    is absent, or asserts tolerance in a comment rather than by
    execution.
-4. **Repo-tree conformance.** Every file under
-   `workstream-tracker-1-0/` and `demo-workstream/` sits at its
-   convention path; `go test ./...` is green; the rendered
+4. **Repo-tree conformance (Phase 2 — deferred).** Every file
+   under `workstream-tracker-1-0/` and `demo-workstream/` sits at
+   its convention path; `go test ./...` is green; the rendered
    roots-and-children set is unchanged pre/post move. Falsifier:
    a moved file's slug changed, or the rendered tree diff is
-   non-empty.
+   non-empty. **Not run in this PR** — Phase 2 is deferred at the
+   repo owner's instruction (see Phases); this gate runs in
+   Phase 2's PR.
 5. **Link-resolution check.** Every relative link added or moved
    resolves from its editing file's location.
 6. **Exact-match token check.** Every cited section title and
