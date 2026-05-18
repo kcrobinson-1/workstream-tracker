@@ -114,7 +114,7 @@ the walk-on-every-request render path is unchanged.
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Proposed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
-| `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [Proposed](t4-p1-bare-roster.md) |
+| `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [Landed](t4-p1-bare-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
 
 t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
@@ -134,12 +134,11 @@ cross-doc-currency gap; the latter is why this milestone's
 Cross-Task Invariant carries the data-path carve-out below — see
 the plan's Status history). Its two phases were seeded as
 parent-promotion **stubs**; phase 1
-[`t4-p1`](t4-p1-bare-roster.md) is now a **drafted phase plan**
-at `Status: Proposed` (its own just-in-time scoping + plan
-drafting ran, the one open p1 mechanism resolved — classify
-against the in-request walked parsed-doc set, no fresh read; the
-phase promotion-gate self-review run clean), ready for code
-review and implementation; phase 2
+[`t4-p1`](t4-p1-bare-roster.md) is **`Landed`** (drafted,
+promoted, and implemented — the bare bound/unbound roster shipped:
+every active session listed and classified against the
+in-request walked parsed-doc set, replacing t1's placeholder, no
+event join / no client change); phase 2
 [`t4-p2`](t4-p2-enrichment.md) remains a seeded
 parent-promotion **stub**, scoped just-in-time at its own
 drafting. t3 also remains a seeded parent-promotion **stub**

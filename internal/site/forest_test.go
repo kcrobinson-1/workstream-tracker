@@ -117,8 +117,14 @@ func TestRenderEmptyStateInForestRegion(t *testing.T) {
 		t.Errorf("empty-state must render inside the forest region (forest=%d empty=%d roster=%d)",
 			forestOpen, emptyAt, rosterOpen)
 	}
-	if !strings.Contains(html, "The session roster lands in a later task.") {
-		t.Errorf("roster placeholder must still render when the forest is empty; html:\n%s", html)
+	// The roster region is not lost when the forest is empty. (t1
+	// asserted the literal placeholder string here; m2 t4 p1
+	// replaced the placeholder with the real roster, so this is
+	// reconciled to the roster's deliberate empty state — a
+	// plan-flagged cross-region reconciliation, see
+	// t4-p1-bare-roster.md "Files to touch".)
+	if !strings.Contains(html, `<p class="roster-empty">No active sessions.`) {
+		t.Errorf("roster region must still render its deliberate state when the forest is empty; html:\n%s", html)
 	}
 }
 

@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4-p1
-Status: Proposed
+Status: Landed
 short_description: Bare bound/unbound session roster replacing the t1 placeholder (no event join, no client change)
 ---
 
