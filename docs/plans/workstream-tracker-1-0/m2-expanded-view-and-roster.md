@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2
-Status: In draft
+Status: Proposed
 short_description: In-root expanded view, doc-declared progress boxes, and a session roster
 ---
 
@@ -8,15 +8,25 @@ short_description: In-root expanded view, doc-declared progress boxes, and a ses
 
 ## Status
 
-`In draft`. This milestone doc is in multi-pass drafting per
+`Proposed`. Drafting is complete and the
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-`In draft` → `Proposed` promotion gate." The task breakdown
-below is **decision-complete and presented for review**; on
-review sign-off the PR that flips this doc to `Proposed` seeds
-the task skeleton docs per
+`In draft` → `Proposed` promotion gate" was walked before this
+flip: read end-to-end for cross-section coherence; Task
+Contracts decision-complete (no deferral names this milestone
+session as resolver — remaining HOW deferrals are bound to each
+child task's own drafting); `Verified by:` and reality-check
+inputs re-confirmed against current code; required sections
+present with the "Out of Scope" variance now carried in
+milestone.md's optional list; no content descended to
+implementation prescription. The child set is **locked at four
+tasks**, and the PR that carries this flip seeds their
+parent-promotion stubs per
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts" (Parent-promotion stub seeding). Nothing here
-is flipped to `Proposed` before that explicit go-ahead.
+child contracts":
+[`m2-t1`](m2-t1-site-skeleton.md),
+[`m2-t2`](m2-t2-expanded-render.md),
+[`m2-t3`](m2-t3-doc-declared-stages.md),
+[`m2-t4`](m2-t4-session-roster.md).
 
 **Target mockup approved; the "how to get there" gate is
 resolved.** The finished-page target — plan-tree forest and
@@ -100,21 +110,21 @@ the walk-on-every-request render path is unchanged.
 
 | Slug                              | Title                                                | Status |
 |-----------------------------------|------------------------------------------------------|--------|
-| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | —      |
-| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | —      |
-| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | —      |
-| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | —      |
+| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [In draft (stub)](m2-t1-site-skeleton.md) |
+| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [In draft (stub)](m2-t2-expanded-render.md) |
+| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](m2-t3-doc-declared-stages.md) |
+| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](m2-t4-session-roster.md) |
 
-Status `—` indicates the task plan has not been drafted; tasks
-draft just-in-time per
+Each task is a seeded parent-promotion **stub** (`slug` +
+`Status: In draft` + inherited WHAT contract) — not yet a
+drafted plan. Each task's full HOW is scoped just-in-time at
+its own drafting session per
 [`task-plan.md`](../../../spec/planning/task-plan.md)
-"Just-in-time scoping and plan drafting." The task set is
-**decision-complete and presented for review** (see Status
-above); per
+"Just-in-time scoping and plan drafting"; the stubs are exempt
+from the required-sections rule until then per
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts" the Task Contracts below lock, and stubs
-seed, in the PR that flips this doc to `Proposed` — held for
-explicit review sign-off.
+child contracts." The Task Contracts below are the locked WHAT
+each stub inherited.
 
 ## Sequencing
 

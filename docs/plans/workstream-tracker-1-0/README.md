@@ -110,9 +110,10 @@ rather than lost.
   parsing as a phase), expanded per-node display. Full task
   list and contracts in [`m1-v0-2.md`](m1-v0-2.md).
 
-- `workstream-tracker-1-0-m2` (In draft — task scope proposed,
-  pending review). **v0.3 — In-root expanded view, doc-declared
-  progress boxes, and session roster.** A root's contents
+- `workstream-tracker-1-0-m2` (Proposed — task scope locked at
+  4 tasks; parent-promotion stubs seeded). **v0.3 — In-root
+  expanded view, doc-declared progress boxes, and session
+  roster.** A root's contents
   render as nested epic → milestone → task → phase boxes with
   per-node Status, collapsible, inside the active-work surface;
   every node level shows progress boxes whose count and order
@@ -361,7 +362,7 @@ milestone remain estimates pending their planning sessions.
 
 - **m1**: 4 tasks. Landed (all four tasks complete). See
   [`m1-v0-2.md`](m1-v0-2.md).
-- **m2**: 4 tasks proposed (pending review): site skeleton
+- **m2**: 4 tasks, scope locked (Proposed; stubs seeded): site skeleton
   (two-region shell); expanded nested-box render; doc-declared
   progress stages (spec-first); session roster + work-item
   enrichment. The skeleton (t1) ships the approved side-by-side
