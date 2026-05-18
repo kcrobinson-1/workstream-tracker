@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4
-Status: In draft
+Status: Proposed
 short_description: Session roster (bound + unbound) with named sessions and a deliberately-unstructured raw-JSON detail view
 ---
 
@@ -8,8 +8,9 @@ short_description: Session roster (bound + unbound) with named sessions and a de
 
 ## Status
 
-`In draft`. **History:** two review findings each regressed a
-premature `Proposed`.
+`Proposed` (re-promoted after the gate re-walk below).
+**History:** two review findings each regressed a premature
+`Proposed`.
 
 1. *Decision-completeness.* Two Contracts bullets (the roster's
    metadata read policy and the name/no-name fallback) deferred
@@ -45,18 +46,20 @@ resolved in the scoping doc
 ([`scoping/t4-session-roster.md`](scoping/t4-session-roster.md),
 decisions D1–D5); no "input from prior task" is pending (t1 is
 `Landed`; t4 is independent of t2/t3 per the milestone Sequencing
-graph). What remains before `Proposed` is re-walking the
+graph). The
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion gate with both findings resolved:
-end-to-end + cross-doc coherence (the milestone/t1 carve-out now
-makes the permitted `render.go` data-path edit consistent with the
-authoritative invariants); Contracts decision-complete (the sole
-residual deferral, the literal slug-fallback formatting, is
-authorized by "Bans on surface require rendering the
-consequence"); the broadened `Verified by:` rule re-confirmed
-against the branch; required sections present and estimate-shaped
-sections labeled; no implementation prescription (query mechanism
-explicitly carved as p2 HOW). The two phase skeleton docs the
+`In draft → Proposed` promotion gate was **re-walked** before this
+flip with both findings resolved: end-to-end + cross-doc coherence
+(the milestone/t1 carve-out, amended in this drafting change, makes
+the permitted `render.go` data-path edit consistent with the
+authoritative invariants — no `Proposed` cross-doc contradiction
+stands); Contracts decision-complete (the sole residual deferral,
+the literal slug-fallback formatting, is authorized by "Bans on
+surface require rendering the consequence"); the broadened
+`Verified by:` rule re-confirmed against the branch; required
+sections present and estimate-shaped sections labeled; no
+implementation prescription (query mechanism explicitly carved as
+p2 HOW). The two phase skeleton docs the
 `Phase Contracts` section names —
 [`t4-p1-bare-roster.md`](t4-p1-bare-roster.md) and
 [`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were seeded at an
