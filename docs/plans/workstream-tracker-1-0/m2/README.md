@@ -111,23 +111,29 @@ the walk-on-every-request render path is unchanged.
 | Slug                              | Title                                                | Status |
 |-----------------------------------|------------------------------------------------------|--------|
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
-| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [In draft (stub)](t2-expanded-render.md) |
+| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Proposed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](t4-session-roster.md) |
 
 t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
 `Landed` (drafted, promoted, and implemented — the two-region
-shell shipped); t2–t4 remain seeded parent-promotion
-**stubs** (`slug`
+shell shipped). t2
+([`m2-t2-expanded-render.md`](t2-expanded-render.md)) is a
+**drafted task plan** at `Status: Proposed` (its collapse
+mechanism resolved — see Cross-Task Decisions; phase split
+resolved to N = 1 via the branch test; promotion-gate
+self-review run clean and the locked-decision supersession
+authorized), ready for code review and implementation. t3–t4
+remain seeded parent-promotion **stubs** (`slug`
 + `Status: In draft` + inherited WHAT contract) — not yet
 drafted plans. Each not-yet-drafted task's full HOW is scoped
 just-in-time at its own drafting session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-"Just-in-time scoping and plan drafting"; the stubs are exempt
-from the required-sections rule until then per
+"Just-in-time scoping and plan drafting"; the remaining stubs
+are exempt from the required-sections rule until then per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts." The Task Contracts below are the locked WHAT
-each stub inherited.
+each task inherited.
 
 ## Sequencing
 
@@ -318,20 +324,27 @@ the other lands" requirement. The cost (t2/t4 serialized
 behind t1) is recorded in Sequencing and accepted.
 
 No further cross-task contract requires locking at
-milestone-planning time. The following are recorded
-as deliberately deferred to the resolving task's drafting per
+milestone-planning time. The following were recorded as
+deliberately deferred to the resolving task's drafting per
 [`milestone.md`](../../../../spec/planning/milestone.md) "Defer
 rather than over-resolve," each with the code surface where the
-decision will be grounded.
+decision is grounded; resolved entries are marked inline as
+their tasks draft.
 
-- **Collapsible mechanism (decide when t2 drafts).** v0.2
+- **Collapsible mechanism — RESOLVED at t2 drafting.** v0.2
   locked "no JavaScript, no panel, no expand/collapse" for the
-  bare-bones render (m1-t4). t2 reintroduces collapse;
-  HTML-native `<details>`/`<summary>` is collapse without
-  JavaScript, but whether t2 stays no-JS or revisits that
-  posture is a HOW call for t2 scoping, which must record the
-  decision against the v0.2 no-JS posture explicitly rather
-  than regress it silently. Verified by:
+  bare-bones render (m1-t4). t2 resolves this to **native
+  HTML `<details>`/`<summary>`, zero JavaScript, no new
+  route**: the durable architectural tenet (server-rendered,
+  refresh-to-update, no read API, no push) is *preserved*, and
+  only the narrower m1-t4 task-scoped "no expand/collapse"
+  decision is *superseded* — its stated rationale ("first
+  JavaScript and first non-`/` route") is moot under
+  `<details>`. The decision against the v0.2 posture is
+  recorded explicitly, not regressed silently, in
+  [`m2-t2-expanded-render.md`](t2-expanded-render.md) C2 and
+  [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
+  S1. Verified by:
   [the v0.2 no-JS decision in m1-v0-2.md "Cross-Task
   Decisions"](../m1/README.md);
   [the `node` template in forest.go](../../../../internal/site/forest.go)
