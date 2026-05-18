@@ -178,19 +178,19 @@ carve-out.
 
 ## Open decisions to make at plan-drafting
 
-- **Phase split (N = 1 vs N ≥ 2).** The m2 milestone estimates t2
-  plausibly N ≥ 2 (nested-box render, then the narrow-window
-  per-node-row degrade). This is an estimate, not a contract;
-  resolve it with the
+- **Phase split (N = 1 vs N ≥ 2) — RESOLVED at plan-drafting:
+  N = 1.** Resolved by the
   [`task-plan.md`](../../../../../spec/planning/task-plan.md)
-  "PR-count predictions need a branch test." Scoping's read
-  (non-binding): both the box render and the per-node-row degrade
-  live in `forest.go` (template + CSS) and are sequence-steps
-  toward one outcome with no independent value — shipping the
-  boxes without the degrade ships a known-broken narrow surface —
-  so N = 1 is likely unless the branch test shows > 300 LOC of
-  substantive logic or > 5 subsystems. The plan's Status block
-  records the resolved N with the branch-test result.
+  "PR-count predictions need a branch test": single subsystem,
+  ≈ 15–20 LOC substantive logic, far below the split thresholds.
+  Candidate boundaries were enumerated rather than assuming the
+  milestone's render-vs-degrade guess; the strongest seam
+  (collapsible render | active-work default-open) shares t2's
+  validation apparatus (unlike m1-t4's subprocess P2) so it is a
+  commit boundary, not a phase. Full evidence and the rejected
+  candidate boundaries are in the plan's Status block and Commit
+  Boundaries section ([`../t2-expanded-render.md`](../t2-expanded-render.md));
+  not restated here.
 
 ## Plan structure handoff
 

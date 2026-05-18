@@ -8,16 +8,29 @@ short_description: Nested collapsible per-node Status boxes inside the forest re
 
 ## Status
 
-`In draft`. One named input is unresolved: the phase split
-(N = 1 vs N ≥ 2) is deferred to the
+`In draft`. The one named input — the phase split — is now
+**resolved: N = 1**, by the
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-"PR-count predictions need a branch test," tracked as the open
-decision in
-[`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
-"Open decisions to make at plan-drafting." Status flips to
-`Proposed` only after that input settles and the
+"PR-count predictions need a branch test." Evidence: the change
+touches a single subsystem (`internal/site` render) and ≈ 15–20
+LOC of substantive logic (the `buildTree` post-order pass — the
+template/CSS rewrite is markup, not algorithmic logic), far below
+the >5-subsystem / >300-LOC split thresholds. Candidate phase
+boundaries were enumerated (render vs. degrade; model vs. render;
+always-open vs. collapse; collapsible vs. active-work
+default-open); the strongest (collapsible boxes | active-work
+default-open) was rejected for N ≥ 2 because, unlike m1-t4's
+subprocess P2, t2's default-open logic shares the same validation
+apparatus (`go test` + the same manual UI capture) as the rest —
+it is a commit boundary, not a distinct validation surface. The
+real seam is preserved as a Commit Boundary (below), not a phase.
+
+Status flips to `Proposed` once the
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion-gate self-review has run.
+`In draft → Proposed` promotion-gate self-review has run and is
+authorized — held here pending that step because this plan
+supersedes a prior locked cross-task decision (C2/S1) and is not
+a small autonomous-promotion change.
 
 Drafting deliberation, rejected alternatives, and `Verified by:`
 grounding for every decision below live in
@@ -216,6 +229,34 @@ is a reviewer-flag candidate.
   intentional layout — this is a required gate step, not optional.
 - Self-review audits below are run at the implementing commit
   boundary.
+
+## Commit Boundaries
+
+N = 1 (one phase, one implementing PR), two commits. This is the
+real phase-D seam (collapsible render | active-work default-open)
+preserved as a review boundary without N ≥ 2 orchestration.
+
+- **Commit 1 — nested collapsible render.** The `forest.go` node
+  template rewrite (`<ul>/<li>` → `<details>/<summary>` boxes,
+  per-type styling, the flex header with the reserved right-side
+  Status region) and CSS, plus the semantic/structural test
+  rewrite replacing the byte-identity pin (C1, C2, C5, C6). A
+  simple static default-open at this commit (all boxes open).
+  Reviewable as "the forest renders nested collapsible boxes,
+  no surface regressed."
+- **Commit 2 — active-work default-open + degrade.** The
+  `tree.go` additive field and its post-order computation, the
+  template reading it for `<details open>`, the
+  default-open-by-active-work tests, and the C4 narrow-window
+  per-node-row degrade with its required observed-render gate
+  step (C3, C4). Reviewable as "the view opens where work is
+  active and degrades cleanly when narrow."
+
+The plan is the only doc (no phase plan files). If commit 2's
+diff unexpectedly balloons past the branch-test thresholds at
+implementation, the
+[`task-plan.md`](../../../../spec/planning/task-plan.md) N = 1 →
+N ≥ 2 transition rule governs the split decision then.
 
 ## Self-Review Audits
 
