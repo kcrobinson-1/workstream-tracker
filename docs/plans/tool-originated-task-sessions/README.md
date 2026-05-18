@@ -142,7 +142,10 @@ re-opened here; the epic's vision work reconciles against them.
   cannot be deterministic. This epic does not contradict that
   decision — it changes who the launcher is for a *different*
   class of session. (Verified by [`docs/backlog.md` →
-  `deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration).)
+  `deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
+  for the registration circularity, and →
+  [`interactive-registration-tripwire`](../../backlog.md#interactive-registration-tripwire)
+  for the best-effort posture.)
 - **The spec's exact-slug create-or-attach registration path.**
   The spec already defines registration "at exactly this slug"
   with server-side trust of the caller's slug. The
@@ -426,10 +429,11 @@ m1's locked contract.
   but flagged so spec coherence is a conscious milestone input.
 - **What is the relationship between this epic and the 1.0-epic
   interactive-registration tripwire?** Recorded as a non-goal
-  in Out of Scope and as the backlog split in Backlog Impact
-  (independent; not resolved here). Flagged here so the call
-  stays conscious through the epic's lifecycle rather than being
-  silently absorbed.
+  in Out of Scope and as the dedicated, deliberately-Open
+  [`interactive-registration-tripwire`](../../backlog.md#interactive-registration-tripwire)
+  backlog entry (independent; binds earlier; not resolved here).
+  Flagged here so the call stays conscious through the epic's
+  lifecycle rather than being silently absorbed.
 
 ## Out of Scope
 
@@ -442,12 +446,14 @@ m1's locked contract.
   interactive-registration tripwire.** That obligation —
   re-deliberate best-effort registration before the 1.0 epic's
   neighborly-events integration milestone — binds independently
-  of and *earlier* than this post-1.0 epic. This epic is the
-  eventual determinism home; it neither satisfies that tripwire
-  nor pulls determinism forward to meet it, and the tripwire may
-  pull a different backstop forward on its own schedule.
-  (Verified by [`docs/backlog.md` →
-  `deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
+  of and *earlier* than this post-1.0 epic, and lives in its own
+  dedicated Open
+  [`interactive-registration-tripwire`](../../backlog.md#interactive-registration-tripwire)
+  entry. This epic is the eventual determinism home; it neither
+  satisfies that tripwire nor pulls determinism forward to meet
+  it, and the tripwire may pull a different backstop forward on
+  its own schedule. (Verified by [`docs/backlog.md` →
+  `interactive-registration-tripwire`](../../backlog.md#interactive-registration-tripwire)
   and [`workstream-tracker-1-0` Risk
   Register](../workstream-tracker-1-0/README.md).)
 - **Changing the interactive (contributor-opened) registration
@@ -466,10 +472,11 @@ m1's locked contract.
   in the implementing PR, not contracted here.
 - **The tree-side observability heuristic.** A tree-side
   "node with an active plan doc but no work-instance" heuristic
-  is part of the
-  [`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
-  residual that stays in the backlog under the split below; it
-  is not a deliverable of this epic.
+  belongs to the observability-residual thread, which the
+  session-roster work (`workstream-tracker-1-0-m2-t4`) owns as
+  its own separate backlog entry — not the
+  `deterministic-interactive-registration` entry and not a
+  deliverable of this epic.
 
 ## Backlog Impact
 
@@ -482,23 +489,30 @@ Per the effect taxonomy in
   `Graduated — tool-originated-task-sessions` with a `**Plan:**`
   line pointing here.
 - [`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
-  — **split.** The entry tracks two separable threads. (1) The
-  *determinism-resolution* thread — determinism's "only
-  resolution home" — graduates into this epic (the epic node
-  now carries it; no separate Status flip on the entry for this
-  thread, because the entry is not wholly graduated). (2) The
-  *interactive-registration best-effort tripwire and
-  observability residual* — re-deliberate best-effort before
-  the 1.0 epic's neighborly-events integration milestone; the
-  tree cannot distinguish unregistered work from no work — binds
-  independently of this post-1.0 epic and *earlier* than it
-  ships. That thread **stays Open under the same
-  `deterministic-interactive-registration` slug**, with its body
-  narrowed to the surviving obligation and a note that the
-  determinism-resolution thread is now homed here. The slug is
-  preserved deliberately: multiple 1.0-epic plan docs reference
-  it by anchor, and the independent tripwire must not be
-  silently absorbed into this far-future epic.
+  — **graduate**, as the determinism-resolution thread of a
+  **three-way split** reconciled with the session-roster work
+  (`workstream-tracker-1-0-m2-t4`), which independently split
+  the same entry. The three threads bind in different places,
+  so each is homed where it fires: (1) *Determinism resolution*
+  — graduates into this epic; the entry is reduced to this
+  thread and its Status flips to
+  `Graduated — tool-originated-task-sessions` with a `**Plan:**`
+  line. (2) *The best-effort tripwire* — carved into a dedicated
+  [`interactive-registration-tripwire`](../../backlog.md#interactive-registration-tripwire)
+  entry that **stays Open**: it binds the 1.0 epic's
+  neighborly-events integration milestone independently of and
+  *earlier* than this post-1.0 epic, so it is deliberately not
+  graduated and not folded into the graduated entry. (3) *The
+  observability residual* — a separate entry the session-roster
+  work owns and creates in its implementing PR (its narrowing
+  is roster-informed); this epic neither creates nor carries it.
+  The `deterministic-interactive-registration` slug is preserved
+  so the many 1.0-epic plan-doc anchors still resolve; that
+  entry now carries forward pointers to the other two threads.
+  Cross-PR note: m2-t4's scoping D2 still reads "determinism-only
+  entry, stays Open" (written before this epic existed); when
+  t4-p2 lands it reconciles that one line to "graduated; tripwire
+  is its own Open entry." This epic does not edit m2-t4's plan.
 
 ## Risk Register
 
@@ -519,13 +533,18 @@ Per the effect taxonomy in
   slug-carried path with a *manual* slug producer, never
   "deterministic interactive registration."
 - **The independent tripwire gets absorbed and lost.** Marking
-  the whole
-  [`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
-  entry Graduated would silently move the earlier-binding
-  tripwire into this far-future epic, where it would not fire
-  in time. Mitigation: Backlog Impact records a split — the
-  tripwire/observability residual stays Open under the same
-  slug with inbound anchors preserved.
+  the determinism entry Graduated (which it now is) would
+  silently move the earlier-binding tripwire into this
+  far-future epic, where it would not fire in time — and the
+  1.0 epic's Risk Register only *points at the backlog anchor*
+  for the tripwire, so a Graduated determinism entry would
+  strand that pointer. Mitigation: the tripwire is carved into
+  its own dedicated
+  [`interactive-registration-tripwire`](../../backlog.md#interactive-registration-tripwire)
+  Open entry — not graduated, not bundled — and the preserved
+  `deterministic-interactive-registration` anchor forward-points
+  to it, so the 1.0-epic reference still lands on a live,
+  earlier-binding obligation.
 - **m1 builds throwaway scaffolding.** The explicit-slug
   invocation that exercises m1's path may be discarded once the
   UX producer lands. Mitigation: scope m1's manual producer at
