@@ -27,7 +27,11 @@ the canonical plan-doc spec consumer projects adopt in
   CREATE-IF-NOT-EXISTS.
 - **`slog`** — structured logging with per-request IDs.
 
-No CI, no build matrix today. Single-maintainer repo.
+Single-maintainer repo. No CI or build matrix exists yet — this
+describes the current scale, not a constraint. Adding CI checks,
+or build/lint/doc tooling (including external tools and new
+dependencies), is fine when it earns its keep; it just hasn't been
+needed yet.
 
 ## Repository Shape
 
@@ -47,8 +51,9 @@ No CI, no build matrix today. Single-maintainer repo.
 
 ## Local Workflow
 
-1. Clone the repo. No external dependencies beyond Go and an
-   `sqlite3` driver pulled in via `go.mod`.
+1. Clone the repo. Today the only dependencies are Go and an
+   `sqlite3` driver pulled in via `go.mod` — that is the current
+   state, not a no-new-dependencies rule.
 2. Run the server:
 
    ```sh
@@ -141,14 +146,6 @@ specific commands this repo uses to satisfy that discipline.
 - **Build:** `go build ./...` — every package compiles.
 - **Vet:** `go vet ./...` — static checks pass.
 - **Tests:** `go test ./...` — full unit-test suite.
-- **Doc links:** `scripts/check-md-links.py` — every relative
-  markdown link in a tracked `.md` resolves on disk. Run it after
-  moving, renaming, or re-nesting any doc (the plan tree moves
-  often), and before pushing a change that touches the doc tree.
-  Dependency-free; not CI-wired (single-maintainer repo, no CI
-  today). It deliberately skips `/`-rooted host-absolute links —
-  that class is tracked separately in
-  [`backlog.md`](backlog.md) `repo-rooted-doc-links`.
 
 Run `go test ./...` before any push. Run `go build ./...` after
 any cross-package refactor. The pre-edit-gate's baseline-
