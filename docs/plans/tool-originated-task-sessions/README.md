@@ -221,21 +221,6 @@ them.
   than an added adapter. This is a forward-compatibility
   posture, not a commitment to ship a second agent in this
   epic.
-- **This epic neither resolves nor cancels the 1.0-epic
-  interactive-registration tripwire.** The
-  [`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
-  tripwire — re-deliberate best-effort registration before the
-  1.0 epic's neighborly-events integration milestone — binds
-  independently and *earlier* than this post-1.0 epic ships.
-  This epic is the eventual determinism home; it does not pull
-  determinism forward to satisfy that tripwire, and the
-  tripwire may pull a different backstop forward on its own
-  schedule. (Verified by
-  [`docs/backlog.md` →
-  `deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
-  and [`workstream-tracker-1-0` Risk
-  Register](../workstream-tracker-1-0/README.md).)
-
 ## Milestone Structure
 
 The epic's scope-locking vision/technical-direction Open
@@ -440,10 +425,11 @@ m1's locked contract.
   expression of the deterministic path. Downstream of vision,
   but flagged so spec coherence is a conscious milestone input.
 - **What is the relationship between this epic and the 1.0-epic
-  interactive-registration tripwire?** Stated as a
-  cross-cutting invariant above (independent; not resolved
-  here). Flagged here so the call stays conscious through the
-  epic's lifecycle rather than being silently absorbed.
+  interactive-registration tripwire?** Recorded as a non-goal
+  in Out of Scope and as the backlog split in Backlog Impact
+  (independent; not resolved here). Flagged here so the call
+  stays conscious through the epic's lifecycle rather than being
+  silently absorbed.
 
 ## Out of Scope
 
@@ -453,10 +439,17 @@ m1's locked contract.
   spawn is out of scope and remains governed by the standing
   observe-only posture.
 - **Resolving or cancelling the 1.0-epic
-  interactive-registration tripwire.** Per the cross-cutting
-  invariant, that obligation binds independently and earlier;
-  this epic does not satisfy it and does not pull determinism
-  forward to meet it.
+  interactive-registration tripwire.** That obligation —
+  re-deliberate best-effort registration before the 1.0 epic's
+  neighborly-events integration milestone — binds independently
+  of and *earlier* than this post-1.0 epic. This epic is the
+  eventual determinism home; it neither satisfies that tripwire
+  nor pulls determinism forward to meet it, and the tripwire may
+  pull a different backstop forward on its own schedule.
+  (Verified by [`docs/backlog.md` →
+  `deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
+  and [`workstream-tracker-1-0` Risk
+  Register](../workstream-tracker-1-0/README.md).)
 - **Changing the interactive (contributor-opened) registration
   path.** Sessions a contributor opens outside the tool keep
   the observable best-effort grounded narration handshake; this
