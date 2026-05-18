@@ -7,7 +7,7 @@ Status: Landed
 
 ## Goal
 
-The first milestone in the [parent epic](README.md) that takes
+The first milestone in the [parent epic](../README.md) that takes
 workstream-tracker from v0.1 toward 1.0. Lift the plan-tree view
 from "informational" to "scannable per node," make the agent
 dogfood credible, and establish the descriptive-label foundation
@@ -25,14 +25,14 @@ visible.
 
 | Slug                              | Title                                | Status |
 |-----------------------------------|--------------------------------------|--------|
-| `workstream-tracker-1-0-m1-t1`    | Multi-work-instance per slug         | [Landed](m1-t1-multi-wi-per-slug.md) |
-| `workstream-tracker-1-0-m1-t2`    | Automatic agent registration         | [Landed](m1-t2-auto-registration.md) |
-| `workstream-tracker-1-0-m1-t3`    | Descriptive tree labels              | [Landed](m1-t3-descriptive-labels.md) |
-| `workstream-tracker-1-0-m1-t4`    | Expanded per-node display            | [Landed](m1-t4-expanded-per-node-display.md) |
+| `workstream-tracker-1-0-m1-t1`    | Multi-work-instance per slug         | [Landed](t1-multi-wi-per-slug.md) |
+| `workstream-tracker-1-0-m1-t2`    | Automatic agent registration         | [Landed](t2-auto-registration.md) |
+| `workstream-tracker-1-0-m1-t3`    | Descriptive tree labels              | [Landed](t3-descriptive-labels.md) |
+| `workstream-tracker-1-0-m1-t4`    | Expanded per-node display            | [Landed](t4-expanded-per-node-display.md) |
 
 Status `—` indicates the task plan has not been drafted; tasks
 draft just-in-time per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Just-in-time scoping and plan drafting."
 
 **t3 phase structure (resolved at t3 drafting):** **N = 1** —
@@ -40,7 +40,7 @@ phase content absorbed inline; no separate phase plan files.
 The earlier two-phase estimate (parse, then render) was
 rejected because the split lacks independent value per the
 level picker. The task plan is
-[`m1-t3-descriptive-labels.md`](m1-t3-descriptive-labels.md)
+[`m1-t3-descriptive-labels.md`](t3-descriptive-labels.md)
 (Status `Landed`); rationale and rejected alternative recorded
 in the t3 plan. t3 also adds an exported
 `slugs.Slug.Position()` accessor — additive to the shared
@@ -56,14 +56,14 @@ a distinct environment-dependent Validation Gate and
 Self-Review surface plus a novel-mechanism spike the
 pure-template P1 does not (rationale and rejected N = 1
 resolved at t4 drafting). The task plan is
-[`m1-t4-expanded-per-node-display.md`](m1-t4-expanded-per-node-display.md)
+[`m1-t4-expanded-per-node-display.md`](t4-expanded-per-node-display.md)
 (Status `Landed`; it flipped `Proposed → In progress`
 when P1's implementing PR merged and reached `Landed` with
 P2's, the last phase); the P1 phase plan
-[`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
+[`m1-t4-p1-inline-detail-render.md`](t4-p1-inline-detail-render.md)
 is Status `Landed` (P1's implementing PR, #15) and the P2
 phase plan
-[`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md) is
+[`m1-t4-p2-gh-discovery.md`](t4-p2-gh-discovery.md) is
 Status `Landed` (P2's implementing PR, #19). t4
 adds one optional, additive `related_prs` frontmatter field,
 documented in `spec/planning/shared.md` adjacent to
@@ -93,7 +93,7 @@ Two parallel tracks emerge from the v0.1 baseline:
 
 The two tracks are independent at task level — each task
 delivers stakeholder-facing value alone per the level-picker
-rule in [`task-plan.md`](../../../spec/planning/task-plan.md).
+rule in [`task-plan.md`](../../../../spec/planning/task-plan.md).
 Track-choice for the first task is sized at
 just-in-time-drafting time.
 
@@ -103,9 +103,9 @@ Per-task **WHAT** contracts — end result, sibling interfaces,
 preserves. The **HOW** (file inventory, signature shapes,
 specific commands, validation gate) lives in each task's plan
 when it drafts. Required section per
-[`milestone.md`](../../../spec/planning/milestone.md) "Required
+[`milestone.md`](../../../../spec/planning/milestone.md) "Required
 and optional sections" and
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts."
 
 ### t1 — Multi-work-instance per slug
@@ -201,13 +201,13 @@ any per-task drafting brushes against these.
 - **Backward-compatible API extension.** t1 and t2 extend the
   register flow without breaking v0.1's existing root-create or
   descendant-create flows. Verified by:
-  [`registerWorkInstance` in handlers.go](../../../internal/api/handlers.go)
+  [`registerWorkInstance` in handlers.go](../../../../internal/api/handlers.go)
   dispatches on `RegisterRequest.ParentPath` (defined in
-  [`api.go`](../../../internal/api/api.go)) to root-create when
+  [`api.go`](../../../../internal/api/api.go)) to root-create when
   nil and descendant-create when non-nil.
 - **Render path stays walk-on-every-request.** The website walks
   `docs/plans/` on each request. Verified by:
-  [`Server.index` in site.go](../../../internal/site/site.go)
+  [`Server.index` in site.go](../../../../internal/site/site.go)
   calls `walkPlans(s.plansPath)` per HTTP handler invocation
   (v0.1-design §3 codifies this as intent). No task in m1
   introduces caching, file watching, or in-memory build-up; that
@@ -281,12 +281,12 @@ plans.
   at t1 (Landed), no escalation.** The risk was that t1's
   uniqueness relaxation would surface downstream assumptions
   quietly relying on the constraint (in
-  [`internal/site/`](../../../internal/site/) render code or
+  [`internal/site/`](../../../../internal/site/) render code or
   test fixtures). The read path already built a slice per slug —
   verified by: [`loadActiveWorkInstances` in
-  site.go](../../../internal/site/site.go) appends per slug into
+  site.go](../../../../internal/site/site.go) appends per slug into
   a `map[string][]*ActiveWorkInstance`, and the template in
-  [`render.go`](../../../internal/site/render.go) ranges over
+  [`render.go`](../../../../internal/site/render.go) ranges over
   `.WorkInstances`. t1's implementing PR swept every read and
   write site consuming `work_instances.slug`; the relaxation
   landed without a downstream regression.
@@ -294,7 +294,7 @@ plans.
   rules — RESOLVED at t3 (Landed).** The risk was that t3's
   frontmatter spec edit, which consumer projects vendor, could
   ripple into adjacent rules. t3's implementing PR walked
-  [`shared.md`](../../../spec/planning/shared.md) for adjacent
+  [`shared.md`](../../../../spec/planning/shared.md) for adjacent
   references to frontmatter shape and kept the change purely
   additive; no breaking implication for vendored consumers
   surfaced (t4 P1 later added `related_prs` under the same
@@ -305,20 +305,20 @@ plans.
 Status-bearing or contract-bearing docs the milestone's tasks
 touch:
 
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — add `short_description` to the frontmatter field list (t3);
   add the optional, additive `related_prs` field adjacent to it
   (t4 P1).
-- [`../../../design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`../../../design/v0.1-design.md`](../../../../design/v0.1-design.md)
   — reflect the multi-work-instance schema relaxation (t1) and
   the API shape extension (t1, t2). Update on the same PR that
   lands the change. §7 "What the Website Renders" updated for
   inline per-node detail (t4 P1) and the `gh` auto-discovery
   source (t4 P2).
-- [`../../dev.md`](../../dev.md) — note that registration is
+- [`../../dev.md`](../../../dev.md) — note that registration is
   automatic; manual API calls become a fallback path (t2).
-- [`../../../AGENTS.md`](../../../AGENTS.md) and
-  [`../../agents/local/`](../../agents/local/) — add the
+- [`../../../AGENTS.md`](../../../../AGENTS.md) and
+  [`../../agents/local/`](../../../agents/local/) — add the
   auto-registration narration-handshake rule here (t2). It
   cannot live under `docs/agents/shared/`, which is vendored
   read-only; corrected at t2 drafting and carried in the t2
@@ -327,24 +327,24 @@ touch:
 ## Backlog Impact
 
 This milestone's terminal close-out PR **shifts** the
-[`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
+[`deterministic-interactive-registration`](../../../backlog.md#deterministic-interactive-registration)
 entry: its tripwire wording is reconciled to the locked m1-t2
 decision — observable best-effort is the accepted, vision-faithful
 posture, and achieving determinism is **not** a 1.0 requirement
 (its home stays the post-v0.2 `tool-originated-task-sessions`
 capability). The entry's framing changes; it stays Open — a
-`shift` per the [`backlog.md`](../../../spec/backlog.md) effect
+`shift` per the [`backlog.md`](../../../../spec/backlog.md) effect
 taxonomy, correcting drift between the entry and the t2 contract
 rather than introducing new scope. No backlog entry graduates,
 gets deleted, or is split. The
-[`repo-rooted-doc-links`](../../backlog.md#repo-rooted-doc-links)
+[`repo-rooted-doc-links`](../../../backlog.md#repo-rooted-doc-links)
 entry (created during parent-epic deliberation) is post-1.0
 work, not touched by m1.
 
 ## Out of Scope
 
 Section added to the milestone-doc shape (variance from
-[`milestone.md`](../../../spec/planning/milestone.md) required +
+[`milestone.md`](../../../../spec/planning/milestone.md) required +
 optional list) to record the boundary calls drawn from m1's
 original v0.2 candidate list.
 
@@ -353,14 +353,14 @@ original v0.2 candidate list.
   `m2`; the milestone homes were reworked when the new `m2`
   (in-root expanded view + roster) was drafted, and this piece
   re-homed to
-  [`workstream-tracker-1-0-m3`](README.md#milestone-structure).
+  [`workstream-tracker-1-0-m3`](../README.md#milestone-structure).
   Trade-off accepted: without it, v0.2's tree is still
   alphabetical and active work stays buried in noise across the
   forest.
 - **Richer work-instance states** (`awaiting-user`,
   `awaiting-external`, `backgrounded`). Re-homed with the
   on-box actor presence work to
-  [`workstream-tracker-1-0-m3`](README.md#milestone-structure).
+  [`workstream-tracker-1-0-m3`](../README.md#milestone-structure).
 - **Editorial fields beyond `short_description`:** owner, dates,
   dependencies, tags, acceptance criteria. Deferred until the
   read experience is solid.
@@ -374,14 +374,14 @@ original v0.2 candidate list.
 
 ## Related Docs
 
-- [`README.md`](README.md) — parent epic
+- [`README.md`](../README.md) — parent epic
   (`workstream-tracker-1-0`).
-- [`../../../design/vision.md`](../../../design/vision.md) —
+- [`../../../design/vision.md`](../../../../design/vision.md) —
   the long-term vision; m1's intent is anchored to it.
-- [`../../../design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`../../../design/v0.1-design.md`](../../../../design/v0.1-design.md)
   — the design v0.1 ships against; m1's tasks build on its data
   model and API shape.
-- [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md)
+- [`../../../spec/planning/milestone.md`](../../../../spec/planning/milestone.md)
   — the rules this milestone doc is structured against.
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — cross-level planning rules.

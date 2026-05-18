@@ -7,8 +7,8 @@ short_description: Automatic agent registration
 # Task — Automatic agent registration (workstream-tracker-1-0-m1-t2)
 
 Task plan for the second task of
-[`m1`](m1-v0-2.md) under the
-[workstream-tracker-1-0 epic](README.md). The paired scoping
+[`m1`](README.md) under the
+[workstream-tracker-1-0 epic](../README.md). The paired scoping
 deliberation (rejected alternatives, reality-check inputs) was
 retired in the m1 milestone-terminal close-out per the
 `spec/planning/milestone.md` batch-deletion convention and
@@ -16,7 +16,7 @@ survives in git history; this plan owns the durable contract,
 file inventory, validation surface, and risks. N = 1 — one
 phase, content absorbed inline; no separate phase plan files,
 per the plan-structure handoff resolved at t2 drafting and
-[`task-plan.md`](../../../spec/planning/task-plan.md) "N = 1 task
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "N = 1 task
 plan: phase content absorbed inline."
 
 ## Context
@@ -95,10 +95,10 @@ implementer's technique for making it hold.
   work-instance registration against a running server's
   `POST /work-instances`, consuming t1's exact-slug
   create-or-attach flow. Verified by:
-  [`internal/api/handlers.go:58-62`](../../../internal/api/handlers.go)
+  [`internal/api/handlers.go:58-62`](../../../../internal/api/handlers.go)
   (non-empty `exact_slug` selects create-or-attach and bypasses
   the root/descendant requirements) and
-  [`design/v0.1-design.md`](../../../design/v0.1-design.md) §4
+  [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §4
   exact-slug case.
 - **Inputs.** The canonical slug, the actor label, and the
   server base location, each supplied to the command as an
@@ -112,9 +112,9 @@ implementer's technique for making it hold.
   a generated per-session identifier; it must never default to
   the git user, because collapsing parallel agents onto one
   actor defeats the cross-agent-visibility goal. Verified by:
-  [`internal/api/api.go`](../../../internal/api/api.go)
+  [`internal/api/api.go`](../../../../internal/api/api.go)
   `RegisterRequest.Actor` (free string) and
-  [`internal/api/handlers.go:51-54`](../../../internal/api/handlers.go)
+  [`internal/api/handlers.go:51-54`](../../../../internal/api/handlers.go)
   (actor required, non-empty). The per-session id format and
   its reuse mechanism are named in the Naming section.
 - **Single-attempt best-effort, non-blocking.** The command
@@ -122,7 +122,7 @@ implementer's technique for making it hold.
   unreachable, non-success HTTP status, malformed response — it
   logs an explicit line and exits success; it never blocks,
   retries in a loop, or fails the session. Verified by:
-  [`m1-v0-2.md`](m1-v0-2.md) t2 "Preserves" (server
+  [`m1-v0-2.md`](README.md) t2 "Preserves" (server
   unreachability tolerated; session proceeds) and the planning
   spike, which exercised server-up (HTTP 201), server-down, and
   no-input paths and confirmed exit-success in every case.
@@ -130,18 +130,18 @@ implementer's technique for making it hold.
   same slug and actor while a prior registration is still active
   collapses to the existing work-instance (no duplicate row, no
   duplicate event), so restart/resume is safe. Verified by:
-  [`internal/api/handlers.go:226-234`](../../../internal/api/handlers.go)
+  [`internal/api/handlers.go:226-234`](../../../../internal/api/handlers.go)
   (the `(slug, actor, state = active)` idempotency check) and
-  [`design/v0.1-design.md`](../../../design/v0.1-design.md) §4
+  [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §4
   idempotency; the spike's repeat scenario returned the same
   work-instance id.
 - **First-registration safe.** When the slug has no prior
   work-instance, the command creates the slug's first one (the
   freshly-drafted-node case). Verified by:
-  [`design/v0.1-design.md`](../../../design/v0.1-design.md) §4
+  [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §4
   ("no precondition that a work-instance already exists for the
   slug") and the locked t1↔t2 cross-task decision in
-  [`m1-v0-2.md`](m1-v0-2.md) "Cross-Task Decisions."
+  [`m1-v0-2.md`](README.md) "Cross-Task Decisions."
 
 ### C2 — The grounded narration handshake
 
@@ -153,10 +153,10 @@ observed fact, not a prose success claim:
 - **Resolve.** The agent resolves the canonical slug from the
   prompt and the plan tree (the unavoidable cognition step,
   given the registration circularity). Verified by:
-  [`spec/planning/shared.md`](../../../spec/planning/shared.md)
+  [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
   "Plan-doc identity (slug)" (the slug is the authoritative
   identity, carried in plan-doc frontmatter) and
-  [`design/v0.1-design.md`](../../../design/v0.1-design.md) §3
+  [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §3
   (agents read plan files including the slug frontmatter).
 - **Confirm.** The agent states the resolved plan-doc path and
   the resolved slug for the human to confirm before proceeding.
@@ -169,7 +169,7 @@ observed fact, not a prose success claim:
   receipts; the handshake's value is that a present human can
   catch a missing or incongruent *fact*. This ties directly to
   the `validation-honesty` audit. Verified by:
-  [`docs/agents/local/self-review-catalog.md`](../../../docs/agents/local/self-review-catalog.md)
+  [`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md)
   (`validation-honesty`: a claim that a check ran is only valid
   if it ran end-to-end on the current state).
 - **Narrate failure explicitly.** If registration fails or the
@@ -179,7 +179,7 @@ observed fact, not a prose success claim:
   proceeds with task work. A silent skip is a contract
   violation. This ties to the `error-surfacing-user-mutations`
   audit. Verified by:
-  [`docs/agents/local/self-review-catalog.md`](../../../docs/agents/local/self-review-catalog.md)
+  [`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md)
   (`error-surfacing-user-mutations`: silent failure is the
   trap).
 - **Proceed.** Registration never blocks task work; whether it
@@ -191,7 +191,7 @@ That is faithful to the long-term vision, which explicitly
 accepts manual-for-some-sessions and prescribes "make the
 manual invocation cheap and habit-forming … and surface
 unregistered work somehow." Verified by:
-[`design/vision.md:171`](../../../design/vision.md) (the
+[`design/vision.md:171`](../../../../design/vision.md) (the
 "registration depends on user discipline for some kinds of
 sessions" feature-risk paragraph and its stated mitigation
 direction). The exact narration line wording is render-time UX
@@ -218,7 +218,7 @@ surface — each breaks silently if only one site honors it.
   task adds no endpoint, no request/response field, no schema
   change, and no plan-doc frontmatter change. It is a pure
   consumer of t1's exact-slug create-or-attach flow. Verified
-  by: [`m1-v0-2.md`](m1-v0-2.md) "Cross-Task Invariants"
+  by: [`m1-v0-2.md`](README.md) "Cross-Task Invariants"
   (backward-compatible API extension; spec changes stay
   additive).
 - **Missing/failed registration must be noticeable to the
@@ -259,7 +259,7 @@ the implementing PR carries the literal definitions.
 - **Server location.** Environment variable `WST_SERVER` (or an
   equivalent flag), defaulting to the local server's default
   address; aligns with the existing `PORT` default in
-  [`cmd/workstream-tracker/main.go`](../../../cmd/workstream-tracker/main.go).
+  [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go).
 
 These spellings are this plan's estimate of the command's
 surface; the implementing PR may adjust a spelling if a
@@ -272,14 +272,14 @@ the "Plan-to-PR Completion Gate."
 scope shape, not a binding rule. Implementation may revise them
 when a structural call requires deviating; deviations are called
 out in the implementing PR body per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Plan-to-PR Completion Gate."
 
 ### New
 
 - `cmd/workstream-tracker/` — a new `register` subcommand entry
   point (the binary is currently server-only; Verified by:
-  [`cmd/workstream-tracker/main.go`](../../../cmd/workstream-tracker/main.go),
+  [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go),
   no subcommand dispatch).
 - A thin internal HTTP client package (under `internal/`)
   that posts the exact-slug registration request and surfaces
@@ -292,10 +292,10 @@ out in the implementing PR body per
 
 ### Modify
 
-- [`docs/plans/workstream-tracker-1-0/m1-v0-2.md`](m1-v0-2.md)
+- [`docs/plans/workstream-tracker-1-0/m1-v0-2.md`](README.md)
   — the recorded milestone t2-contract amendment (executed in
   this plan PR; see "Milestone amendment" below).
-- [`docs/backlog.md`](../../backlog.md) — add two net-new
+- [`docs/backlog.md`](../../../backlog.md) — add two net-new
   entries (executed in this plan PR; see "Backlog Impact"
   below): `deterministic-interactive-registration` and
   `tool-originated-task-sessions`.
@@ -306,7 +306,7 @@ These are named here but **not edited in this plan PR**. They
 describe behavior that does not exist until the implementing PR
 ships, so editing them now would document an unbuilt system:
 
-- [`AGENTS.md`](../../../AGENTS.md) — the narration-handshake
+- [`AGENTS.md`](../../../../AGENTS.md) — the narration-handshake
   universal session rule. The auto-registration rule lives here
   and in the local agent-rules tree, **not** in the vendored
   shared modules, because `docs/agents/shared/**` is vendored
@@ -317,10 +317,10 @@ ships, so editing them now would document an unbuilt system:
   at t2 drafting).
 - `docs/agents/local/` — the repo-owned rule-additions surface
   for the narration rule.
-- [`docs/dev.md`](../../dev.md) — note that registration is
+- [`docs/dev.md`](../../../dev.md) — note that registration is
   automatic via the handshake and that a manual command
   invocation is the fallback path.
-- [`design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md)
   §3/§4 — reflect that registration is consumed via the new
   command through the narration handshake (no API/schema
   change; the §4 API shape is unchanged).
@@ -346,7 +346,7 @@ hard prohibition.
   "consumer-agnostic; no committed harness coupling"
   cross-cutting invariant: no harness-specific configuration is
   a committed tool artifact.
-- [`design/vision.md`](../../../design/vision.md) — an optional
+- [`design/vision.md`](../../../../design/vision.md) — an optional
   one-clause honesty clarification ("automatic only with a
   launch-supplied slug") was floated at t2 drafting as the
   maintainer's call, not assumed. This plan does not edit the
@@ -359,11 +359,11 @@ to `Landed`. The three canonical repo commands plus the
 interactive-lane exercise.
 
 - **Build.** `go build ./...` — every package compiles.
-  Verified by: [`docs/dev.md:84`](../../dev.md).
+  Verified by: [`docs/dev.md:84`](../../../dev.md).
 - **Vet.** `go vet ./...` — static checks pass. Verified by:
-  [`docs/dev.md:85`](../../dev.md).
+  [`docs/dev.md:85`](../../../dev.md).
 - **Tests.** `go test ./...` — full unit-test suite. Verified
-  by: [`docs/dev.md:86`](../../dev.md).
+  by: [`docs/dev.md:86`](../../../dev.md).
 - **Command behavior.** With a slug and actor supplied and the
   server up, the command registers a work-instance that becomes
   visible in the tree; with the server down, the command logs
@@ -407,7 +407,7 @@ request until the server under test was moved to a free port).
 ## Self-Review Audits
 
 Run at the implementing PR's commit boundaries, drawn from
-[`docs/agents/local/self-review-catalog.md`](../../../docs/agents/local/self-review-catalog.md):
+[`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md):
 
 - **`validation-honesty`** — the narration must report observed
   command/server output, not a prose success claim; a
@@ -426,19 +426,19 @@ Status-bearing or contract-bearing docs the implementing PR
 must update **in that same PR** (named here, not edited in this
 plan PR):
 
-- [`AGENTS.md`](../../../AGENTS.md) — add the narration-handshake
+- [`AGENTS.md`](../../../../AGENTS.md) — add the narration-handshake
   universal rule (in `AGENTS.md` + `docs/agents/local/`, not
   vendored shared, resolved at t2 drafting).
 - `docs/agents/local/` — the narration rule's repo-owned
   surface.
-- [`docs/dev.md`](../../dev.md) — registration is automatic via
+- [`docs/dev.md`](../../../dev.md) — registration is automatic via
   the handshake; the manual command invocation is the documented
   fallback.
-- [`design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md)
   §3/§4 — the registration-via-command narration reality (no
   API/schema change).
-- [`docs/plans/workstream-tracker-1-0/m1-v0-2.md`](m1-v0-2.md)
-  and [`docs/backlog.md`](../../backlog.md) — the t2-contract
+- [`docs/plans/workstream-tracker-1-0/m1-v0-2.md`](README.md)
+  and [`docs/backlog.md`](../../../backlog.md) — the t2-contract
   amendment and the backlog reconciliation are executed in
   **this** plan PR (see next sections), not deferred.
 
@@ -449,7 +449,7 @@ explicit deferral with rationale in this plan doc, per the
 
 ## Milestone amendment (executed in this plan PR)
 
-The milestone [`m1-v0-2.md`](m1-v0-2.md) t2 "End result"
+The milestone [`m1-v0-2.md`](README.md) t2 "End result"
 currently overclaims: agent sessions "register on start without
 manual API invocation" and markers are "trustworthy because
 registration is reliable." The unconditional form is false under
@@ -585,19 +585,19 @@ close-out and survives in git history.
 
 ## Related Docs
 
-- [`m1-v0-2.md`](m1-v0-2.md) — parent milestone (v0.2).
-- [`README.md`](README.md) — parent epic
+- [`m1-v0-2.md`](README.md) — parent milestone (v0.2).
+- [`README.md`](../README.md) — parent epic
   (`workstream-tracker-1-0`).
-- [`m1-t1-multi-wi-per-slug.md`](m1-t1-multi-wi-per-slug.md) —
+- [`m1-t1-multi-wi-per-slug.md`](t1-multi-wi-per-slug.md) —
   the task that landed the exact-slug create-or-attach flow this
   task consumes.
-- [`design/vision.md`](../../../design/vision.md) — the
+- [`design/vision.md`](../../../../design/vision.md) — the
   long-term vision; the feature-risk paragraph this task's
   handshake operationalizes.
-- [`design/v0.1-design.md`](../../../design/v0.1-design.md) —
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md) —
   §3 (plan tree / slug frontmatter) and §4 (the API and
   exact-slug create-or-attach flow).
-- [`spec/planning/task-plan.md`](../../../spec/planning/task-plan.md),
-  [`spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md),
+  [`spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — the plan-doc authoring rules this plan is structured
   against.

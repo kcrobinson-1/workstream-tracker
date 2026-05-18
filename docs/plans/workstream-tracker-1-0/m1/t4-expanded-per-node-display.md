@@ -45,14 +45,14 @@ task plan's `Status` is
 `Landed`: its orchestration contracts (Phase Contracts,
 Cross-Phase Decisions, Cross-Cutting Invariants, sequencing)
 locked at drafting (promotion-gate self-review per
-[`task-plan.md`](../../../spec/planning/task-plan.md) run), it
+[`task-plan.md`](../../../../spec/planning/task-plan.md) run), it
 flipped `Proposed → In progress` when P1's implementing PR
 (#15) merged, and reached `Landed` with **P2's** (the last
 phase's) implementing PR (#19). Both phase plans are `Landed`:
 P1
-[`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
+[`m1-t4-p1-inline-detail-render.md`](t4-p1-inline-detail-render.md)
 and P2
-[`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md) (P2
+[`m1-t4-p2-gh-discovery.md`](t4-p2-gh-discovery.md) (P2
 drafted just-in-time after P1 merged, resolved at t4 drafting).
 P2's PR was **t4's task-terminal** PR, **not** the
 m1-milestone-terminal PR; m1 has since reached terminal and its
@@ -74,18 +74,18 @@ additive and degrades gracefully when `gh` is unavailable.
 
 t4 ships in two phases (resolved at t4 drafting). Phase plans
 are separate files per
-[`task-plan.md`](../../../spec/planning/task-plan.md) path
+[`task-plan.md`](../../../../spec/planning/task-plan.md) path
 conventions.
 
 - **P1 — Inline per-node detail render.**
-  [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
+  [`m1-t4-p1-inline-detail-render.md`](t4-p1-inline-detail-render.md)
   (Status `Proposed`). Renders `LongDescription` inline; adds
   the optional `related_prs` frontmatter field, parses it, and
   renders author-curated PRs inline. Pure read-path, no external
   dependency. Independently shippable: the page surfaces
   descriptions and manually-listed PRs.
 - **P2 — `gh pr list` auto-discovery.**
-  [`m1-t4-p2-gh-discovery.md`](m1-t4-p2-gh-discovery.md)
+  [`m1-t4-p2-gh-discovery.md`](t4-p2-gh-discovery.md)
   (Status `Proposed`; drafted just-in-time now that P1's PR has
   merged, resolved at t4 drafting — spike run, promotion-gate
   self-review complete). Adds the codebase's first
@@ -116,7 +116,7 @@ drafting).
 Per-phase **WHAT** contracts. The **HOW** (file inventory,
 signatures, commands, validation gate) lives in each phase plan.
 Required for an N ≥ 2 task plan per
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc child
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc child
 contracts."
 
 ### P1 — Inline per-node detail render
@@ -161,7 +161,7 @@ contracts."
 ## Cross-Phase Decisions
 
 Decisions that thread both phases, owned here per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Cross-PR coordination" (the task plan coordinates phases; phase
 plans do not pre-lock cross-phase contracts). Deliberation and
 rejected alternatives were retired in the m1 milestone-terminal
@@ -205,9 +205,9 @@ Rules ≥ 2 sites must agree on, threading the phases.
   watching, or in-memory build-up is introduced in either phase;
   P2's `gh` call runs inside the existing per-request walk.
   `Verified by:`
-  [`Server.index` in site.go](../../../internal/site/site.go)
+  [`Server.index` in site.go](../../../../internal/site/site.go)
   calls `walkPlans` then `buildTree` per HTTP handler
-  invocation; [`m1-v0-2.md`](m1-v0-2.md) Cross-Task Invariant
+  invocation; [`m1-v0-2.md`](README.md) Cross-Task Invariant
   "Render path stays walk-on-every-request."
 - **Spec change is additive.** The `related_prs` addition
   introduces no breaking change for vendored spec consumers;
@@ -216,20 +216,20 @@ Rules ≥ 2 sites must agree on, threading the phases.
 - **Bare-bones render, no JavaScript.** Neither phase introduces
   client-side script or a non-`/` route; detail is static
   server-rendered HTML. `Verified by:`
-  [`render.go`](../../../internal/site/render.go) is one no-JS
-  `html/template`; [`design/v0.1-design.md`](../../../design/v0.1-design.md)
+  [`render.go`](../../../../internal/site/render.go) is one no-JS
+  `html/template`; [`design/v0.1-design.md`](../../../../design/v0.1-design.md)
   §7.
 
 ## Section variance
 
-Per [`shared.md`](../../../spec/planning/shared.md) "Section
+Per [`shared.md`](../../../../spec/planning/shared.md) "Section
 variance disclosure": as an N ≥ 2 orchestrating task plan this
 doc skips the task-plan-required inline *Contracts (full final
 shape)*, *Files to touch*, and a concrete *Validation Gate* —
 those genuinely don't apply at the orchestration layer and are
 delegated to the phase plans, with the N ≥ 2-required *Phase
 Contracts* section substituting for inline Contracts per
-[`task-plan.md`](../../../spec/planning/task-plan.md) "Required
+[`task-plan.md`](../../../../spec/planning/task-plan.md) "Required
 and optional sections." The PR introducing this doc repeats
 this disclosure in its body's Documentation section.
 
@@ -244,7 +244,7 @@ parent milestone t4 row is closed (see Terminal state).
 
 ## Terminal state
 
-Per [`task-plan.md`](../../../spec/planning/task-plan.md) "Task
+Per [`task-plan.md`](../../../../spec/planning/task-plan.md) "Task
 plan terminal state when N ≥ 2": this task plan is `Proposed`
 once its orchestration contracts lock (done at drafting). It
 flips `Proposed → In progress` when P1's implementing PR merges
@@ -252,7 +252,7 @@ flips `Proposed → In progress` when P1's implementing PR merges
 `In progress → Landed` with **P2's** implementing PR (the last
 phase). P2's PR — the **t4 task-terminal** PR — performs only
 the t4 close-out: flip P2 `→ Landed`, this task plan
-`→ Landed`, and the [`m1-v0-2.md`](m1-v0-2.md) t4 **row**
+`→ Landed`, and the [`m1-v0-2.md`](README.md) t4 **row**
 `→ Landed`.
 
 **P2's PR is NOT the m1-milestone-terminal PR.** m1 has tasks
@@ -260,7 +260,7 @@ beyond t4 — its Task Status table still carries
 `workstream-tracker-1-0-m1-t2` (Automatic agent registration)
 at `—` (undrafted), and t4 is the last task of the
 *read-experience track*, not of m1. Per
-[`task-plan.md`](../../../spec/planning/task-plan.md) path
+[`task-plan.md`](../../../../spec/planning/task-plan.md) path
 conventions, the `scoping/` subfolder's contents delete **in
 batch at the milestone-terminal PR** (all of m1's per-task
 scoping docs together), and any milestone Status / Backlog /
@@ -273,7 +273,7 @@ PR.
 
 ## Documentation currency
 
-- [`m1-v0-2.md`](m1-v0-2.md) — the parent milestone's Task
+- [`m1-v0-2.md`](README.md) — the parent milestone's Task
   Status t4 row mirrors this task plan's Status: set to
   `Proposed` (linked to this plan; the `—` legend means "not
   drafted," which no longer holds). Its deferred "Long-
@@ -287,7 +287,7 @@ PR.
 - `spec/planning/shared.md` — the additive `related_prs` field
   doc lands in P1's implementing PR (resolved at t4 drafting);
   owned by the P1 phase plan's Documentation currency.
-- [`design/v0.1-design.md`](../../../design/v0.1-design.md) §7 —
+- [`design/v0.1-design.md`](../../../../design/v0.1-design.md) §7 —
   "What the Website Renders" currently says the node shows only
   badge + label + marker. P1's PR updates §7 to reflect inline
   per-node detail; P2's PR notes the `gh` auto-discovery source.
@@ -296,7 +296,7 @@ PR.
 ## Backlog Impact
 
 None. No backlog entry graduates, is deleted, split, or shifts.
-The [`repo-rooted-doc-links`](../../backlog.md#repo-rooted-doc-links)
+The [`repo-rooted-doc-links`](../../../backlog.md#repo-rooted-doc-links)
 entry is post-1.0 and untouched by t4; the governance entries
 (`plan-doc-child-contracts`, `stub-children-on-parent-promotion`,
 `promotion-gate-explicit-checklist`) are unrelated to t4's
@@ -304,16 +304,16 @@ read-path surface.
 
 ## Related Docs
 
-- [`m1-v0-2.md`](m1-v0-2.md) — parent milestone; t4 task
+- [`m1-v0-2.md`](README.md) — parent milestone; t4 task
   contract and the deferred decision this task resolves.
-- [`README.md`](README.md) — parent epic.
-- [`m1-t4-p1-inline-detail-render.md`](m1-t4-p1-inline-detail-render.md)
+- [`README.md`](../README.md) — parent epic.
+- [`m1-t4-p1-inline-detail-render.md`](t4-p1-inline-detail-render.md)
   — P1 phase plan.
-- [`m1-t3-descriptive-labels.md`](m1-t3-descriptive-labels.md)
+- [`m1-t3-descriptive-labels.md`](t3-descriptive-labels.md)
   — t3 (Landed); supplies the `LongDescription` carry P1
   consumes.
-- [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+- [`../../../spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md)
   — the rules this plan is structured against.
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — cross-level planning rules; the `related_prs` spec edit
   lands in P1.

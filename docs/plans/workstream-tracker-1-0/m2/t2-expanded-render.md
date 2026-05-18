@@ -7,11 +7,11 @@ short_description: Nested collapsible per-node Status boxes inside the forest re
 # Task 2 (stub) — Expanded in-root nested-box render
 
 > **Parent-promotion stub.** Seeded from
-> [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md)
+> [`m2-expanded-view-and-roster.md`](README.md)
 > "Task Contracts" in the PR that flipped m2 to `Proposed`. Per
-> [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+> [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 > child contracts," this stub is exempt from the
-> [`task-plan.md`](../../../spec/planning/task-plan.md) "Required
+> [`task-plan.md`](../../../../spec/planning/task-plan.md) "Required
 > and optional sections" rule and from "Plans describe contracts,
 > not implementation" until this task's own `In draft` →
 > `Proposed` drafting session runs. It carries only the locked

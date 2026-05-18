@@ -7,11 +7,11 @@ short_description: Session roster (bound + unbound) with deliberately-unstructur
 # Task 4 (stub) — Session roster + work-item enrichment
 
 > **Parent-promotion stub.** Seeded from
-> [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md)
+> [`m2-expanded-view-and-roster.md`](README.md)
 > "Task Contracts" in the PR that flipped m2 to `Proposed`. Per
-> [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+> [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 > child contracts," this stub is exempt from the
-> [`task-plan.md`](../../../spec/planning/task-plan.md) "Required
+> [`task-plan.md`](../../../../spec/planning/task-plan.md) "Required
 > and optional sections" rule and from "Plans describe contracts,
 > not implementation" until this task's own `In draft` →
 > `Proposed` drafting session runs. It carries only the locked
@@ -39,7 +39,7 @@ still lists).
 placeholder); does not touch the forest region. Independent of
 t2/t3; ships in parallel with the t2 → t3 chain. Delivers the
 "every session can be accounted for" observability surface the
-[`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
+[`deterministic-interactive-registration`](../../../backlog.md#deterministic-interactive-registration)
 backlog entry's mitigation direction names.
 
 **Open HOW (decide at this task's drafting, per m2 Cross-Task

@@ -81,7 +81,7 @@ The original `m2` ("activity-first ordering") and `m3`
 estimates made before m1 landed. They are superseded here: the
 new `m2` is the in-root expanded view, doc-declared progress
 boxes, and session roster (drafted in
-[`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md));
+[`m2-expanded-view-and-roster.md`](m2/README.md));
 the across-roots tier ordering and cell-level actor presence
 the old estimates named are re-homed to a later milestone
 rather than lost.
@@ -108,7 +108,7 @@ rather than lost.
   instance support per slug, automatic agent registration,
   descriptive tree labels (with frontmatter `short_description`
   parsing as a phase), expanded per-node display. Full task
-  list and contracts in [`m1-v0-2.md`](m1-v0-2.md).
+  list and contracts in [`m1-v0-2.md`](m1/README.md).
 
 - `workstream-tracker-1-0-m2` (Proposed — task scope locked at
   4 tasks; parent-promotion stubs seeded). **v0.3 — In-root
@@ -122,7 +122,7 @@ rather than lost.
   roster lists bound + unbound active sessions with an
   expandable deliberately-unstructured-JSON detail view. Full
   task list and contracts in
-  [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md).
+  [`m2-expanded-view-and-roster.md`](m2/README.md).
 
 - `workstream-tracker-1-0-m3` (early estimate — scope not yet
   locked). **Activity-first forest ordering and richer actor
@@ -160,7 +160,7 @@ optional sections" and [`shared.md`](../../../spec/planning/shared.md)
   `short_description`, expanded per-node detail) and an agent
   dogfood loop that's trustworthy (multi-work-instance support
   per slug, automatic registration). Task-level breakdown in
-  [`m1-v0-2.md`](m1-v0-2.md).
+  [`m1-v0-2.md`](m1/README.md).
 - **Interfaces.** Establishes the `short_description`
   frontmatter field and parsed body that m3's cell rendering
   consumes. Produces a render path that supports multi-WI per
@@ -244,7 +244,7 @@ once the surface area is clearer.
   listing bound + unbound active sessions so every session
   *can* be accounted for — **is a committed 1.0 goal**,
   delivered by `m2`
-  ([`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md)).
+  ([`m2-expanded-view-and-roster.md`](m2/README.md)).
   The **triage *action*** (acting on an unbound session to
   promote it into the tree or dismiss it) is **deferred past
   1.0**: the roster makes unbound work visible; deciding its
@@ -361,7 +361,7 @@ drafted milestone doc (pending review); m3 and the final
 milestone remain estimates pending their planning sessions.
 
 - **m1**: 4 tasks. Landed (all four tasks complete). See
-  [`m1-v0-2.md`](m1-v0-2.md).
+  [`m1-v0-2.md`](m1/README.md).
 - **m2**: 4 tasks, scope locked (Proposed; stubs seeded): site skeleton
   (two-region shell); expanded nested-box render; doc-declared
   progress stages (spec-first); session roster + work-item
@@ -369,7 +369,7 @@ milestone remain estimates pending their planning sessions.
   shell so t2/t4 build into independently-owned regions in
   parallel; t2/t3/t4 each plausibly N ≥ 2, phase splits
   re-derived at task drafting. See
-  [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md).
+  [`m2-expanded-view-and-roster.md`](m2/README.md).
 - **m3**: estimate pending the m3 milestone-drafting session.
   Re-homed deferred pieces: across-roots tier classification
   and sort, collapse of inactive branches, on-box actor-icon
@@ -381,7 +381,7 @@ milestone remain estimates pending their planning sessions.
 
 ## Related Docs
 
-- [`m1-v0-2.md`](m1-v0-2.md) — m1 milestone doc (drafted,
+- [`m1-v0-2.md`](m1/README.md) — m1 milestone doc (drafted,
   scope locked).
 - [`../../../design/vision.md`](../../../design/vision.md) —
   the long-term vision; this epic's scope decisions cite it

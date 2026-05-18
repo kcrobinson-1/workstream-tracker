@@ -151,9 +151,9 @@ Verified by:
 (the rule being narrowed);
 [`../../../spec/planning/shared.md:113-119`](../../../spec/planning/shared.md)
 (slug immutability/identity the narrowing preserves);
-[`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md:113-142`](../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md)
+[`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md:113-142`](../workstream-tracker-1-0/m1/t1-multi-wi-per-slug.md)
 (exact-slug create-or-attach flow);
-[`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md:377-389`](../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md)
+[`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md:377-389`](../workstream-tracker-1-0/m1/t1-multi-wi-per-slug.md)
 (m1-t1 leaves stub-seeding to this entry, not replacing the
 flow).
 
@@ -406,7 +406,7 @@ no-clobber rule. Verified by:
 - [`../promotion-gate-explicit-checklist/README.md`](../promotion-gate-explicit-checklist/README.md)
   — the spec-prose-only gate-edit precedent this plan mirrors in
   shape and cite-by-name discipline.
-- [`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md`](../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md)
+- [`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md`](../workstream-tracker-1-0/m1/t1-multi-wi-per-slug.md)
   — the landed exact-slug create-or-attach path C2 depends on,
   and whose review captured this entry.
 - [`../workstream-tracker-1-0/README.md`](../workstream-tracker-1-0/README.md)

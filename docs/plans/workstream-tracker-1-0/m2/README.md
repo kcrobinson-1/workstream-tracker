@@ -9,7 +9,7 @@ short_description: In-root expanded view, doc-declared progress boxes, and a ses
 ## Status
 
 `Proposed`. Drafting is complete and the
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 `In draft` → `Proposed` promotion gate" was walked before this
 flip: read end-to-end for cross-section coherence; Task
 Contracts decision-complete (no deferral names this milestone
@@ -21,12 +21,12 @@ milestone.md's optional list; no content descended to
 implementation prescription. The child set is **locked at four
 tasks**, and the PR that carries this flip seeds their
 parent-promotion stubs per
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts":
-[`m2-t1`](m2-t1-site-skeleton.md),
-[`m2-t2`](m2-t2-expanded-render.md),
-[`m2-t3`](m2-t3-doc-declared-stages.md),
-[`m2-t4`](m2-t4-session-roster.md).
+[`m2-t1`](t1-site-skeleton.md),
+[`m2-t2`](t2-expanded-render.md),
+[`m2-t3`](t3-doc-declared-stages.md),
+[`m2-t4`](t4-session-roster.md).
 
 **Target mockup approved; the "how to get there" gate is
 resolved.** The finished-page target — plan-tree forest and
@@ -34,7 +34,7 @@ session roster **side-by-side** (forest ~2/3, roster ~1/3), a
 single page scroll with the roster placed to be visible
 without scrolling when window height allows, and the
 stacked-row narrow-window degrade — is **approved**:
-[`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg).
+[`design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg).
 The mockup's forest renders **no activity-tier sections**
 (Active / In-flight / Landed & Abandoned); that across-roots
 tier grouping is the re-homed m3 work, not m2 (see Out of
@@ -59,7 +59,7 @@ later milestone; the parent epic's Milestone Structure,
 Milestone Contracts, and Sizing are reworked in the same change
 that creates this doc, and the epic's "Triage zone in 1.0?"
 open question is resolved here (see Backlog Impact and the epic
-[`README.md`](README.md)).
+[`README.md`](../README.md)).
 
 ## Goal
 
@@ -78,7 +78,7 @@ invariant):
    active-work surface, each box carrying its own Status, each
    collapsible — replacing v0.1's flat nested-bullet list.
    Conveyed by the mockup
-   [`design/workstreams-view.svg`](../../../design/workstreams-view.svg)
+   [`design/workstreams-view.svg`](../../../../design/workstreams-view.svg)
    ("ACTIVE WORK" card).
 2. **Progress boxes driven by the doc.** Each node renders a
    row of progress boxes whose count and order come from the
@@ -110,22 +110,22 @@ the walk-on-every-request render path is unchanged.
 
 | Slug                              | Title                                                | Status |
 |-----------------------------------|------------------------------------------------------|--------|
-| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](m2-t1-site-skeleton.md) |
-| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [In draft (stub)](m2-t2-expanded-render.md) |
-| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](m2-t3-doc-declared-stages.md) |
-| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](m2-t4-session-roster.md) |
+| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
+| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [In draft (stub)](t2-expanded-render.md) |
+| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
+| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](t4-session-roster.md) |
 
-t1 ([`m2-t1-site-skeleton.md`](m2-t1-site-skeleton.md)) is
+t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
 `Landed` (drafted, promoted, and implemented — the two-region
 shell shipped); t2–t4 remain seeded parent-promotion
 **stubs** (`slug`
 + `Status: In draft` + inherited WHAT contract) — not yet
 drafted plans. Each not-yet-drafted task's full HOW is scoped
 just-in-time at its own drafting session per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Just-in-time scoping and plan drafting"; the stubs are exempt
 from the required-sections rule until then per
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts." The Task Contracts below are the locked WHAT
 each stub inherited.
 
@@ -141,7 +141,7 @@ flowchart LR
 
 Task numbering reflects intended ship order, **not** strict
 dependency (per
-[`milestone.md`](../../../spec/planning/milestone.md) the graph
+[`milestone.md`](../../../../spec/planning/milestone.md) the graph
 is authoritative for parallelism; the prose carries rationale):
 
 - **t1 first (site skeleton).** Ships the approved two-region
@@ -168,7 +168,7 @@ is authoritative for parallelism; the prose carries rationale):
 
 **Level-picker note (records the classification so a reviewer
 need not re-flag it).** Per
-[`task-plan.md`](../../../spec/planning/task-plan.md) the
+[`task-plan.md`](../../../../spec/planning/task-plan.md) the
 level picker is independent value vs. sequence-step, and the
 recurring trap is mis-classification in *either* direction. t1
 is a thin but genuine task, not over-decomposition: it ships
@@ -185,7 +185,7 @@ re-home. t2, t3, t4 carry independent stakeholder-facing value
 in the usual sense. Per-task phase splits (t2, t3, t4 each
 plausibly N ≥ 2) are estimates re-derived at task-drafting
 time per
-[`milestone.md`](../../../spec/planning/milestone.md) "PR-count
+[`milestone.md`](../../../../spec/planning/milestone.md) "PR-count
 predictions are not contracts" — see Cross-Task Decisions.
 
 ## Task Contracts
@@ -195,9 +195,9 @@ preserves. The **HOW** (file inventory, frontmatter-field
 spelling, template structure, schema/column decisions,
 validation gate) lives in each task's plan when it drafts.
 Required-when-locked section per
-[`milestone.md`](../../../spec/planning/milestone.md) "Required
+[`milestone.md`](../../../../spec/planning/milestone.md) "Required
 and optional sections" and
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
+[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts"; presented here as the proposed contract
 pending review (Status section above).
 
@@ -224,18 +224,18 @@ any per-task drafting brushes against these.
   shell, the region boundary, or a sibling's region — a PR that
   does is reworking another task's surface and is reviewer-flag.
   Both regions share one visual vocabulary anchored to
-  [`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg);
+  [`design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg);
   neither region invents a divergent card/box/spacing/type
   language. Verified by: t1 (PR #26) made this **file-enforced**
-  — [`render.go`](../../../internal/site/render.go) is the
+  — [`render.go`](../../../../internal/site/render.go) is the
   shell (the `.layout` container + `{{template "forest" .}}` /
   `{{template "roster" .}}` composition, one parsed `indexTmpl`
-  tree), [`forest.go`](../../../internal/site/forest.go) owns
+  tree), [`forest.go`](../../../../internal/site/forest.go) owns
   the forest/`node` region (t2's surface), and
-  [`roster.go`](../../../internal/site/roster.go) owns the
+  [`roster.go`](../../../../internal/site/roster.go) owns the
   roster region (t4's surface); a later-task diff crossing
   those file boundaries is the reviewer-flag signal.
-  [`Server.index` in site.go](../../../internal/site/site.go)
+  [`Server.index` in site.go](../../../../internal/site/site.go)
   is the single `/` handler.
 - **Opposite spec postures are intentional — do not
   homogenize.** t3 *tightens* the spec (a doc must be able to
@@ -252,15 +252,15 @@ any per-task drafting brushes against these.
   deferred *on the assumption* node-level actor tags remain
   present. Every task that touches the render path preserves
   the existing per-node actor-marker render. Verified by:
-  [the `node` template in forest.go](../../../internal/site/forest.go)
+  [the `node` template in forest.go](../../../../internal/site/forest.go)
   ranges `.WorkInstances` into `actor-marker` spans (relocated
   unedited from `render.go` by t1 PR #26);
-  [`buildTree` in tree.go](../../../internal/site/tree.go)
+  [`buildTree` in tree.go](../../../../internal/site/tree.go)
   attaches `active[d.Slug]` to each node.
 - **Render path stays walk-on-every-request.** No task
   introduces caching, file-watching, or in-memory build-up.
   Verified by:
-  [`Server.index` in site.go](../../../internal/site/site.go)
+  [`Server.index` in site.go](../../../../internal/site/site.go)
   calls `walkPlans` and `loadActiveWorkInstances` per HTTP
   request; this milestone preserves that (parent-epic and m1
   cross-cutting invariant).
@@ -272,21 +272,21 @@ any per-task drafting brushes against these.
   check (parent-epic Risk Register mitigation). Verified by:
   the optional/additive precedent for `short_description` and
   `related_prs` in
-  [`shared.md` "Plan-doc identity (slug)"](../../../spec/planning/shared.md).
+  [`shared.md` "Plan-doc identity (slug)"](../../../../spec/planning/shared.md).
 - **Stub render case is preserved, not pre-empted.** A
   `slug` + `Status: In draft` stub remains a valid render with
   no error/skip; t3 makes it render exactly the Drafting box.
   Seeding a stub still creates no work-instance and does not
   resolve the deferred triage-*action* question. Verified by:
   [`stub-children-on-parent-promotion` README "Stub ≠
-  work-instance"](../../stub-children-on-parent-promotion/README.md).
+  work-instance"](../../../stub-children-on-parent-promotion/README.md).
 
 ## Cross-Task Decisions
 
 **RESOLVED — page layout and the forest/roster composition
 (locked at milestone planning).** Step 1: the finished-page
 target is approved
-([`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg))
+([`design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg))
 — forest (~2/3) and roster (~1/3) **side-by-side**, single
 page scroll, roster placed to be visible without scrolling
 when window height allows, stacked-row narrow-window degrade,
@@ -320,7 +320,7 @@ behind t1) is recorded in Sequencing and accepted.
 No further cross-task contract requires locking at
 milestone-planning time. The following are recorded
 as deliberately deferred to the resolving task's drafting per
-[`milestone.md`](../../../spec/planning/milestone.md) "Defer
+[`milestone.md`](../../../../spec/planning/milestone.md) "Defer
 rather than over-resolve," each with the code surface where the
 decision will be grounded.
 
@@ -333,8 +333,8 @@ decision will be grounded.
   decision against the v0.2 no-JS posture explicitly rather
   than regress it silently. Verified by:
   [the v0.2 no-JS decision in m1-v0-2.md "Cross-Task
-  Decisions"](m1-v0-2.md);
-  [the `node` template in forest.go](../../../internal/site/forest.go)
+  Decisions"](../m1/README.md);
+  [the `node` template in forest.go](../../../../internal/site/forest.go)
   (t1 PR #26 split the regions into their own files; t2 changes
   the forest region's node render here, not in the `render.go`
   shell).
@@ -345,14 +345,14 @@ decision will be grounded.
   (a doc declares its own progress boxes; box count + order
   come from the doc; all node levels; stub ⇒ Drafting only).
   The spelling is deferred to t3 scoping under
-  [`shared.md`](../../../spec/planning/shared.md) "Decompose
+  [`shared.md`](../../../../spec/planning/shared.md) "Decompose
   options into shapes before analyzing" and the exact-match
   label discipline (do not invent the token here). Grounded
   against:
-  [`parsePlanDoc`/`parsedDoc` in walker.go](../../../internal/site/walker.go)
+  [`parsePlanDoc`/`parsedDoc` in walker.go](../../../../internal/site/walker.go)
   (goldmark-meta frontmatter read this field is added to);
   the vision's own open question on prose-to-data extraction in
-  [`design/vision.md` §7](../../../design/vision.md).
+  [`design/vision.md` §7](../../../../design/vision.md).
 - **Where richer session data is stored/read (decide when t4
   drafts).** A free-form `metadata` JSON column already exists
   on `events` but not on `work_instances`, and
@@ -361,15 +361,15 @@ decision will be grounded.
   additive `work_instances` column is a HOW call for t4,
   bounded by the additive-spec/additive-schema invariant.
   Verified by:
-  [`schema.go`](../../../internal/db/schema.go) (`events` has
+  [`schema.go`](../../../../internal/db/schema.go) (`events` has
   `metadata`, `work_instances` does not);
-  [`loadActiveWorkInstances` in site.go](../../../internal/site/site.go)
+  [`loadActiveWorkInstances` in site.go](../../../../internal/site/site.go)
   (selects `slug, actor` only, filters `state = active`,
   drops nothing about unbound at query time — the drop is in
   `buildTree`);
-  [`RegisterRequest.Metadata` in api.go](../../../internal/api/api.go)
+  [`RegisterRequest.Metadata` in api.go](../../../../internal/api/api.go)
   and
-  [`registerclient.Register` in client.go](../../../internal/registerclient/client.go)
+  [`registerclient.Register` in client.go](../../../../internal/registerclient/client.go)
   (client currently sends only `{exact_slug, actor}`).
 - **Per-task phase splits (decide at each task's drafting).**
   t2 (nested-box render, then the narrow-window degrade), t3
@@ -378,7 +378,7 @@ decision will be grounded.
   plausibly resolve to N ≥ 2. t1 (site skeleton) is most likely
   N = 1. This is an estimate, not a contract, and
   the split is re-derived at task-drafting per
-  [`task-plan.md`](../../../spec/planning/task-plan.md)
+  [`task-plan.md`](../../../../spec/planning/task-plan.md)
   "PR-count predictions need a branch test."
 
 ## Cross-Task Risks
@@ -433,7 +433,7 @@ plans.
 Status-bearing or contract-bearing docs this milestone's tasks
 and the same-change epic rework touch:
 
-- [`README.md`](README.md) — parent epic. Reworked in the
+- [`README.md`](../README.md) — parent epic. Reworked in the
   change that creates this doc: Milestone Structure and
   Milestone Contracts supersede the early-estimate `m2`/`m3`;
   the across-roots tier ordering and cell-level actor presence
@@ -441,7 +441,7 @@ and the same-change epic rework touch:
   "Triage zone in 1.0?" open question resolved (roster is a
   committed 1.0 goal via this m2; triage *action* deferred
   past 1.0).
-- [`../../../design/vision.md`](../../../design/vision.md) §4
+- [`../../../design/vision.md`](../../../../design/vision.md) §4
   — the narrow "Triage zone for uncategorized work" paragraph
   is replaced with the broader **session presence** concept
   (principle: *every session can be accounted for* — opt-in,
@@ -449,28 +449,28 @@ and the same-change epic rework touch:
   lists bound + unbound sessions; triage demoted to a deferred
   future *action*). Same change as this doc per the
   parent-doc-currency rule.
-- [`m1-v0-2.md`](m1-v0-2.md) — its "Out of Scope" section
+- [`m1-v0-2.md`](../m1/README.md) — its "Out of Scope" section
   points "Activity-first ordering → m2" and "Richer
   work-instance states → m3"; those pointers are reconciled to
   the reworked milestone homes in the same change (a
   cross-reference currency fix to a Landed sibling, not a
   scope change).
-- [`../../../spec/planning/`](../../../spec/planning/) — t3
+- [`../../../spec/planning/`](../../../../spec/planning/) — t3
   adds the optional/additive doc-declared-stages frontmatter
   affordance to the plan-doc spec (field documented adjacent
   to `short_description`/`related_prs` in
-  [`shared.md`](../../../spec/planning/shared.md), exact home
+  [`shared.md`](../../../../spec/planning/shared.md), exact home
   decided at t3 drafting).
-- [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md)
+- [`../../../spec/planning/milestone.md`](../../../../spec/planning/milestone.md)
   — "Out of Scope" is now used by two milestone docs
   (`m1-v0-2.md` and this doc); per
-  [`shared.md`](../../../spec/planning/shared.md) "Section
+  [`shared.md`](../../../../spec/planning/shared.md) "Section
   variance disclosure" recurrence rule, the same change that
   adds the second occurrence updates milestone.md's
   "Required and optional sections" to list "Out of Scope" as
   optional-when-applicable rather than letting the variance
   accrete as one-off prose.
-- [`../../../design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`../../../design/v0.1-design.md`](../../../../design/v0.1-design.md)
   — §7 "What the Website Renders" is updated by t1–t4 on the
   PRs that land them (two-region shell, expanded nested render,
   doc-driven progress boxes, roster surface) per the
@@ -479,12 +479,12 @@ and the same-change epic rework touch:
 
 ## Backlog Impact
 
-Per [`spec/backlog.md`](../../../spec/backlog.md) effect
+Per [`spec/backlog.md`](../../../../spec/backlog.md) effect
 taxonomy (graduate / delete / split / shift). This milestone is
 framed directly as a milestone of the parent epic and does not
 graduate from a backlog entry.
 
-- [`deterministic-interactive-registration`](../../backlog.md#deterministic-interactive-registration)
+- [`deterministic-interactive-registration`](../../../backlog.md#deterministic-interactive-registration)
   — **referenced as a deliberated intersection, effect
   decided when t4 drafts.** t4's bound+unbound roster delivers
   the "surface unregistered/unbound work in the view"
@@ -499,9 +499,9 @@ graduate from a backlog entry.
   entry stays Open and its integration-milestone tripwire is
   untouched by this milestone. **Named open question:** the
   precise effect (shift vs. reference-only).
-- [`stale-skeleton-on-parent-reopen`](../../backlog.md#stale-skeleton-on-parent-reopen),
-  [`repo-rooted-doc-links`](../../backlog.md#repo-rooted-doc-links),
-  [`tool-originated-task-sessions`](../../backlog.md#tool-originated-task-sessions)
+- [`stale-skeleton-on-parent-reopen`](../../../backlog.md#stale-skeleton-on-parent-reopen),
+  [`repo-rooted-doc-links`](../../../backlog.md#repo-rooted-doc-links),
+  [`tool-originated-task-sessions`](../../../backlog.md#tool-originated-task-sessions)
   — not touched by this milestone (open, post-1.0 or
   unrelated). No backlog entry graduates, gets deleted, or is
   split by this milestone doc.
@@ -509,9 +509,9 @@ graduate from a backlog entry.
 ## Out of Scope
 
 Section added to the milestone-doc shape (variance from
-[`milestone.md`](../../../spec/planning/milestone.md) required
+[`milestone.md`](../../../../spec/planning/milestone.md) required
 + optional list, disclosed per
-[`shared.md`](../../../spec/planning/shared.md) "Section
+[`shared.md`](../../../../spec/planning/shared.md) "Section
 variance disclosure"; this is the recurrence that triggers the
 milestone.md list update noted in Documentation Currency).
 Boundary calls the parent-epic rework re-homes rather than
@@ -543,27 +543,27 @@ loses:
 
 ## Related Docs
 
-- [`README.md`](README.md) — parent epic
+- [`README.md`](../README.md) — parent epic
   (`workstream-tracker-1-0`), reworked in the same change.
-- [`m1-v0-2.md`](m1-v0-2.md) — prior milestone (Landed); this
+- [`m1-v0-2.md`](../m1/README.md) — prior milestone (Landed); this
   milestone preserves its labels, per-node detail, and
   multi-work-instance schema, and reconciles its Out-of-Scope
   pointers.
-- [`../../stub-children-on-parent-promotion/README.md`](../../stub-children-on-parent-promotion/README.md)
+- [`../../stub-children-on-parent-promotion/README.md`](../../../stub-children-on-parent-promotion/README.md)
   — the landed stub render case (`slug` + `Status: In draft`)
   t3's Drafting-box-only behavior anchors to.
-- [`../../../design/vision.md`](../../../design/vision.md) —
+- [`../../../design/vision.md`](../../../../design/vision.md) —
   the long-term vision; §4 is reworked here (session presence),
   and §2/§3 frame the roster and progress-cell concepts this
   milestone delivers a first cut of.
-- [`../../../design/workstreams-view.svg`](../../../design/workstreams-view.svg)
+- [`../../../design/workstreams-view.svg`](../../../../design/workstreams-view.svg)
   — the strawman mockup conveying the in-root expanded layout
   and progress-box row.
-- [`../../../design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`../../../design/v0.1-design.md`](../../../../design/v0.1-design.md)
   — the design v0.1 ships against; §5 (data model) and §7
   (render scope) are the surfaces this milestone extends.
-- [`../../../spec/planning/milestone.md`](../../../spec/planning/milestone.md)
+- [`../../../spec/planning/milestone.md`](../../../../spec/planning/milestone.md)
   — the rules this milestone doc is structured against.
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — cross-level planning rules (promotion gate, parent-doc
   child contracts, additive-spec posture).

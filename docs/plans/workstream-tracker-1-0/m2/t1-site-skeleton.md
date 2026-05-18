@@ -11,7 +11,7 @@ short_description: Two-region page shell — existing forest in the forest regio
 The workstream-tracker page today renders one thing: the
 plan-tree forest, stacked roots in a single centered
 `max-width: 60rem` column. The approved m2 target
-([`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg))
+([`design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg))
 is a two-region page — a tall plan-tree **forest** on the left
 (~2/3) and a **session roster** on the right (~1/3), one page
 scroll, the roster sitting at the top so it shows without
@@ -41,7 +41,7 @@ that is byte-for-intent the same as today.
 This is an **N = 1** task plan; phase content is absorbed
 inline. It is a **narrow-surface** plan and deliberately skips
 the separate scoping doc per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Narrow-surface plans may skip the scoping doc": it touches a
 single subsystem (one UI template + its CSS), an estimated 1
 code file, introduces no new public-API contract, introduces no
@@ -55,7 +55,7 @@ inputs the gate protects are absorbed inline in the
 **Reality-check inputs** section below (plus per-contract
 `Verified by:` citations), not dropped.
 
-The [`task-plan.md`](../../../spec/planning/task-plan.md)
+The [`task-plan.md`](../../../../spec/planning/task-plan.md)
 `In draft → Proposed` promotion-gate self-review has been run:
 read end-to-end for cross-section coherence; Contracts walked
 for deferral phrases (the only deferrals — exact CSS technique
@@ -92,7 +92,7 @@ placeholder.
 
 The narrow-surface carve-out compresses the scoping doc's
 reality-check pass into this section per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Verification protocols are not optional under this carve-out."
 Each load-bearing codebase claim below was checked against the
 current branch with a one-sentence falsifier; the per-contract
@@ -101,7 +101,7 @@ current branch with a one-sentence falsifier; the per-contract
 - **`indexTmpl` is the single page template and a single
   centered column.** Falsifier: "there is more than one
   page template, or the body is already multi-column." Checked:
-  [`render.go`](../../../internal/site/render.go) defines exactly
+  [`render.go`](../../../../internal/site/render.go) defines exactly
   one `template.Must(... "index" ...)`; `<body>` is one
   `{{range .Roots}}`/`{{else}}` block inside
   `body { … max-width: 60rem; margin: 0 auto }`. False —
@@ -114,7 +114,7 @@ current branch with a one-sentence falsifier; the per-contract
 - **The forest render to preserve is the Roots/empty block +
   `node` template.** Falsifier: "node rendering lives outside
   `indexTmpl` (a partial/file include)." Checked:
-  [`render.go`](../../../internal/site/render.go) — the
+  [`render.go`](../../../../internal/site/render.go) — the
   `{{if .Roots}} … {{range .Roots}}<div class="root">` block,
   the `{{else}}<p class="empty">No plan-tree roots found …`
   branch, and `{{define "node"}}` (actor markers ranging
@@ -124,10 +124,10 @@ current branch with a one-sentence falsifier; the per-contract
 - **The data path is untouched by a layout-only change.**
   Falsifier: "the roster needs request-time data, so a
   handler/query/`indexData` change is unavoidable." Checked:
-  [`site.go`](../../../internal/site/site.go) `Server.index`
+  [`site.go`](../../../../internal/site/site.go) `Server.index`
   walks plans + loads work-instances and calls
   `renderIndex(w, indexData{Roots, PlansPath})`;
-  [`render.go`](../../../internal/site/render.go) `indexData`
+  [`render.go`](../../../../internal/site/render.go) `indexData`
   has only `Roots` + `PlansPath`. The roster placeholder is
   static markup needing no data. False — t1 is template/CSS
   only; `site.go`/`tree.go`/`walker.go` stay untouched.
@@ -135,7 +135,7 @@ current branch with a one-sentence falsifier; the per-contract
   scroll/stack behavior.** Falsifier: "the SVG doesn't actually
   say one-scrollbar / roster-top-right / stacked-narrow."
   Checked:
-  [`workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg)
+  [`workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg)
   line 29 states it verbatim; the narrow-window note states
   region stacking, mobile out of scope. False — the shell
   behavior is anchored, not invented.
@@ -147,7 +147,7 @@ current branch with a one-sentence falsifier; the per-contract
 - **A render-test harness already exists to extend.** Falsifier:
   "there is no render test file / no `renderIndex` test entry
   point." Checked:
-  [`render_test.go`](../../../internal/site/render_test.go) has
+  [`render_test.go`](../../../../internal/site/render_test.go) has
   a `renderTree` helper calling
   `renderIndex(&buf, indexData{Roots, PlansPath})` and existing
   cases; the new region/placeholder cases extend it. False — the
@@ -162,7 +162,7 @@ current branch with a one-sentence falsifier; the per-contract
 
 Final shapes. Estimate-shaped sections (Files to touch, Commit
 Boundaries) are labeled as estimates per
-[`shared.md`](../../../spec/planning/shared.md) "Plan content is
+[`shared.md`](../../../../spec/planning/shared.md) "Plan content is
 a mix of rules and estimates."
 
 These bullets state the observable end-state each surface must
@@ -179,9 +179,9 @@ mechanism.
   approximate (the design is `~2/3` / `~1/3`, not pixel-exact);
   the contract is "forest is the dominant left region, roster is
   the secondary right region," anchored to
-  [`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg).
+  [`design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg).
   `Verified by:`
-  [`render.go`](../../../internal/site/render.go) owns the
+  [`render.go`](../../../../internal/site/render.go) owns the
   **shell** template — page chrome, the `.layout` container, and
   the `{{template "forest" .}}` / `{{template "roster" .}}`
   composition — and the shared `indexData` / `renderIndex` /
@@ -196,7 +196,7 @@ mechanism.
   visible without scrolling when the window is tall enough — it
   is not vertically centered or pushed down by the forest's
   height. `Verified by:`
-  [`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg)
+  [`design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg)
   line 29 ("One page, one scrollbar. … Roster sits top-right so
   it shows without scrolling; the tall forest is what you scroll
   through.").
@@ -214,12 +214,12 @@ mechanism.
   per-row element to collide. `Verified by:` the parent
   milestone Task Contract for t1 ("The narrow-window
   *per-node-row* degrade is **not** here … it is t2's") and
-  [`render.go`](../../../internal/site/render.go) — the existing
+  [`render.go`](../../../../internal/site/render.go) — the existing
   `node` template renders the badge/label/markers left-to-right
   with no right-aligned column.
 - The single visual vocabulary (card/box/spacing/type language)
   is anchored to
-  [`design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg);
+  [`design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg);
   the shell does not invent a divergent panel/card language, and
   the roster placeholder uses the same panel framing the design
   shows for the roster column. `Verified by:` the
@@ -231,7 +231,7 @@ mechanism.
 
 *Contract revised after PR #25 (folded into the open
 implementing PR #26 per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Plan-to-PR Completion Gate" — a rule deviation rewrites the
 plan rule in the same PR). The original plan put all three
 concerns in `render.go`; this revision makes the milestone's
@@ -293,7 +293,7 @@ contend on `render.go` or each other.*
   markers, long-description, or related-PR rendering**. The
   `node` template body is not edited at all — only relocated.
   `Verified by:`
-  [`forest.go`](../../../internal/site/forest.go) — the
+  [`forest.go`](../../../../internal/site/forest.go) — the
   `forest`/`node` defines whose markup must equal the prior
   `render.go` output; the milestone names "no node-shape change
   — that is t2," and the byte-identity node test
@@ -303,7 +303,7 @@ contend on `render.go` or each other.*
   shows the existing `No plan-tree roots found at <code>…</code>`
   message (not a blank region), while the roster region still
   shows its placeholder. `Verified by:`
-  [`forest.go`](../../../internal/site/forest.go) `{{else}}`
+  [`forest.go`](../../../../internal/site/forest.go) `{{else}}`
   branch in the `forest` define — the empty-state markup that
   survives the relocation.
 - All existing CSS classes the forest render depends on
@@ -314,13 +314,13 @@ contend on `render.go` or each other.*
   rule content unchanged (only the shell-level `body`/`.layout`
   rules and the widened container live in `render.go`).
   `Verified by:`
-  [`forest.go`](../../../internal/site/forest.go) `forest-style`
+  [`forest.go`](../../../../internal/site/forest.go) `forest-style`
   define — same rule bodies as the prior single `<style>`,
   relocated not restyled.
 - v0.1's per-node actor tags still render on every node exactly
   as today (the deferred "actor icons on progress boxes" work
   assumes node-level actor tags remain). `Verified by:`
-  [`forest.go`](../../../internal/site/forest.go) — the `node`
+  [`forest.go`](../../../../internal/site/forest.go) — the `node`
   define ranges `.WorkInstances` into `actor-marker` spans;
   that line is relocated unedited.
 
@@ -338,7 +338,7 @@ contend on `render.go` or each other.*
   ships as a blank/broken gap … t1's roster region must render a
   deliberate, observed placeholder" and the "Bans on surface
   require rendering the consequence" rule in
-  [`task-plan.md`](../../../spec/planning/task-plan.md) — the
+  [`task-plan.md`](../../../../spec/planning/task-plan.md) — the
   Validation Gate observes the rendered placeholder, it is not
   asserted from template source.
 - The placeholder does **not** list, query, or hint at session
@@ -358,7 +358,7 @@ contend on `render.go` or each other.*
   roster placeholder is static markup in the template; it
   introduces no new template field, no new query, and no new
   request-time work. `Verified by:`
-  [`Server.index` in site.go](../../../internal/site/site.go)
+  [`Server.index` in site.go](../../../../internal/site/site.go)
   walks plans + loads work-instances per request and calls
   `renderIndex(w, indexData{Roots: roots, PlansPath: …})`; t1
   changes only the template body `renderIndex` executes, not its
@@ -372,7 +372,7 @@ surface this task's diff brushes against, so self-review and
 reviewers know they are reviewer-flag candidates here (per the
 milestone's "Reviewer-flag candidates when any per-task drafting
 brushes against these"). They are cited, not re-derived, per
-[`shared.md`](../../../spec/planning/shared.md)
+[`shared.md`](../../../../spec/planning/shared.md)
 scoping-vs-duplication discipline.
 
 - **The shell is t1's; siblings build into regions, never the
@@ -388,7 +388,7 @@ scoping-vs-duplication discipline.
 - **Render path stays walk-on-every-request.** No caching,
   file-watch, or in-memory build-up. t1 trivially preserves this
   because it changes no data path. `Verified by:`
-  [`Server.index` in site.go](../../../internal/site/site.go)
+  [`Server.index` in site.go](../../../../internal/site/site.go)
   calls `walkPlans` + `loadActiveWorkInstances` per request; t1
   does not touch `site.go`.
 - **v0.1 actor tags on nodes must not regress.** Preserved by
@@ -402,7 +402,7 @@ scoping-vs-duplication discipline.
 
 *Estimate of expected shape — implementation may revise if a
 structural call requires it; deviations are reported per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Plan-to-PR Completion Gate."*
 
 **Modify:**
@@ -573,7 +573,7 @@ commit build and test green.
 ## Self-Review Audits
 
 Audits from
-[`docs/agents/local/self-review-catalog.md`](../../agents/local/self-review-catalog.md)
+[`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md)
 that map to this PR's diff surfaces, run at step 6:
 
 - **rename-aware-diff-classification** (render surface) — moving
@@ -704,17 +704,17 @@ touches no backlog entry.
 
 ## Related Docs
 
-- [`m2-expanded-view-and-roster.md`](m2-expanded-view-and-roster.md)
+- [`m2-expanded-view-and-roster.md`](README.md)
   — parent milestone; t1 Task Contract, Cross-Task Invariants,
   Cross-Task Risks, and Documentation Currency this plan honors.
-- [`README.md`](README.md) — parent epic.
-- [`../../../design/workstreams-view-m2.svg`](../../../design/workstreams-view-m2.svg)
+- [`README.md`](../README.md) — parent epic.
+- [`../../../design/workstreams-view-m2.svg`](../../../../design/workstreams-view-m2.svg)
   — the approved two-region target this shell renders.
-- [`../../../design/v0.1-design.md`](../../../design/v0.1-design.md)
+- [`../../../design/v0.1-design.md`](../../../../design/v0.1-design.md)
   — §7 (render scope) is updated by the implementing PR.
-- [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+- [`../../../spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md)
   — the rules this plan is structured against (narrow-surface
   carve-out, promotion gate, completion gate).
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — cross-level planning rules (additive posture, `Verified by:`
   discipline, parent-doc child contracts).

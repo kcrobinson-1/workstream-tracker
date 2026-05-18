@@ -296,7 +296,7 @@ splits, or shifts. Verified by:
   — the prior spec task whose C4 built the parent-doc gate
   symmetric to the task/phase gate; this task preserves that
   symmetry.
-- [`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md`](../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md)
+- [`../workstream-tracker-1-0/m1-t1-multi-wi-per-slug.md`](../workstream-tracker-1-0/m1/t1-multi-wi-per-slug.md)
   — the doc whose promotion walk surfaced and captured this gap.
 - [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
   and [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)

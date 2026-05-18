@@ -35,7 +35,7 @@ were retired in the m1 milestone-terminal close-out per the
 `spec/planning/milestone.md` batch-deletion convention and
 survive in git history; this plan does not restate them. The
 `In draft → Proposed` promotion-gate self-review per
-[`task-plan.md`](../../../spec/planning/task-plan.md) has been
+[`task-plan.md`](../../../../spec/planning/task-plan.md) has been
 run (end-to-end coherence, contract decision-completeness,
 universal `Verified by:` walk, reality-check re-confirmation);
 no open inputs remained at t3 drafting, so Status is
@@ -75,7 +75,7 @@ with no other behavior change.
 
 Final shapes. Estimate-shaped sections (Files to touch) are
 labeled as estimates per
-[`shared.md`](../../../spec/planning/shared.md) "Plan content is
+[`shared.md`](../../../../spec/planning/shared.md) "Plan content is
 a mix of rules and estimates."
 
 These bullets state the observable end-state each surface must
@@ -92,14 +92,14 @@ Steps — the contract is the behavior, not the mechanism.
 - The spec documents `short_description` as an optional,
   additive field that pre-existing docs and vendored consumers
   remain valid without. `Verified by:`
-  [`spec/planning/shared.md` "Plan-doc identity (slug)"](../../../spec/planning/shared.md)
+  [`spec/planning/shared.md` "Plan-doc identity (slug)"](../../../../spec/planning/shared.md)
   is the section carrying the frontmatter field block the new
   field documents alongside.
 - The plan-tree carries a long-description value derived from
   the document's markdown body (the content after the
   frontmatter block). t3 parses and carries it only; where and
   how it renders is t4's call. `Verified by:`
-  [`m1-v0-2.md`](m1-v0-2.md) Cross-Task Decisions
+  [`m1-v0-2.md`](README.md) Cross-Task Decisions
   ("Long-description rendering location (t4)").
 
 ### Slugs accessor contract (`internal/slugs/slugs.go`)
@@ -110,13 +110,13 @@ Steps — the contract is the behavior, not the mechanism.
   `func (s Slug) Position() (int, bool)` (position + `true`,
   or `0, false` for a root), mirroring the existing
   `NodeType()` accessor shape. `Verified by:`
-  [`slugs.go` exported `Slug` methods](../../../internal/slugs/slugs.go)
+  [`slugs.go` exported `Slug` methods](../../../../internal/slugs/slugs.go)
   are `String/Root/NodeType/Parent` only and `segments` is
   unexported — no terminal-position accessor exists today.
 - The addition is purely additive: no existing exported
   signature or behavior changes, so `internal/api` (the other
   consumer of `slugs`) is unaffected. `Verified by:`
-  [`slugs.go`](../../../internal/slugs/slugs.go) — the change
+  [`slugs.go`](../../../../internal/slugs/slugs.go) — the change
   adds a method and touches no existing one.
 
 ### Walker contract (`internal/site/walker.go`)
@@ -127,7 +127,7 @@ Steps — the contract is the behavior, not the mechanism.
 - When `short_description` is present and a string, it is
   carried; when absent or non-string, the carried value is
   empty and the doc is neither warned nor skipped. `Verified
-  by:` [`parsePlanDoc` in walker.go](../../../internal/site/walker.go)
+  by:` [`parsePlanDoc` in walker.go](../../../../internal/site/walker.go)
   already applies this tolerant-read shape to `Status`
   (`status, _ := metaData["Status"].(string)`).
 - The long description is the document's markdown body — the
@@ -136,7 +136,7 @@ Steps — the contract is the behavior, not the mechanism.
   carries an empty string and is not an error. A file with no
   leading frontmatter block has no `slug` and is skipped
   upstream exactly as today. `Verified by:`
-  [`parsePlanDoc` in walker.go](../../../internal/site/walker.go)
+  [`parsePlanDoc` in walker.go](../../../../internal/site/walker.go)
   returns the "missing or empty `slug`" error before any body
   handling, so the no-frontmatter path is unchanged.
 
@@ -156,7 +156,7 @@ Steps — the contract is the behavior, not the mechanism.
   - Any node without `short_description`: the **slug suffix**
     (slug text after the root; the full slug for a root).
   - `Verified by:`
-    [`buildTree` in tree.go](../../../internal/site/tree.go)
+    [`buildTree` in tree.go](../../../../internal/site/tree.go)
     already resolves `root` and calls `slugs.Parse` per doc, so
     type and position are available where the node is built;
     `<ordinal>` reads `slugs.Slug.Position()` (new accessor)
@@ -169,7 +169,7 @@ Steps — the contract is the behavior, not the mechanism.
   HTML `title` attribute (resolved at t3 drafting), emitted in
   an auto-escaped context so the slug cannot break out of the
   attribute. `Verified by:`
-  [`indexTmpl` in render.go](../../../internal/site/render.go)
+  [`indexTmpl` in render.go](../../../../internal/site/render.go)
   is built with `html/template` (imported at the top of the
   file), which auto-escapes attribute context; no manual
   escaping is added.
@@ -191,7 +191,7 @@ Steps — the contract is the behavior, not the mechanism.
 - **Render path stays walk-on-every-request.** No caching, file
   watching, or in-memory build-up is introduced; the label is
   computed within the existing per-request build. `Verified
-  by:` [`Server.index` in site.go](../../../internal/site/site.go)
+  by:` [`Server.index` in site.go](../../../../internal/site/site.go)
   calls `walkPlans(s.plansPath)` then `buildTree` on every HTTP
   handler invocation.
 - **Spec change is additive.** The `short_description` addition
@@ -202,7 +202,7 @@ Steps — the contract is the behavior, not the mechanism.
 
 *Estimate of expected shape — implementation may revise if a
 structural call requires it; deviations are reported per
-[`task-plan.md`](../../../spec/planning/task-plan.md)
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Plan-to-PR Completion Gate."*
 
 **Modify:**
@@ -315,7 +315,7 @@ order lets each commit build and test green.
 ## Self-Review Audits
 
 Audits from
-[`docs/agents/local/self-review-catalog.md`](../../agents/local/self-review-catalog.md)
+[`docs/agents/local/self-review-catalog.md`](../../../agents/local/self-review-catalog.md)
 that map to this PR's diff surfaces, run at step 7:
 
 - **validation-honesty** (validation surface) — the Validation
@@ -338,7 +338,7 @@ renames, and no directory restructure.
 ## Out Of Scope
 
 - Long-description **rendering** (location/shape) — t4's call
-  per [`m1-v0-2.md`](m1-v0-2.md). t3 only parses and carries it.
+  per [`m1-v0-2.md`](README.md). t3 only parses and carries it.
 - Activity-first ordering, sub-stage cells, richer
   work-instance states — later milestones.
 - Editorial frontmatter fields beyond `short_description`
@@ -387,16 +387,16 @@ renames, and no directory restructure.
 ## Backlog Impact
 
 None. No backlog entry graduates, is deleted, split, or shifts.
-The [`repo-rooted-doc-links`](../../backlog.md#repo-rooted-doc-links)
+The [`repo-rooted-doc-links`](../../../backlog.md#repo-rooted-doc-links)
 entry (parent-epic deliberation) is post-1.0 and untouched by t3.
 
 ## Related Docs
 
-- [`m1-v0-2.md`](m1-v0-2.md) — parent milestone; t3 task
+- [`m1-v0-2.md`](README.md) — parent milestone; t3 task
   contract and deferred decisions.
-- [`README.md`](README.md) — parent epic.
-- [`../../../spec/planning/task-plan.md`](../../../spec/planning/task-plan.md)
+- [`README.md`](../README.md) — parent epic.
+- [`../../../spec/planning/task-plan.md`](../../../../spec/planning/task-plan.md)
   — the rules this plan is structured against.
-- [`../../../spec/planning/shared.md`](../../../spec/planning/shared.md)
+- [`../../../spec/planning/shared.md`](../../../../spec/planning/shared.md)
   — cross-level planning rules; the `short_description` spec
   edit lands here.
