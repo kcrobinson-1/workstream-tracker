@@ -279,7 +279,7 @@ any per-task drafting brushes against these.
   Seeding a stub still creates no work-instance and does not
   resolve the deferred triage-*action* question. Verified by:
   [`stub-children-on-parent-promotion` README "Stub ≠
-  work-instance"](../../../stub-children-on-parent-promotion/README.md).
+  work-instance"](../../stub-children-on-parent-promotion/README.md).
 
 ## Cross-Task Decisions
 
@@ -549,7 +549,7 @@ loses:
   milestone preserves its labels, per-node detail, and
   multi-work-instance schema, and reconciles its Out-of-Scope
   pointers.
-- [`../../stub-children-on-parent-promotion/README.md`](../../../stub-children-on-parent-promotion/README.md)
+- [`../../stub-children-on-parent-promotion/README.md`](../../stub-children-on-parent-promotion/README.md)
   — the landed stub render case (`slug` + `Status: In draft`)
   t3's Drafting-box-only behavior anchors to.
 - [`../../../design/vision.md`](../../../../design/vision.md) —

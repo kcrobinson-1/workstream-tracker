@@ -46,8 +46,8 @@ that makes X happen. The trigger pattern lives here; the
 per-doc list lives per-repo.
 
 This pattern depends on the optional **Doc Ownership Table**
-convention (see
-[`../meta/doc-ownership-table.md`](../meta/doc-ownership-table.md)):
+convention (defined in the upstream `shared-agent-rules`
+`meta` module; not vendored into this repo):
 each canonical doc has a named owner and an explicit
 trigger list. Repos that adopt the ownership-table convention
 get the full trigger-driven version of this rule; repos that
@@ -95,9 +95,9 @@ reflect the new state, not when the code change is done.
 - [`ephemeral-identifiers.md`](ephemeral-identifiers.md) for
   the related "don't embed PR numbers / commit IDs in durable
   docs" rule.
-- [`../meta/doc-ownership-table.md`](../meta/doc-ownership-table.md)
-  for the optional Doc Ownership Table convention this
-  module's trigger-list pattern depends on.
+- The optional Doc Ownership Table convention this module's
+  trigger-list pattern depends on (defined in the upstream
+  `shared-agent-rules` `meta` module; not vendored here).
 - [`../validation/philosophy.md`](../validation/philosophy.md)
   for the sibling validation gate.
 - [`../code-docs/code-comments.md`](../code-docs/code-comments.md)

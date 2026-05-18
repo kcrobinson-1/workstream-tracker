@@ -22,7 +22,7 @@ Map of `docs/agents/`:
   version. Lives at `docs/agents/shared.manifest.yaml` (alongside
   this README); `scripts/assemble.sh` reads it by default.
 
-Universal session rules live in [`/AGENTS.md`](/AGENTS.md) at
+Universal session rules live in [`AGENTS.md`](../../AGENTS.md) at
 the repo root and the linked shared modules.
 
 ## Editing flow
