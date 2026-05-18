@@ -239,7 +239,9 @@ is eventually achieved.
 
 ### templ-render-adoption
 
-**Status:** Open
+**Status:** Graduated — templ-render-adoption
+
+**Plan:** [`docs/plans/templ-render-adoption/README.md`](plans/templ-render-adoption/README.md)
 
 Revisit `templ` for HTML rendering, or formally accept stdlib
 `html/template` as the v0.1+ choice.
