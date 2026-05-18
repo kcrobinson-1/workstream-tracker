@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t2
-Status: In draft
+Status: Proposed
 short_description: Nested collapsible per-node Status boxes inside the forest region
 ---
 
@@ -8,7 +8,7 @@ short_description: Nested collapsible per-node Status boxes inside the forest re
 
 ## Status
 
-`In draft`. The one named input — the phase split — is now
+`Proposed`. The one named input — the phase split — was
 **resolved: N = 1**, by the
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 "PR-count predictions need a branch test." Evidence: the change
@@ -25,12 +25,16 @@ apparatus (`go test` + the same manual UI capture) as the rest —
 it is a commit boundary, not a distinct validation surface. The
 real seam is preserved as a Commit Boundary (below), not a phase.
 
-Status flips to `Proposed` once the
-[`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion-gate self-review has run and is
-authorized — held here pending that step because this plan
-supersedes a prior locked cross-task decision (C2/S1) and is not
-a small autonomous-promotion change.
+The [`task-plan.md`](../../../../spec/planning/task-plan.md)
+`In draft → Proposed` promotion-gate self-review has run and
+passed clean: end-to-end coherence, contract
+decision-completeness, the universal `Verified by:` walk, and
+reality-check re-confirmation against current code all pass; all
+required sections are present with no undisclosed variance and no
+descent into implementation prescription; N = 1 so no phase
+skeletons are seeded. The flip past the locked-decision
+supersession (C2/S1) was explicitly authorized by the
+contributor.
 
 Drafting deliberation, rejected alternatives, and `Verified by:`
 grounding for every decision below live in

@@ -111,7 +111,7 @@ the walk-on-every-request render path is unchanged.
 | Slug                              | Title                                                | Status |
 |-----------------------------------|------------------------------------------------------|--------|
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
-| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [In draft](t2-expanded-render.md) |
+| `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Proposed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](t4-session-roster.md) |
 
@@ -119,11 +119,12 @@ t1 ([`m2-t1-site-skeleton.md`](t1-site-skeleton.md)) is
 `Landed` (drafted, promoted, and implemented — the two-region
 shell shipped). t2
 ([`m2-t2-expanded-render.md`](t2-expanded-render.md)) is a
-**drafted task plan** at `Status: In draft` (its collapse
-mechanism resolved — see Cross-Task Decisions — with one open
-input, the phase split, tracked in its scoping doc; it flips to
-`Proposed` once that input settles and its promotion gate
-runs). t3–t4 remain seeded parent-promotion **stubs** (`slug`
+**drafted task plan** at `Status: Proposed` (its collapse
+mechanism resolved — see Cross-Task Decisions; phase split
+resolved to N = 1 via the branch test; promotion-gate
+self-review run clean and the locked-decision supersession
+authorized), ready for code review and implementation. t3–t4
+remain seeded parent-promotion **stubs** (`slug`
 + `Status: In draft` + inherited WHAT contract) — not yet
 drafted plans. Each not-yet-drafted task's full HOW is scoped
 just-in-time at its own drafting session per
