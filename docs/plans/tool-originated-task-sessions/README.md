@@ -263,7 +263,8 @@ commitments.
   UX. Proves the deterministic path end-to-end before the
   tool-acting posture shift.
 
-- **Tool-originated session UX milestone** (named; WHAT sealed
+- `tool-originated-task-sessions-m2` — **Tool-originated
+  session UX milestone** (directional stub seeded; WHAT sealed
   at its own milestone planning). The plan-tree-node affordance
   that spawns the agent session and becomes the *real*
   construction-time slug producer feeding m1's path. This is the
@@ -295,7 +296,7 @@ WHAT without final sealing until that session runs.
 | Milestone | Short description | End result and what it preserves (WHAT) | Sibling interface |
 |---|---|---|---|
 | `tool-originated-task-sessions-m1` | Unwired deterministic slug-carried registration path | **Locked.** Given a construction-known canonical slug, a work-instance registers deterministically with no resolution and no narration handshake; exercised via an explicit slug argument. Preserves the existing interactive best-effort registration path unchanged (this is an additional path, not a replacement) and the spec's existing exact-slug create-or-attach posture. | Produces the slug-carried registration entrypoint the UX milestone's spawn wires into as the construction-time slug producer. |
-| Tool-originated session UX milestone | The node affordance that spawns a session and carries its slug by construction | *Scope-not-yet-locked (vision inputs resolved; WHAT sealed at its own milestone planning).* Directional: an explicit contributor action on a node spawns a real local interactive session, handed the mode-appropriate prompt, carrying the node's slug out-of-band; a session-start hook registers it deterministically via m1's path; the agent self-provisions its worktree and reports it as best-effort enrichment. Preserves observe-only for all sessions the tool did not originate. | Consumes m1's slug-carried registration entrypoint as the real construction-time slug producer. |
+| `tool-originated-task-sessions-m2` | The node affordance that spawns a session and carries its slug by construction | *Scope-not-yet-locked (directional stub seeded; vision inputs resolved; WHAT sealed at its own milestone planning).* Directional: an explicit contributor action on a node spawns a real local interactive session, handed the mode-appropriate prompt, carrying the node's slug out-of-band; a session-start hook registers it deterministically via m1's path; the agent self-provisions its worktree and reports it as best-effort enrichment. Preserves observe-only for all sessions the tool did not originate. | Consumes m1's slug-carried registration entrypoint as the real construction-time slug producer. |
 
 ## Open Questions Resolved By This Epic
 
@@ -561,9 +562,9 @@ commitments).*
   milestone-planning session's output. A slug-carried
   deterministic registration entrypoint plus a manual slug
   producer to exercise it.
-- **Tool-originated session UX milestone** (named; WHAT sealed
-  at its own milestone planning): task count and any internal
-  split are that session's output. All scope-locking vision
+- **`tool-originated-task-sessions-m2`** (directional stub
+  seeded; WHAT sealed at its own milestone planning): task count
+  and any internal split are that session's output. All scope-locking vision
   questions (spawn shape, one-way reconciliation, workspace
   origin, level/mode) are resolved.
 
