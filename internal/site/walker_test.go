@@ -90,6 +90,44 @@ func TestWalkPlansSkipsScopingFolder(t *testing.T) {
 	}
 }
 
+// TestWalkPlansNestedMilestoneLayout dogfoods the per-milestone
+// nesting convention (spec/planning-doc-location.md): a milestone
+// doc at m<N>/README.md, its task/phase docs as siblings inside
+// m<N>/, and scoping at m<N>/scoping/. The walker is slug-driven
+// and recursive, so the discovered doc set must be identical to
+// the flat equivalent and the per-milestone scoping/ must be
+// skipped just like a root-level one.
+func TestWalkPlansNestedMilestoneLayout(t *testing.T) {
+	dir := t.TempDir()
+	writeDoc(t, filepath.Join(dir, "epic-a", "README.md"), "epic-a", "In progress")
+	writeDoc(t, filepath.Join(dir, "epic-a", "m1", "README.md"), "epic-a-m1", "Proposed")
+	writeDoc(t, filepath.Join(dir, "epic-a", "m1", "t1-foo.md"), "epic-a-m1-t1", "In draft")
+	writeDoc(t, filepath.Join(dir, "epic-a", "m1", "t1-p1-bar.md"), "epic-a-m1-t1-p1", "In draft")
+	// Per-milestone scoping must be skipped just like root scoping.
+	writeDoc(t, filepath.Join(dir, "epic-a", "m1", "scoping", "t1-p1.md"), "scoping-should-not-render", "")
+
+	docs, err := walkPlans(dir)
+	if err != nil {
+		t.Fatalf("walkPlans: %v", err)
+	}
+
+	got := []string{}
+	for _, d := range docs {
+		got = append(got, d.Slug)
+	}
+	sort.Strings(got)
+
+	want := []string{"epic-a", "epic-a-m1", "epic-a-m1-t1", "epic-a-m1-t1-p1"}
+	if len(got) != len(want) {
+		t.Fatalf("got %v, want %v (per-milestone scoping must be skipped)", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("docs[%d] = %q, want %q", i, got[i], want[i])
+		}
+	}
+}
+
 func TestWalkPlansSkipsTopLevelFiles(t *testing.T) {
 	dir := t.TempDir()
 	writeDoc(t, filepath.Join(dir, "stray.md"), "stray", "")

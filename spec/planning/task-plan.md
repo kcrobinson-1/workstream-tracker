@@ -821,11 +821,14 @@ Per the in-repo plan layout (see
 
 Every plan-tree root lives in its own folder at
 `docs/plans/<root-slug>/`. The root doc is at
-`<root-slug>/README.md`; descendants are sibling files inside
-the same folder, named by the slug-suffix (the part of the
-slug after the root) plus an optional `-<descriptor>` for
-human readability. The slug in frontmatter is the identity;
-the filename is for browsing.
+`<root-slug>/README.md`. Each milestone of an epic nests in its
+own `<root-slug>/m<N>/` folder (the milestone doc is the
+`README.md` inside it); a standalone task plan keeps its
+descendants directly in the root folder. Descendant filenames
+encode the slug-suffix *after the milestone segment* plus an
+optional `-<descriptor>` for human readability. The slug in
+frontmatter is the identity; the filename and folder path are
+for browsing only.
 
 - **Standalone task plan, N = 1 phase:**
   `docs/plans/<task-slug>/README.md` only. Phase content lives
@@ -836,16 +839,18 @@ the filename is for browsing.
   phase plan.
 - **Epic with milestones, tasks, phases:**
   `docs/plans/<epic-slug>/README.md` (the epic doc),
-  `docs/plans/<epic-slug>/m<N>-<descriptor>.md` (milestone
-  docs), `docs/plans/<epic-slug>/m<N>-t<T>-<descriptor>.md`
-  (task plans), `docs/plans/<epic-slug>/m<N>-t<T>-p<P>-<descriptor>.md`
+  `docs/plans/<epic-slug>/m<N>/README.md` (each milestone
+  doc), `docs/plans/<epic-slug>/m<N>/t<T>-<descriptor>.md`
+  (task plans), `docs/plans/<epic-slug>/m<N>/t<T>-p<P>-<descriptor>.md`
   (phase plans).
-- **Scoping docs:** `docs/plans/<root-slug>/scoping/<slug-suffix>.md`
-  mirroring the slug position of the doc they pair with. The
-  `scoping/` subfolder is transient — its contents delete in
-  batch at the milestone-terminal PR (or the task-terminal PR
-  for standalone task plans) per "Scoping owns / plan owns"
-  above.
+- **Scoping docs:** mirror the slug position of the doc they
+  pair with — `docs/plans/<root-slug>/m<N>/scoping/<suffix-after-mN>.md`
+  for a milestone's tasks/phases, or
+  `docs/plans/<root-slug>/scoping/<slug-suffix>.md` for a
+  standalone task plan. The `scoping/` subfolder is transient —
+  its contents delete in batch at the milestone-terminal PR (or
+  the task-terminal PR for standalone task plans) per "Scoping
+  owns / plan owns" above.
 
 The four-segment slug cap (root + m + t + p) holds across all
 shapes; see [`shared.md`](./shared.md) "Plan-doc identity

@@ -21,9 +21,11 @@ the start of a milestone, before any per-task planning.
   (see "Task Contracts" below), cross-task invariants that thread
   multiple tasks, cross-task decisions that lock contracts between
   tasks, milestone-level risks, doc-currency map across the
-  milestone set. Path: `docs/plans/<epic-slug>/m<N>-<short-descriptor>.md`,
-  where `<short-descriptor>` is an optional human-readable suffix. The
-  slug in frontmatter is the identity; the filename is for browsing.
+  milestone set. Path: `docs/plans/<epic-slug>/m<N>/README.md` —
+  the milestone doc is the `README.md` inside the milestone's own
+  `m<N>/` folder; that milestone's task and phase docs are
+  siblings in the same folder. The slug in frontmatter is the
+  identity; the filename and folder path are for browsing.
   See [`planning-doc-location.md`](../planning-doc-location.md) for
   the full layout convention.
 - **Task dependency graph.** The milestone doc's "Sequencing"
