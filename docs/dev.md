@@ -27,7 +27,11 @@ the canonical plan-doc spec consumer projects adopt in
   CREATE-IF-NOT-EXISTS.
 - **`slog`** — structured logging with per-request IDs.
 
-No CI, no build matrix today. Single-maintainer repo.
+Single-maintainer repo. No CI or build matrix exists yet — this
+describes the current scale, not a constraint. Adding CI checks,
+or build/lint/doc tooling (including external tools and new
+dependencies), is fine when it earns its keep; it just hasn't been
+needed yet.
 
 ## Repository Shape
 
@@ -47,8 +51,9 @@ No CI, no build matrix today. Single-maintainer repo.
 
 ## Local Workflow
 
-1. Clone the repo. No external dependencies beyond Go and an
-   `sqlite3` driver pulled in via `go.mod`.
+1. Clone the repo. Today the only dependencies are Go and an
+   `sqlite3` driver pulled in via `go.mod` — that is the current
+   state, not a no-new-dependencies rule.
 2. Run the server:
 
    ```sh

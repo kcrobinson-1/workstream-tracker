@@ -129,9 +129,6 @@ reviewer should look harder, not that the change is clean.
 - `workstream-tracker/spec/planning/task-plan.md`
   "Plan-to-PR Completion Gate" for the rule/estimate-deviation
   distinction and the in-PR plan-doc edit requirement.
-- [`examples/feature-pr.md`](examples/feature-pr.md) and
-  [`examples/refactor-pr.md`](examples/refactor-pr.md) for
-  filled-in illustrations.
 
 ---
 
