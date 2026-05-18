@@ -1,12 +1,30 @@
 ---
 slug: workstream-tracker-1-0-m2-t2
-Status: Proposed
+Status: Landed
 short_description: Nested collapsible per-node Status boxes inside the forest region
 ---
 
 # Task 2 — Expanded in-root nested-box render
 
 ## Status
+
+`Landed`. Implemented across the two estimated commits with no
+deviation from the Commit Boundaries (commit 1: forest.go
+nested-box render + CSS + semantic test rewrite; commit 2:
+tree.go `ActiveInSubtree` post-order field + conditional
+`<details open>` + C4 narrow-window degrade). The Validation
+Gate is satisfied: `go build ./...`, `go vet ./...`,
+`go test ./...` all pass, and the render + narrow-window degrade
+were observed against a real `go run` reading the `docs/plans/`
+dogfood tree and a populated `DB_PATH` (active subtrees open,
+idle collapsed, stubs render as leaf boxes, the `@media
+(max-width: 48rem)` degrade rule served). No estimate deviations.
+The transient [`scoping/`](scoping/t2-expanded-render.md) doc is
+intentionally retained — it deletes in batch with sibling
+scoping docs at the milestone-terminal PR (t3/t4 are still
+undrafted stubs), not at this task-terminal PR.
+
+The drafting record below is preserved for the decision history.
 
 `Proposed`. The one named input — the phase split — was
 **resolved: N = 1**, by the
