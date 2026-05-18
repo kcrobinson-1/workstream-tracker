@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4
-Status: In draft
+Status: Proposed
 short_description: Session roster (bound + unbound) with named sessions and a deliberately-unstructured raw-JSON detail view
 ---
 
@@ -8,38 +8,45 @@ short_description: Session roster (bound + unbound) with named sessions and a de
 
 ## Status
 
-`In draft` (regressed from a premature `Proposed`). A review
-finding caught a **decision-completeness failure**: two Contracts
-bullets — the roster's metadata read policy and the name/no-name
-fallback — deferred task-level *behavior* decisions to phase-plan
-drafting. For an N ≥ 2 task plan those are cross-phase WHAT the
-orchestrating doc must own (only per-phase HOW and render-time UX
-copy are legitimately deferrable), so the `Proposed` claim was
-false. Both are now **resolved concretely in the Contracts
-section**: the read policy is register-event metadata as the
-baseline with the latest later event's metadata overlaid
-key-by-key (per-request); the label is the reported `name` else
-the work-instance slug, never the `wst-<uuid>` actor — only the
-*literal slug-fallback formatting* stays render-time-deferred
-under "Bans on surface require rendering the consequence." The
-scoping doc's Open-decisions section and the
-[`t4-p2-enrichment.md`](t4-p2-enrichment.md) stub's Open-HOW are
-reconciled to mechanism-only in the same change.
+`Proposed`. **History:** a first `Proposed` flip was premature —
+review caught a decision-completeness failure where two Contracts
+bullets (the roster's metadata read policy and the name/no-name
+fallback) deferred task-level *behavior* decisions to phase-plan
+drafting, which an N ≥ 2 orchestrating plan must own. The plan was
+regressed to `In draft`, both decisions resolved concretely in the
+Contracts section (read policy: register-event metadata baseline
+with the latest later event's metadata overlaid key-by-key,
+per-request; label: reported `name` else the work-instance slug,
+never the `wst-<uuid>` actor, with only the *literal
+slug-fallback formatting* render-time-deferred under "Bans on
+surface require rendering the consequence"), and the scoping
+Open-decisions section plus the p1/p2 stub Open-HOW reconciled to
+mechanism-only.
 
 The load-bearing HOW calls the parent milestone deferred to t4 are
 resolved in the scoping doc
 ([`scoping/t4-session-roster.md`](scoping/t4-session-roster.md),
-decisions D1–D5); no "input from prior task" is pending (t1 is
+decisions D1–D5); no "input from prior task" was pending (t1 is
 `Landed`; t4 is independent of t2/t3 per the milestone Sequencing
-graph). What remains before `Proposed` is re-walking the
+graph). The
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion gate (the decision-completeness
-step now genuinely passing) and re-confirming the rest. The two
-phase skeleton docs the `Phase Contracts` section names —
+`In draft → Proposed` promotion gate was **re-walked** before this
+flip with the corrected Contracts: read end-to-end for
+cross-section coherence; Contracts re-scanned for deferral phrases
+— now decision-complete (the sole residual deferral, the literal
+slug-fallback label formatting, is authorized by "Bans on surface
+require rendering the consequence," not deferred to a phase or to
+the task-drafting moment); the broadened `Verified by:` rule
+applied to every load-bearing claim including the new
+read-policy / slug-fallback citations and re-confirmed against the
+branch; required sections present with estimate-shaped sections
+labeled; no content descended to implementation prescription
+(query mechanism is explicitly carved as p2 HOW). The two phase
+skeleton docs the `Phase Contracts` section names —
 [`t4-p1-bare-roster.md`](t4-p1-bare-roster.md) and
-[`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were already seeded
-and are left in place (no-clobber); only their inherited
-Open-HOW framing is corrected.
+[`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were seeded at the
+first flip and left in place (no-clobber); only their inherited
+Open-HOW framing was corrected to mechanism-only.
 
 This is an **N ≥ 2 task plan** (orchestrating doc). Per-phase HOW
 lives in the phase plans seeded at the `Proposed` flip; this doc
