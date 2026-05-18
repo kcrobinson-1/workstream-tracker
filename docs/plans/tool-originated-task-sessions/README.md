@@ -116,7 +116,8 @@ prompt respectively. Claude Code is the concrete first launcher;
 adding another agent is an adapter, not a rewrite. The vision
 and technical direction for *how the tool spawns a session* —
 and how that reconciles with the product's standing observe-only
-posture — are settled in this doc before milestone scope locks.
+posture — are settled (see "Open Questions Resolved By This
+Epic"); milestone scope has locked accordingly.
 
 ## Inherited Context
 
@@ -414,9 +415,12 @@ Long-standing deferrals this epic's existence settles.
 
 ## Open Questions Newly Opened
 
-These are the vision and technical-direction calls the epic
-must resolve before the UX milestone's scope can lock. They are
-the substance of the "settle vision first" framing.
+The scope-locking vision/technical-direction questions are
+resolved above. The items below are **not scope-locking** —
+they are milestone-time HOW or conscious-tracking concerns,
+flagged so they stay visible through the epic's lifecycle
+rather than being lost. None blocks the locked child set or
+m1's locked contract.
 
 - **Does m1's slug-carried path reuse the existing exact-slug
   create-or-attach registration path, or introduce new
