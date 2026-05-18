@@ -236,3 +236,27 @@ several, opportunity-framed; this is the home where the
 determinism deferred by
 [`deterministic-interactive-registration`](#deterministic-interactive-registration)
 is eventually achieved.
+
+### templ-render-adoption
+
+**Status:** Open
+
+Revisit `templ` for HTML rendering, or formally accept stdlib
+`html/template` as the v0.1+ choice.
+
+[`design/v0.1-design.md`](../design/v0.1-design.md) §10 locked
+`templ` for HTML rendering, but the v0.1 implementation
+deliberately used the stdlib `html/template` instead, deferring
+templ "until there are real reusable components" (the decision
+and its rationale are recorded in git, commit `60040be`); §10
+was reconciled to point here rather than left silently
+contradicting the codebase. The m2-t1 region split (a shell
+composing `forest` / `roster` / `node` sub-templates in their
+own files) is the first plausible "real reusable components"
+trigger, so the open question is whether to migrate the render
+layer to templ for its type-safe component model or formally
+accept `html/template` as the standing choice. One option among
+several: a throwaway spike converting the forest/roster/node
+templates to templ components to weigh the
+ergonomics-versus-extra-dependency tradeoff §10 originally
+cited, before committing either way.
