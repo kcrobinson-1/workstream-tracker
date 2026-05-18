@@ -166,27 +166,31 @@ remember the adjacent always-on rules.
 
 **Status:** Open
 
-Deterministic work-instance registration for interactive,
-natural-language sessions.
+The interactive-registration best-effort tripwire and its
+observability residual.
+
+**Split.** This entry originally tracked two separable threads.
+The *determinism-resolution* thread — interactive registration
+is *not* deterministic and provably cannot be (resolving
+natural-language intent to a canonical slug requires agent
+cognition, which postdates session start, while a deterministic
+trigger must run before it: the "registration circularity"),
+and its only resolution home is changing who the launcher is —
+has **graduated** into the
+[`tool-originated-task-sessions`](#tool-originated-task-sessions)
+epic ([`docs/plans/tool-originated-task-sessions/README.md`](plans/tool-originated-task-sessions/README.md)),
+where the tool launches the agent so the slug is known by
+construction. That epic is post-1.0. This entry **stays Open**
+under its original slug — referenced by anchor from multiple
+1.0-epic plan docs — and is narrowed to the thread that binds
+*independently of and earlier than* that epic: the best-effort
+tripwire and observability residual below.
 
 m1-t2 ships interactive registration as an observable
-best-effort grounded narration handshake. It is *not*
-deterministic, and provably cannot be: resolving natural-language
-intent to a canonical slug requires agent cognition, which
-postdates session start, while a deterministic trigger must run
-before it (the "registration circularity"). Observable
-best-effort is the accepted, vision-faithful posture, not a
-stopgap: the m1-t2 decision (locked at t2 drafting) treats the
-grounded narration handshake as a faithful operationalization of
-the long-term vision's prescribed mitigation, and "deterministic"
-was never an upstream promise for registration. Achieving
-determinism is therefore **not a 1.0 requirement** — its only
-resolution home is the post-v0.2
-[`tool-originated-task-sessions`](#tool-originated-task-sessions)
-capability (the tool itself launches the agent, so the slug is
-known by construction), which is well beyond this epic's scope;
-the registration circularity is dissolved only by changing who
-the launcher is, and that is where it gets dissolved. What *does*
+best-effort grounded narration handshake. Observable best-effort
+is the accepted, vision-faithful posture, not a stopgap, and
+"deterministic" was never an upstream promise for registration;
+achieving determinism is **not a 1.0 requirement**. What *does*
 bind: best-effort's acceptability rests on sole-consumer
 compensation (the lone producer can notice and hand-fix a missed
 marker), and that compensation evaporates when an external
@@ -196,7 +200,10 @@ neighborly-events integration milestone**, where sole-consumer
 compensation no longer holds; that re-deliberation decides
 whether best-effort is still acceptable at that point or whether
 a backstop must be pulled forward, and is not a commitment that
-registration becomes deterministic for 1.0.
+registration becomes deterministic for 1.0. The
+`tool-originated-task-sessions` epic does not satisfy this
+tripwire: it lands post-1.0, while the tripwire fires before the
+1.0 epic's neighborly-events integration milestone.
 
 This entry also tracks the **observability residual**: a missed
 registration is unobservable from the rendered tree by
@@ -207,13 +214,18 @@ handshake, which works solely while a contributor is present to
 notice it — the same sole-consumer compensation the tripwire is
 about. A tree-side heuristic ("a node with an active/Proposed
 plan doc but no work-instance") is the candidate future
-affordance, deferred under the same tripwire. This entry tracks
-both the determinism gap and the observability gap until
-resolved.
+affordance, deferred under the same tripwire. After the split
+above, this entry tracks the observability gap and the
+best-effort tripwire until resolved; the determinism gap is
+carried by the graduated
+[`tool-originated-task-sessions`](#tool-originated-task-sessions)
+epic.
 
 ### tool-originated-task-sessions
 
-**Status:** Open
+**Status:** Graduated — tool-originated-task-sessions
+
+**Plan:** [`docs/plans/tool-originated-task-sessions/README.md`](plans/tool-originated-task-sessions/README.md)
 
 The tool's own UX originates a planning/implementation session
 from a plan-tree node.
