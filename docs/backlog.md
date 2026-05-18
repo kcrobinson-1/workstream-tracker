@@ -20,6 +20,25 @@ the `{spec_root}` substitution mechanism in
 `scripts/assemble.sh` with a sibling `{repo_root}` placeholder
 applied to in-repo docs at write time.
 
+### nested-milestone-doc-layout
+
+**Status:** Graduated — nested-milestone-doc-layout
+
+**Plan:** [`docs/plans/nested-milestone-doc-layout/README.md`](plans/nested-milestone-doc-layout/README.md)
+
+Nest milestone docs under per-milestone folders in the plan
+layout.
+
+A flat epic-rooted tree puts every milestone, task, and phase
+doc as siblings in one folder; a multi-milestone epic
+accumulates dozens of flat files (`workstream-tracker-1-0/` is
+already ~13). The layout convention nests each milestone's doc
+and descendants under `docs/plans/<root>/m<N>/`, with scoping at
+`m<N>/scoping/`; standalone task plans are unchanged. The
+visualization walker is already recursive and slug-identity
+driven, so this is a spec-prose change plus a dogfood test, with
+no walker/tree behavior change.
+
 ### plan-doc-child-contracts
 
 **Status:** Graduated — spec-updates-contracts-and-gates
