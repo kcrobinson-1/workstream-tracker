@@ -492,6 +492,16 @@ relationship."
   names. Replace the raw uuid in the forest UX (and/or revisit the
   actor generator). Added in p2's implementing PR; scope-framed,
   not prescribed.
+- [`scoping-deletion-target-spec-conflict`](../../../backlog.md#scoping-deletion-target-spec-conflict)
+  — **new entry, added in this PR** (not deferred to a phase): a
+  Codex review of PR #34 surfaced that `task-plan.md` self-conflicts
+  on where a task-plan-under-a-milestone's scoping doc deletes
+  ("Goal" / "Scoping owns" say task-terminal; "Path conventions"
+  says milestone-terminal). Captured rather than acted on — it is a
+  `spec/planning/` reconciliation independent of t4; the t4 scoping
+  doc's lifecycle note follows the authoritative "Path conventions"
+  reading (milestone-terminal) and its citation was tightened to
+  that section in this PR.
 
 ## Related Docs
 

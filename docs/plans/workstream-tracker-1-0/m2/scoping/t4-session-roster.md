@@ -1,11 +1,17 @@
 # Scoping — t4 Session roster + work-item enrichment
 
 Scoping doc for [`t4-session-roster.md`](../t4-session-roster.md)
-(`workstream-tracker-1-0-m2-t4`). Transient: deletes in batch with
-its sibling scoping docs at the milestone-terminal PR per
-[`task-plan.md`](../../../../../spec/planning/task-plan.md) "Scoping
-owns / plan owns." Carries no `Status` field (scoping docs are
-deliberation, not lifecycle artifacts).
+(`workstream-tracker-1-0-m2-t4`). Transient: this doc lives in the
+milestone's `m2/scoping/` subfolder (t4 is a task under the m2
+milestone, **not** a standalone task plan), so its contents delete
+**in batch at the milestone-terminal PR** per
+[`task-plan.md`](../../../../../spec/planning/task-plan.md) "Path
+conventions" — "The `scoping/` subfolder is transient — its
+contents delete in batch at the milestone-terminal PR (or the
+task-terminal PR for standalone task plans)." (Task-terminal
+deletion applies only to standalone task plans, which t4 is not.)
+Carries no `Status` field (scoping docs are deliberation, not
+lifecycle artifacts).
 
 ## Context
 
