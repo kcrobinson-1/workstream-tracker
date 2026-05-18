@@ -43,14 +43,18 @@ implementing PR executes the
 forest-actor-humanization backlog entries, and lands the
 `session-registration.md` / `design/v0.1-design.md` currency.
 
-**Open HOW (decide at this phase's drafting, per the t4 scoping
-doc's Open decisions):** the metadata read policy for the roster
-join (register-event baseline vs. latest-heartbeat overlay vs.
-defined merge); the concrete no-name fallback form (rendered
-consequence observed in this phase's Validation Gate per "Bans on
-surface require rendering the consequence"); the reported-name
-wire field and its producer surface (handshake metadata +
-`--name` / `WST_NAME`). See
+**Open HOW (mechanism, scoped at this phase's drafting).** The
+behavior decisions are already task-level contract and inherited,
+not open here: the metadata read policy (register baseline +
+latest-event key-by-key overlay, per-request) and the
+name-then-slug label rule (never the `wst-<uuid>`; only the
+literal slug-fallback formatting is render-time UX copy). p2's
+remaining HOW is pure mechanism: the metadata-join query shape
+that realizes the decided baseline+overlay rule; the client/CLI
+plumbing to send the conventionally-read `name` key (the
+handshake-metadata path and a CLI affordance such as
+`--name` / `WST_NAME`); and the expandable raw-JSON detail
+rendering. See
 [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
-Open decisions 1–3 and the t4 task plan's Cross-Cutting
-Invariants.
+"Decisions resolved at plan-drafting" and the t4 task plan
+Contracts + Cross-Cutting Invariants.

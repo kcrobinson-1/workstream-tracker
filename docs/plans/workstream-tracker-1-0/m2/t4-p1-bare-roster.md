@@ -35,10 +35,13 @@ reports nothing still lists.
 that p2 enriches. Does not touch the event log or the register
 client/CLI.
 
-**Open HOW (decide at this phase's drafting, per the t4 scoping
-doc's Open decisions):** the bound/unbound classification data
-source (the walked plan-tree slug set the handler already has vs.
-a fresh slug read), bounded by the walk-on-every-request
-invariant. See
+**Open HOW (mechanism, scoped at this phase's drafting).** The
+WHAT is already task-level contract (per-request bound/unbound
+classification against the same walked plan-tree slug set the
+forest is built from — t4 task plan Contracts, "Roster
+membership"). The remaining choice is pure p1 mechanism: reuse the
+slug set the handler already walked vs. a fresh read, bounded by
+the walk-on-every-request invariant. See
 [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
-Open decision 4 and the t4 task plan's Cross-Cutting Invariants.
+"Decisions resolved at plan-drafting" (the unbound-classification
+mechanism note) and the t4 task plan's Cross-Cutting Invariants.

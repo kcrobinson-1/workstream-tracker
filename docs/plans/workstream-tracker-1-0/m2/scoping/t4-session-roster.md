@@ -174,36 +174,40 @@ already selects `slug, actor` for active rows; p1 extends only the
 selected columns and the bound/unbound classification, while the
 event-log join (D1) is isolated to p2's surface.
 
-## Open decisions to make at plan-drafting
+## Decisions resolved at plan-drafting
 
-Carried into the plan as questions the plan resolves concretely
-(not deferred past `Proposed`):
+These were surfaced here as open and **resolved concretely in the
+task plan's Contracts** during plan-drafting (a review finding
+caught the first two having been wrongly deferred to phase-plan
+drafting; they are now task-level contract, not deferred):
 
-1. **Metadata read policy for the roster join.** Which event's
-   metadata represents a session: the `register` event's metadata
-   as the identity baseline, the latest heartbeat's metadata as a
-   live overlay, or a defined merge. This is the schema-loose
-   posture's read side; the plan's Contracts must state the
-   concrete rule (recommended baseline: register-event metadata,
-   latest heartbeat metadata overlaid when present), grounded in
-   the event-type rows `insertRegister` / `insertHeartbeat` write.
-2. **Name fallback when none is reported.** Human-readable and
-   explicitly **not** the `wst-<uuid>` actor (candidates: a
-   slug-derived label, or a generic "unnamed session" form). The
-   plan's Contracts must pick one and the Validation Gate must
-   render the no-name consequence ("Bans on surface require
-   rendering the consequence").
-3. **Name provenance / producer surface.** Where the reported name
-   originates — the interactive agent supplying it in the
-   registration handshake metadata, plus a CLI affordance
-   (`--name` / `WST_NAME`). The plan's Contracts fix the wire
-   field; Documentation Currency covers the
-   `session-registration.md` handshake update.
-4. **Unbound classification source.** How the roster determines
-   bound vs. unbound — the walked plan-tree slug set the handler
-   already has vs. a fresh slug read. The plan's Contracts state
-   the concrete data dependency (it must stay
-   walk-on-every-request, no cache).
+1. **Metadata read policy** — RESOLVED: `register`-event metadata
+   as the identity baseline, the latest later event's metadata
+   overlaid key-by-key, per-request. The query mechanism is p2
+   HOW. See task plan Contracts → "Reported data" ("Metadata read
+   policy").
+2. **Name + no-name fallback** — RESOLVED: label is the reported
+   `name` else the work-instance slug, never the `wst-<uuid>`
+   actor; only the literal slug-fallback formatting is
+   render-time-deferred under "Bans on surface require rendering
+   the consequence." See task plan Contracts → "Session identity
+   and naming."
+3. **Reported-name wire field** — RESOLVED: the sole
+   conventionally-read key is the optional `name`; all other
+   reported keys stay arbitrary (schema-loose preserved). Producer
+   surface (handshake metadata + a CLI affordance) is p2's
+   client/CLI plumbing HOW; the `session-registration.md`
+   handshake update is in p2's Documentation Currency.
+
+Genuinely phase-level mechanism (not a plan-level open decision —
+the WHAT is already in the task plan's "Roster membership"
+contract: per-request classification against the same walked
+plan-tree slug set):
+
+- **Unbound classification source (p1 mechanism HOW).** Whether p1
+  reuses the slug set the handler already walked vs. a fresh read
+  — an implementation choice scoped at p1 drafting, bounded by the
+  walk-on-every-request invariant. Not a deferred contract.
 
 ## Plan structure handoff
 

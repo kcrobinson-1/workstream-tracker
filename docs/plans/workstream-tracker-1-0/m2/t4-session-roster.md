@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2-t4
-Status: Proposed
+Status: In draft
 short_description: Session roster (bound + unbound) with named sessions and a deliberately-unstructured raw-JSON detail view
 ---
 
@@ -8,30 +8,38 @@ short_description: Session roster (bound + unbound) with named sessions and a de
 
 ## Status
 
-`Proposed`. The load-bearing HOW calls the parent milestone
-deferred to t4 are resolved in the scoping doc
+`In draft` (regressed from a premature `Proposed`). A review
+finding caught a **decision-completeness failure**: two Contracts
+bullets — the roster's metadata read policy and the name/no-name
+fallback — deferred task-level *behavior* decisions to phase-plan
+drafting. For an N ≥ 2 task plan those are cross-phase WHAT the
+orchestrating doc must own (only per-phase HOW and render-time UX
+copy are legitimately deferrable), so the `Proposed` claim was
+false. Both are now **resolved concretely in the Contracts
+section**: the read policy is register-event metadata as the
+baseline with the latest later event's metadata overlaid
+key-by-key (per-request); the label is the reported `name` else
+the work-instance slug, never the `wst-<uuid>` actor — only the
+*literal slug-fallback formatting* stays render-time-deferred
+under "Bans on surface require rendering the consequence." The
+scoping doc's Open-decisions section and the
+[`t4-p2-enrichment.md`](t4-p2-enrichment.md) stub's Open-HOW are
+reconciled to mechanism-only in the same change.
+
+The load-bearing HOW calls the parent milestone deferred to t4 are
+resolved in the scoping doc
 ([`scoping/t4-session-roster.md`](scoping/t4-session-roster.md),
-decisions D1–D5) and no "input from prior task" was pending (t1 is
+decisions D1–D5); no "input from prior task" is pending (t1 is
 `Landed`; t4 is independent of t2/t3 per the milestone Sequencing
-graph). The
+graph). What remains before `Proposed` is re-walking the
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-`In draft → Proposed` promotion gate was walked before this flip:
-read end-to-end for cross-section coherence; Contracts walked for
-deferral phrases (the only deferrals — the metadata read policy and
-the no-name fallback form — are handed to each phase's own
-just-in-time drafting via the scoping doc's Open-decisions handoff
-and the "Bans on surface require rendering the consequence" rule,
-not deferred to the task-drafting that produced this plan); the
-broadened `Verified by:` rule applied to every load-bearing claim
-and re-confirmed against the current branch; required sections
-present with estimate-shaped sections labeled; no content descended
-to implementation prescription (per-phase HOW stays in the phase
-plans). The two phase skeleton docs the `Phase Contracts` section
-names — [`t4-p1-bare-roster.md`](t4-p1-bare-roster.md) and
-[`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were seeded in the
-same flip per
-[`shared.md`](../../../../spec/planning/shared.md) "Parent-promotion
-stub seeding."
+`In draft → Proposed` promotion gate (the decision-completeness
+step now genuinely passing) and re-confirming the rest. The two
+phase skeleton docs the `Phase Contracts` section names —
+[`t4-p1-bare-roster.md`](t4-p1-bare-roster.md) and
+[`t4-p2-enrichment.md`](t4-p2-enrichment.md) — were already seeded
+and are left in place (no-clobber); only their inherited
+Open-HOW framing is corrected.
 
 This is an **N ≥ 2 task plan** (orchestrating doc). Per-phase HOW
 lives in the phase plans seeded at the `Proposed` flip; this doc
@@ -125,12 +133,21 @@ a mix of rules and estimates."
   [`activeWorkInstanceID` in handlers.go](../../../../internal/api/handlers.go)
   keys idempotency on `(slug, actor, state=active)` — untouched by
   this task.
-- When a session reports **no name**, the roster shows a
-  defined, human-readable fallback that is **not** the
-  `wst-<uuid>` actor. The concrete fallback form is fixed at
-  phase-plan drafting (scoping Open decision 2) and its rendered
-  consequence is observed in that phase's Validation Gate ("Bans
-  on surface require rendering the consequence").
+- An entry's display label is the reported metadata `name` value
+  when present; when a session reports **no name**, the label
+  falls back to the work-instance's **slug** — **never** the
+  `wst-<uuid>` actor. Every work-instance has a slug (it is the
+  registration key); only the optional reported name may be
+  absent, so the slug fallback is always available. This
+  name-then-slug rule is the task-level contract, fixed here and
+  not deferred; the only render-time-deferred detail is the
+  *literal formatting* of the slug-fallback label, authorized by
+  "Bans on surface require rendering the consequence" and observed
+  in p2's Validation Gate.
+  `Verified by:`
+  [`work_instances` in schema.go](../../../../internal/db/schema.go)
+  declares `slug TEXT NOT NULL`, so every active row the roster
+  lists has a slug to fall back to.
 - The forest's existing raw per-node actor markers are
   **unchanged** by this task (the v0.1 actor-tag no-regress
   invariant). The resulting forest-shows-uuid / roster-shows-name
@@ -160,14 +177,31 @@ a mix of rules and estimates."
   intentionally deferred. No task-side schema is imposed on the
   reported shape, and this data is **not** schematized toward t3's
   declared-stages field (the milestone posture-tension invariant).
+  The sole conventionally-read key is the optional `name` (used
+  only for the entry label per the naming contract above) — a
+  display convention, not a required field or a schema; every
+  other reported key stays arbitrary and unschematized, and a
+  session omitting `name` still lists.
   `Verified by:` the milestone
   [`README.md`](README.md) Cross-Task Invariant "Opposite spec
   postures are intentional — do not homogenize."
-- The roster's metadata read policy (which event's metadata
-  represents the session) is a defined rule fixed at phase-plan
-  drafting (scoping Open decision 1), grounded in the event-type
-  rows `insertRegister` / `insertHeartbeat` write; it must remain a
-  per-request read.
+- **Metadata read policy (task-level contract, fixed here).** A
+  session is represented by its `register` event's metadata as the
+  **identity baseline**, with the **latest** later event's
+  (heartbeat / state-transition) metadata **overlaid key-by-key**
+  when present: a later event's keys win; keys absent from later
+  events keep the register value. It is a **per-request** read
+  (the walk-on-every-request invariant). The query mechanism that
+  realizes this (join shape, event-type filter, latest-event
+  selection) is p2 implementation HOW, not a plan deferral.
+  `Verified by:`
+  [`insertRegister` / `insertHeartbeat` / `insertStateTransition`
+  in handlers.go](../../../../internal/api/handlers.go) each write
+  `nullableJSON(...metadata)` into `events.metadata` tagged by
+  `type` (`register` / `heartbeat` / `state_transition`), so the
+  baseline-plus-overlay rule is derivable from the event rows;
+  [`idx_events_work_instance_id` in schema.go](../../../../internal/db/schema.go)
+  indexes the per-request read.
 - Reported PRs shown in the roster are what the **session
   reported**, distinct from the forest's `gh`-title PR discovery —
   the two are not conflated.

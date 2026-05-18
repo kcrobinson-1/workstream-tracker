@@ -113,7 +113,7 @@ the walk-on-every-request render path is unchanged.
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Proposed](t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
-| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
+| `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [In draft (stub)](t4-p1-bare-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
 
@@ -127,12 +127,14 @@ resolved to N = 1 via the branch test; promotion-gate
 self-review run clean and the locked-decision supersession
 authorized), ready for code review and implementation. **t4**
 ([`t4-session-roster.md`](t4-session-roster.md)) is a
-**`Proposed` N ≥ 2 task plan** (drafted, scoping complete,
-promotion gate walked); its two phases —
-[`t4-p1`](t4-p1-bare-roster.md) and
-[`t4-p2`](t4-p2-enrichment.md) — were seeded as parent-promotion
-**stubs** on that flip and are scoped just-in-time at their own
-drafting. t3 remains a seeded parent-promotion **stub**
+**drafted N ≥ 2 task plan** back at `In draft` (a review
+finding regressed a premature `Proposed`: two Contracts bullets
+had deferred task-level behavior decisions to phase drafting;
+resolved concretely, re-promotion pending the gate re-walk). Its
+two phases — [`t4-p1`](t4-p1-bare-roster.md) and
+[`t4-p2`](t4-p2-enrichment.md) — were already seeded as
+parent-promotion **stubs** and are left in place (no-clobber). t3
+remains a seeded parent-promotion **stub**
 (`slug` + `Status: In draft` + inherited WHAT contract) — not yet
 a drafted plan. Each not-yet-drafted task's full HOW is scoped
 just-in-time at its own drafting session per
