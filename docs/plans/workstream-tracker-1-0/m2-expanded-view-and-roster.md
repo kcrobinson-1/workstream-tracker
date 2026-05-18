@@ -110,15 +110,18 @@ the walk-on-every-request render path is unchanged.
 
 | Slug                              | Title                                                | Status |
 |-----------------------------------|------------------------------------------------------|--------|
-| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [In draft (stub)](m2-t1-site-skeleton.md) |
+| `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [In draft](m2-t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [In draft (stub)](m2-t2-expanded-render.md) |
 | `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](m2-t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [In draft (stub)](m2-t4-session-roster.md) |
 
-Each task is a seeded parent-promotion **stub** (`slug` +
-`Status: In draft` + inherited WHAT contract) — not yet a
-drafted plan. Each task's full HOW is scoped just-in-time at
-its own drafting session per
+t1 ([`m2-t1-site-skeleton.md`](m2-t1-site-skeleton.md)) has
+been drafted (its own drafting session has run — it is a full
+plan, no longer a stub); t2–t4 remain seeded parent-promotion
+**stubs** (`slug`
++ `Status: In draft` + inherited WHAT contract) — not yet
+drafted plans. Each not-yet-drafted task's full HOW is scoped
+just-in-time at its own drafting session per
 [`task-plan.md`](../../../spec/planning/task-plan.md)
 "Just-in-time scoping and plan drafting"; the stubs are exempt
 from the required-sections rule until then per
