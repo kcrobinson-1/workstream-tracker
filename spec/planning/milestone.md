@@ -42,6 +42,23 @@ the start of a milestone, before any per-task planning.
   prose; the prose still carries rationale (which task ships
   first and why, terminal-PR conventions, cross-task coupling
   beyond hard dependencies).
+- **A multi-leaf graph needs a terminal convergence node.** When
+  the `flowchart LR` ends in more than one terminal leaf (≥ 2
+  tasks with no outgoing edge), there is no graph-determined
+  "last" task, so the milestone-terminal close-out — the batch
+  scoping-doc deletion, the milestone doc's own
+  `Proposed → Landed` flip, and the parent epic's milestone-row
+  advance — has no unambiguous owner and silently rides an
+  arbitrary leaf's PR. Such a graph must add one terminal
+  **validate-and-land** node that depends on every leaf; that
+  node owns the milestone-terminal close-out and lands as a
+  dedicated close-out PR — the milestone-graph generalization of
+  the [`task-plan.md`](./task-plan.md) "Parallel implementing
+  PRs" exception, which binds only a single task plan's N ≥ 2 PR
+  set and so does not reach across a milestone's task graph. A
+  graph that ends in exactly one leaf — or whose prose names a
+  clearly-last task — needs no convergence node: the close-out
+  rides with that last PR per the terminal-PR conventions above.
 - **Anti-goal: WHAT-contract each task, do not HOW-scope any
   task in this session.** The milestone doc states each task's
   WHAT contract (end result, sibling interfaces, what it
