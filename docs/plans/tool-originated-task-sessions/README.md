@@ -277,10 +277,10 @@ merged code.*
   capability and the determinism-resolution home. Milestone
   count and structure are the milestone-planning sessions'
   output, not fixed here, and cannot lock until the remaining
-  Open Questions resolve — chiefly "how does the tool spawn a
-  session" (spawn-shape choice), workspace origin, and the
-  level/mode matrix. (The one-way-invariant reconciliation is
-  resolved; see Open Questions Resolved By This Epic.)
+  Open Questions resolve — the spawn-shape choice and the
+  level/mode matrix. (One-way-invariant reconciliation and
+  workspace origin are resolved; see Open Questions Resolved By
+  This Epic.)
 
 ## Milestone Contracts
 
@@ -351,6 +351,36 @@ Long-standing deferrals this epic's existence settles.
     Invariants](../workstream-tracker-1-0/README.md) and
     [`design/vision.md` §5](../../../design/vision.md).)
 
+- **Where does a tool-originated session's workspace come
+  from?** Resolved: *the tool does not provision it — the agent
+  self-provisions its working context and reports it as
+  enrichment.* Three shapes were considered: (1) the tool
+  creates the worktree itself (directly, or by delegating to a
+  launcher's native isolation); (2) the tool attaches the
+  session to an existing workspace the contributor selects or
+  the tracker's own repo; (3) the tool spawns the session in
+  the contributor's existing repo context and the agent creates
+  its own worktree/branch as an early step, reporting it through
+  the best-effort enrichment phase. Shape 3 is the only one
+  coherent with the already-locked determinism scoping, which
+  classifies branch/worktree as best-effort enrichment the
+  agent reports — so workspace provisioning belongs on the
+  agent side *by construction*, not the tool's. It also keeps
+  the tool's action minimal (launch-not-leash; single-local),
+  keeps the agent-adapter seam free of per-adapter worktree
+  policy, and reuses existing agent behavior. Shape 1 would
+  re-expand the tool's action into filesystem/git mutation
+  right after the epic worked to minimize it and would
+  contradict classifying worktree as agent-reported enrichment;
+  Shape 2 either breaks the parallel-sessions model (shared
+  working directory) or pushes isolation onto the contributor.
+  The brief pre-self-provision window (a session exists before
+  it has its own worktree) is not a correctness issue: identity
+  registration is already deterministic and independent of the
+  worktree. Whether a launcher's native per-session isolation
+  should later assist provisioning is a milestone-time HOW
+  refinement, not a change to this vision answer.
+
 ## Open Questions Newly Opened
 
 These are the vision and technical-direction calls the epic
@@ -415,14 +445,6 @@ the substance of the "settle vision first" framing.
   uniformly at every level (you plan a task to get its phases;
   you implement a phase). The level/mode matrix and how each
   cell maps to the session type and opening prompt is a
-  product-vision call to settle before the UX milestone's scope
-  locks.
-- **Where does a tool-originated session's workspace come
-  from?** The whole product is built around agents living in
-  separate, auto-named workspaces. A spawned session needs one:
-  does the tool create the worktree/workspace itself, or attach
-  the session to one the contributor selects/already has? This
-  intersects the core workspace-named-agent model and is a
   product-vision call to settle before the UX milestone's scope
   locks.
 - **How do the spec and agent rules express a deterministic,
@@ -543,8 +565,8 @@ each milestone-planning session's output.*
   manual slug producer to exercise it.
 - **Tool-originated session UX milestone(s)**: count and split
   are an estimate that cannot firm up until the remaining Open
-  Questions resolve — chiefly the spawn-shape choice, workspace
-  origin, and the level/mode matrix. (One-way reconciliation is
+  Questions resolve — the spawn-shape choice and the level/mode
+  matrix. (One-way reconciliation and workspace origin are
   resolved.)
 
 ## Related Docs
