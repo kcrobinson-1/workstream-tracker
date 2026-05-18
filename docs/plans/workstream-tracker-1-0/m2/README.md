@@ -112,7 +112,7 @@ the walk-on-every-request render path is unchanged.
 |-----------------------------------|------------------------------------------------------|--------|
 | `workstream-tracker-1-0-m2-t1`    | Site skeleton (two-region shell)                     | [Landed](t1-site-skeleton.md) |
 | `workstream-tracker-1-0-m2-t2`    | Expanded in-root nested-box render                   | [Landed](t2-expanded-render.md) |
-| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [In draft (stub)](t3-doc-declared-stages.md) |
+| `workstream-tracker-1-0-m2-t3`    | Doc-declared progress stages (spec-first)            | [Proposed](t3-doc-declared-stages.md) |
 | `workstream-tracker-1-0-m2-t4`    | Session roster + work-item enrichment                | [Proposed](t4-session-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p1` | ↳ Bare bound/unbound roster                          | [Landed](t4-p1-bare-roster.md) |
 | `workstream-tracker-1-0-m2-t4-p2` | ↳ Enrichment + named sessions                        | [In draft (stub)](t4-p2-enrichment.md) |
@@ -140,15 +140,32 @@ promoted, and implemented — the bare bound/unbound roster shipped:
 every active session listed and classified against the
 in-request walked parsed-doc set, replacing t1's placeholder, no
 event join / no client change); phase 2
-[`t4-p2`](t4-p2-enrichment.md) remains a seeded
-parent-promotion **stub**, scoped just-in-time at its own
-drafting. t3 also remains a seeded parent-promotion **stub**
-(`slug` + `Status: In draft` + inherited WHAT contract) — not yet
-a drafted plan. Each not-yet-drafted task's full HOW is scoped
-just-in-time at its own drafting session per
+[`t4-p2`](t4-p2-enrichment.md) remains a seeded parent-promotion
+**stub**, scoped just-in-time at its own drafting. **t3**
+([`t3-doc-declared-stages.md`](t3-doc-declared-stages.md)) is now
+a **`Proposed` N = 1 task plan**: a spawned just-in-time drafting
+session replaced the stub with a full task plan and a paired
+[`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+that decomposed the deferred frontmatter-shape decision into
+candidate shapes with trade-offs; the contributor resolved the
+decisions in-loop (2026-05-18; D1 = shape A2, `progress_stages`
+key, render-side Drafting cell, field-presence-gated, no
+inheritance; per-stage counts deferred as an additive future
+migration) and then directed the session to walk the
+`` `In draft` → `Proposed` `` promotion gate in-session,
+consciously extending past the spawn's original "stop at
+`In draft`" bound at the contributor's explicit direction. The
+gate was walked (end-to-end coherence, decision-completeness,
+universal `Verified by:`, reality-check re-confirmation, always-on
+rules, the D6 branch-test sketch resolving N = 1) and the plan
+flipped to `Proposed`; phase split N = 1 so no phase stubs to
+seed (see the t3 plan's Status section and the "Doc-declared-stages
+frontmatter shape" Cross-Task Decisions entry below). The
+remaining not-yet-drafted child (t4-p2) is scoped just-in-time at
+its own drafting session per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
-"Just-in-time scoping and plan drafting"; the remaining stub
-is exempt from the required-sections rule until then per
+"Just-in-time scoping and plan drafting"; a remaining stub is
+exempt from the required-sections rule until then per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts." The Task Contracts below are the locked WHAT
 each task inherited.
@@ -229,7 +246,7 @@ pending review (Status section above).
 |------|-------|-------------------------------|----------------|
 | `workstream-tracker-1-0-m2-t1` | Site skeleton (two-region shell) | The page renders as the approved two-region layout — a forest region (~2/3, left) and a roster region (~1/3, right), single page scroll, roster placed to be visible without scrolling when window height allows; a too-narrow viewport stacks roster below forest (mobile out of scope). The **existing** plan-tree forest render is placed in the forest region unchanged; the roster region renders a deliberate, intentional placeholder (an observed state, not a blank/broken gap). Preserves: the current forest rendering behavior verbatim (no node-shape change — that is t2); v0.1's actor tags on nodes; the walk-on-every-request render path. | Establishes the two named regions every later task builds into: t2 enriches the *forest region*'s internals; t4 replaces the roster region placeholder. No later task owns or alters the shell or a sibling's region. The narrow-window *per-node-row* degrade is **not** here (t1 ships the existing flat render, which has no right-aligned collision) — it is t2's. |
 | `workstream-tracker-1-0-m2-t2` | Expanded in-root nested-box render | Within t1's forest region, a root's descendants render as nested epic → milestone → task → phase boxes, each carrying its own Status badge, each independently collapsible — replacing the flat nested-`<ul>` bullet render. Owns the stacked-row narrow-window degrade (it introduces the right-aligned Status/progress that can collide with left-aligned label text). Preserves: v0.1's actor tags on nodes still render on each box (the deferred actor-icons-on-progress-boxes work assumes node actor tags remain — they must not regress); walk-on-every-request unchanged; a stub and any node without rich data still render. | Builds into t1's forest region. Provides the per-node expanded box surface t3 renders progress boxes *inside*. Independent of t4. |
-| `workstream-tracker-1-0-m2-t3` | Doc-declared progress stages (spec-first) | An additive `spec/` frontmatter affordance lets a plan doc declare its own progress stages; the parser reads it; every node level (root, milestone, task, phase) renders a row of progress boxes whose count and order come from the doc. A stub (`slug` + `Status: In draft`, no declared stages) renders only the Drafting box; the rest appear once the doc reaches `Proposed`. Preserves: the spec change is optional and additive (a doc omitting the field renders with no error/skip, falling back to the Drafting-box-only / bare shape — the already-supported stub render case `stub-children-on-parent-promotion` relies on); existing vendored consumers are unaffected; walk-on-every-request unchanged. | Consumes t2's expanded per-node box as the render host for the box row. Does not feed t4. The declared-stages spec field is the spec-first deliverable; t4 deliberately does **not** consume or schematize it (posture-tension invariant). |
+| `workstream-tracker-1-0-m2-t3` | Doc-declared progress stages (spec-first) | An additive `spec/` frontmatter affordance lets a plan doc declare its own progress stages; the parser reads it; every node level (root, milestone, task, phase) renders a row of progress boxes whose count and order come from the doc. A doc with no declared-stages field (the `slug` + `Status: In draft` stub case) renders only the Drafting box; a doc that declares the field renders the reserved Drafting box followed by its declared stages. (t3 drafting resolved this contract's earlier "the rest appear once the doc reaches `Proposed`" phrasing to **field-presence** gating, Status-independent — D5; the typical stub is `In draft` and field-less, so the observable behavior is unchanged. See the "Doc-declared-stages frontmatter shape" Cross-Task Decisions entry.) Preserves: the spec change is optional and additive (a doc omitting the field renders with no error/skip, falling back to the Drafting-box-only / bare shape — the already-supported stub render case `stub-children-on-parent-promotion` relies on); existing vendored consumers are unaffected; walk-on-every-request unchanged. | Consumes t2's expanded per-node box as the render host for the box row. Does not feed t4. The declared-stages spec field is the spec-first deliverable; t4 deliberately does **not** consume or schematize it (posture-tension invariant). |
 | `workstream-tracker-1-0-m2-t4` | Session roster + work-item enrichment | Replacing t1's roster-region placeholder, a roster lists every registered active session — bound (slug matches a plan-tree node) and unbound (slug absent from the tree, the accepted orphan/typoed-slug residual) — that v0.1's render currently drops. The register client/CLI sends richer per-session data; roster entries are expandable, showing session name, reported PRs, and other reported fields rendered as a deliberately unstructured raw-JSON view (schema-loose on purpose; "what is required" is intentionally deferred). Preserves: registration stays observable best-effort and opt-in — the roster surfaces sessions that chose to register and never claims to see all of them (the existing best-effort/observable registration tenet); walk-on-every-request unchanged; richer data is additive (a session reporting only the v0.2 minimum still lists). | Builds into t1's roster region (replaces its placeholder); does not touch the forest region. Independent of t2/t3; ships in parallel with the t2 → t3 chain. Delivers the "every session can be accounted for" observability surface the `deterministic-interactive-registration` backlog entry's mitigation direction names (see Backlog Impact). |
 
 ## Cross-Task Invariants
@@ -395,6 +412,34 @@ their tasks draft.
   (goldmark-meta frontmatter read this field is added to);
   the vision's own open question on prose-to-data extraction in
   [`design/vision.md` §7](../../../../design/vision.md).
+  **Status: RESOLVED by human input (2026-05-18); promotion gate
+  walked in-session, t3 plan now `Proposed`.** t3's just-in-time
+  drafting session decomposed
+  this into candidate shapes (ordered stage-label list A1/A2/A3
+  vs. per-stage counts B1/B2 vs. richer records C) with cited
+  trade-offs in
+  [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+  "Decisions resolved by human input" (D1–D6). The human resolved
+  it: **D1 = A2** (ordered list of stage-label strings, one cell ≈
+  one PR in the typical case); **D2** frontmatter key
+  `progress_stages`, rendered element a "progress cell"
+  (reconciles toward
+  [`design/vision.md` §7](../../../../design/vision.md)'s
+  established "cell" vocabulary; this milestone's WHAT prose
+  intentionally keeps "progress boxes" as the umbrella concept
+  term — the contract language is not churned, only the
+  rendered-element name is t3's); **D3** render-side reserved Drafting cell,
+  no doc-visible token; **D4** no inheritance; **D5** row gated by
+  field-presence (Status-independent); **D6** phase split resolved
+  **N = 1** by the branch-test sketch at the in-session gate.
+  Per-stage counts (B2) are deferred as an additive-linear future
+  migration, not designed out. The t3 plan's Contracts are locked
+  to these; the contributor directed the
+  `` `In draft` → `Proposed` `` promotion gate to be walked
+  in-session (extending past the spawn's original "stop at
+  `In draft`" bound at the contributor's explicit direction), and
+  the plan is now `Proposed`. No PR is opened by this session
+  (separately out of scope).
 - **Where richer session data is stored/read — RESOLVED at t4
   drafting: join the event log (no schema change).** A free-form
   `metadata` JSON column already exists on `events` but not on
