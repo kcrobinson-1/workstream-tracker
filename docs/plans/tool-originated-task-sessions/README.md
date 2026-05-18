@@ -52,14 +52,17 @@ work, hope it attributes itself correctly" to "click the node,
 pick the mode, watch the right session start and attach
 itself."
 
-This doc's first job is to **settle the product vision and
-technical direction before any milestone scope locks**. The
+This doc was drafted vision-first: **settle the product vision
+and technical direction before any milestone scope locks**. The
 tool moving from observe-only to launching agents is the
-largest posture change in the product's history; the milestone
-breakdown is an estimate until the vision questions below are
-resolved. Working surface across the epic's lifecycle: sessions
-promote the Open Questions into committed milestone scope (or to
-Out of Scope) as deliberation locks them.
+largest posture change in the product's history. Those
+scope-locking vision/technical-direction questions are now
+resolved (see "Open Questions Resolved By This Epic"), so the
+child set is locked at two milestones and m1's WHAT contract is
+locked; the UX milestone is named with its vision inputs
+resolved but its WHAT sealed at its own milestone-planning
+session. Remaining Open Questions are milestone-time or
+conscious-tracking, not scope-locking.
 
 ## Why This Epic
 
@@ -234,14 +237,17 @@ them.
 
 ## Milestone Structure
 
-*Estimate pending milestone planning. The milestone count and
-split are not locked: this is a vision-first epic, and the
-technical-direction Open Questions below must resolve before
-the UX milestone's scope can lock. Per
-[`epic.md`](../../../spec/planning/epic.md) "Scope," these
-per-milestone details are estimates, not binding specs, until
-each milestone's planning session re-derives them against
-merged code.*
+The epic's scope-locking vision/technical-direction Open
+Questions are resolved (see "Open Questions Resolved By This
+Epic"), so the **child set is now locked at two milestones**:
+m1 and one tool-originated-session UX milestone. m1's WHAT
+contract is locked below. The UX milestone is named with its
+vision inputs resolved but its WHAT **sealed at its own
+milestone-planning session** against merged m1 code, per
+[`epic.md`](../../../spec/planning/epic.md) "Scope" — the epic
+does not pre-seal it. Per-milestone task counts and any
+internal split remain milestone-time estimates, not epic-level
+commitments.
 
 **Sequencing rationale** — sequential dependency, not parallel:
 
@@ -256,31 +262,30 @@ merged code.*
   and it consumes m1's proven slug-carried registration path
   as the thing the spawn wires into.
 
-**Milestones (estimated):**
+**Milestones (child set locked at two):**
 
-- `tool-originated-task-sessions-m1` (estimate — scope not yet
-  locked). **Unwired deterministic slug-carried registration
-  path.** A registration entrypoint that, given a
-  construction-known canonical slug, registers a work-instance
-  deterministically — no natural-language resolution, no
-  narration handshake. Exercised via an explicit slug argument
-  (a manual / CLI invocation) as the stand-in slug producer; no
-  agent-spawning UX. Proves the deterministic path end-to-end
-  before the tool-acting posture shift.
+- `tool-originated-task-sessions-m1` (contract locked).
+  **Unwired deterministic slug-carried registration path.** A
+  registration entrypoint that, given a construction-known
+  canonical slug, registers a work-instance deterministically —
+  no natural-language resolution, no narration handshake.
+  Exercised via an explicit slug argument (a manual / CLI
+  invocation) as the stand-in slug producer; no agent-spawning
+  UX. Proves the deterministic path end-to-end before the
+  tool-acting posture shift.
 
-- **Tool-originated session UX milestone(s)** (estimate — scope
-  not yet locked, gated on the Open Questions below). The
-  plan-tree-node affordance that spawns the agent session and
-  becomes the *real* construction-time slug producer feeding
-  m1's path. This is the actual
+- **Tool-originated session UX milestone** (named; WHAT sealed
+  at its own milestone planning). The plan-tree-node affordance
+  that spawns the agent session and becomes the *real*
+  construction-time slug producer feeding m1's path. This is the
+  actual
   [`tool-originated-task-sessions`](../../backlog.md#tool-originated-task-sessions)
-  capability and the determinism-resolution home. Milestone
-  count and structure are the milestone-planning sessions'
-  output, not fixed here, and cannot lock until the one
-  remaining scope-locking Open Question resolves — the
-  spawn-shape choice. (One-way-invariant reconciliation,
-  workspace origin, and the level/mode matrix are resolved; see
-  Open Questions Resolved By This Epic.)
+  capability and the determinism-resolution home. Its vision
+  inputs are resolved (spawn shape, one-way reconciliation,
+  workspace origin, level/mode — see Open Questions Resolved By
+  This Epic); its WHAT contract and task breakdown are its own
+  milestone-planning session's output against merged m1 code,
+  not pre-sealed here.
 
 ## Milestone Contracts
 
@@ -289,17 +294,19 @@ milestone lives in the milestone doc when it drafts. Required
 section per [`epic.md`](../../../spec/planning/epic.md)
 "Required and optional sections" and
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts." Scope is **not yet locked** for any milestone
-in this epic — it is vision-first by construction; per
+child contracts." The child set is locked at two milestones.
+**m1's WHAT contract is locked** (row below). The **UX
+milestone is explicitly scope-not-yet-locked** — its vision
+inputs are resolved but its WHAT is sealed at its own
+milestone-planning session per
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts," this names the milestones without sealing
-their contracts until their planning sessions run and the
-Open Questions resolve.
+child contracts," which permits a named child carrying its
+WHAT without final sealing until that session runs.
 
-| Milestone | Short description | End result and what it preserves (WHAT, estimated) | Sibling interface (estimated) |
+| Milestone | Short description | End result and what it preserves (WHAT) | Sibling interface |
 |---|---|---|---|
-| `tool-originated-task-sessions-m1` | Unwired deterministic slug-carried registration path | Given a construction-known canonical slug, a work-instance registers deterministically with no resolution and no narration handshake; exercised via an explicit slug argument. Preserves the existing interactive best-effort registration path unchanged (this is an additional path, not a replacement) and the spec's existing exact-slug create-or-attach posture. | Produces the slug-carried registration entrypoint the UX milestone's spawn wires into as the construction-time slug producer. |
-| Tool-originated session UX milestone(s) | The node affordance that spawns a session and carries its slug by construction | *Scope not yet locked.* When done, an explicit contributor action on a plan-tree node spawns an agent session whose canonical slug is carried by construction, registered deterministically via m1's path. Preserves the observe-only behavior for all sessions not originated by the tool. | Consumes m1's slug-carried registration entrypoint as the real construction-time slug producer. |
+| `tool-originated-task-sessions-m1` | Unwired deterministic slug-carried registration path | **Locked.** Given a construction-known canonical slug, a work-instance registers deterministically with no resolution and no narration handshake; exercised via an explicit slug argument. Preserves the existing interactive best-effort registration path unchanged (this is an additional path, not a replacement) and the spec's existing exact-slug create-or-attach posture. | Produces the slug-carried registration entrypoint the UX milestone's spawn wires into as the construction-time slug producer. |
+| Tool-originated session UX milestone | The node affordance that spawns a session and carries its slug by construction | *Scope-not-yet-locked (vision inputs resolved; WHAT sealed at its own milestone planning).* Directional: an explicit contributor action on a node spawns a real local interactive session, handed the mode-appropriate prompt, carrying the node's slug out-of-band; a session-start hook registers it deterministically via m1's path; the agent self-provisions its worktree and reports it as best-effort enrichment. Preserves observe-only for all sessions the tool did not originate. | Consumes m1's slug-carried registration entrypoint as the real construction-time slug producer. |
 
 ## Open Questions Resolved By This Epic
 
@@ -381,6 +388,29 @@ Long-standing deferrals this epic's existence settles.
   that is a signal to revisit this resolution, not to add
   inference power to the tool — the minimal-tool posture is the
   invariant, the table is the means.
+- **How does the tool spawn an agent session?** Resolved. The
+  tool starts a **real local interactive session, hands it the
+  task prompt, and carries the node's slug out-of-band**; a
+  session-start hook runs the deterministic registration before
+  the model reasons. This is the only shape consistent with the
+  locked vision (a session the contributor can take over,
+  handed its task — not a headless batch run) and with
+  launch-not-leash (the tool's sole action is hand over the
+  prompt). The headless/print-mode and cloud-SDK alternatives
+  investigated were not chosen: headless is not a takeable
+  working session, and the cloud SDK is more tool/infra power
+  and off the single-local path (it is recorded under the
+  agent-adapter-seam invariant as a possible future adapter,
+  not committed here). The session-start-hook capability this
+  rests on is real: Claude Code's `SessionStart` hook fires at
+  session start before the model begins, runs a shell command,
+  and can read launcher-provided input. (Verified by [Claude
+  Code hooks
+  documentation](https://code.claude.com/docs/en/hooks.md).)
+  Exact CLI flags and hook spellings remain HOW for the UX
+  milestone's planning session against the then-current Claude
+  Code; the locked commitment is the *shape*, not the
+  invocation specifics.
 
 ## Open Questions Newly Opened
 
@@ -388,48 +418,6 @@ These are the vision and technical-direction calls the epic
 must resolve before the UX milestone's scope can lock. They are
 the substance of the "settle vision first" framing.
 
-- **How does the tool spawn an agent session?** The core
-  technical-direction question — the tool today only observes;
-  "the tool acting / spawning agents" is a fundamentally new
-  capability surface. A first investigation (local-only, per
-  the single-local invariant) decomposed the candidate space
-  into three shapes, to be analyzed at the UX milestone's
-  planning session, not locked here:
-  - **Shape A — spawn the interactive Claude Code CLI; inject
-    the slug out-of-band; register via a session-start hook.**
-    The tool launches a real interactive session the
-    contributor can take over; the launcher passes the
-    construction-known slug through an out-of-band channel
-    (environment or file); a session-start hook runs the
-    deterministic registration before the model reasons. This
-    is the **leading candidate**: it is local, keeps the
-    session interactive, makes registration deterministic by
-    construction, and reuses the existing
-    [`session-registration.md`](../../../docs/agents/local/session-registration.md)
-    model with slug *resolution* replaced by an injected known
-    slug and the narrated best-effort step replaced by the
-    hook. (Verified by [Claude Code hooks
-    documentation](https://code.claude.com/docs/en/hooks.md)
-    for the session-start hook surface.)
-  - **Shape B — headless / print-mode invocation with the slug
-    in the prompt.** Fully scriptable but not a session the
-    contributor can take over and work in; weaker
-    register-before-model-work guarantee. Fails the product
-    vision of a takeable working session, though plausibly
-    useful as m1's unwired test-harness producer.
-  - **Shape C — Agent SDK / cloud managed agents.** A
-    different, cloud product surface with no session-start-hook
-    equivalent; out of local-first focus and in tension with
-    the single-local invariant. Recorded as the **future cloud
-    adapter** the agent-adapter-seam invariant keeps the door
-    open for — explicitly not committed by this epic. (Verified
-    by [Claude Agent SDK / managed-agents
-    documentation](https://platform.claude.com/docs/en/managed-agents/quickstart.md).)
-
-  Exact CLI flags and hook-event spellings are HOW: deferred to
-  the UX milestone's planning session against the then-current
-  Claude Code, and require real-doc verification before they
-  become load-bearing.
 - **Does m1's slug-carried path reuse the existing exact-slug
   create-or-attach registration path, or introduce new
   surface?** The spec already defines an exact-slug
@@ -521,10 +509,10 @@ Per the effect taxonomy in
   feature.** Moving the tool from observe-only to launching
   agents is the largest conceptual change in the product's
   history and tensions with a 1.0-epic cross-cutting invariant.
-  Mitigation: the epic resolves the one-way-invariant
+  Mitigation: the epic resolved the one-way-invariant
   reconciliation in-doc (rule stands; one bounded, fenced
   exception; value preserved; vision §5 named as the carve-out's
-  authoritative home) before any milestone scope locks —
+  authoritative home) before milestone scope locked —
   vision-first by construction, not by convention.
 - **Determinism mis-scoped as an early deliverable.**
   Re-introducing "deterministic interactive registration" as an
@@ -549,17 +537,19 @@ Per the effect taxonomy in
 
 ## Sizing Summary
 
-*Estimates only; nothing locked. Per-milestone task counts are
-each milestone-planning session's output.*
+*Child set locked at two; per-milestone task counts remain each
+milestone-planning session's output (estimates, not epic-level
+commitments).*
 
-- **m1**: estimate pending the m1 milestone-planning session.
-  A slug-carried deterministic registration entrypoint plus a
-  manual slug producer to exercise it.
-- **Tool-originated session UX milestone(s)**: count and split
-  are an estimate that cannot firm up until the one remaining
-  scope-locking Open Question resolves — the spawn-shape choice.
-  (One-way reconciliation, workspace origin, and the level/mode
-  matrix are resolved.)
+- **m1** (contract locked): task count is the m1
+  milestone-planning session's output. A slug-carried
+  deterministic registration entrypoint plus a manual slug
+  producer to exercise it.
+- **Tool-originated session UX milestone** (named; WHAT sealed
+  at its own milestone planning): task count and any internal
+  split are that session's output. All scope-locking vision
+  questions (spawn shape, one-way reconciliation, workspace
+  origin, level/mode) are resolved.
 
 ## Related Docs
 
