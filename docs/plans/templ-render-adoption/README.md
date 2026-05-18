@@ -71,16 +71,27 @@ recursive, with the roster still a placeholder. The original
 deferral's bar ("real reusable components") is not yet met by a
 file split that produced thin, stable partials.
 
-**Documented re-trigger condition.** Revisit `templ` when the
-render layer grows **interactive or stateful components** — for
-example forms or actionable controls in the roster region, or a
-materially larger set of shared partials passing typed props —
-such that compile-time type safety would prevent real defects.
-At that point the byte-identity pins are no longer load-bearing
-(an interactive surface is not a stable byte snapshot) and the
-codegen-tool cost is paid for by genuine ergonomic need rather
-than speculation. A file count growing without that interactive
-or typed-prop pressure is **not** a re-trigger on its own.
+**Documented re-trigger condition.** The tripwire is **render-
+surface complexity**, not interactivity. The website is
+server-rendered by design — real-time updates without refresh
+and server-to-agent push are explicitly out of scope (see
+[`design/v0.1-design.md`](../../../design/v0.1-design.md) §9),
+so the v1.0+ roadmap (intent bar, tier sorting, sub-stage
+D/P/I/V cells, triage zone, actor lineage) grows *more
+server-rendered structure*, not client interactivity. Those
+features are all expressible in `html/template`; the cost of
+staying is developer-experience drag that accretes roughly
+linearly with the surface. Revisit `templ` when that drag
+becomes load-bearing: the partial set, recursion/conditional
+depth, and amount of typed data threaded through the templates
+grow such that the stringly-typed `{{template}}`/`FuncMap`
+indirection and the absence of compile-time field checks are a
+real readability and refactor-safety hazard (a rename of a
+`PlanNode` field silently mis-rendering rather than failing to
+compile is the canonical symptom). A growing file count alone,
+absent that indirection/typed-data pressure, is **not** a
+re-trigger; "interactive components" is explicitly **not** the
+tripwire, because this UI is not headed there.
 
 This decision is recorded for maintainer review via this plan's
 implementing PR; it is not self-applied silently — the PR is the
@@ -220,6 +231,40 @@ diff surface is documentation + a decision record:
 - **trigger-map-currency** — the change rewrites cross-doc
   pointers (backlog → plan, §10 → outcome); audit that every
   added/changed link resolves and no pointer drifts.
+
+## Risk Register
+
+- **Deferral makes a future `templ` migration progressively more
+  expensive — bounded, linear, mitigable.** Accepting
+  `html/template` now means a later migration (if the re-trigger
+  fires) ports more partials than exist today. The structural
+  cost is *not* a cliff: the one-time costs (add the `templ`
+  CLI, wire `templ generate` into the gate, rewrite the
+  byte-identity falsifiers to semantic assertions) are fixed
+  regardless of timing, the render layer is cleanly separated
+  (`PlanNode` is a plain struct `templ` consumes unchanged, each
+  template renders through an isolated Go entrypoint), and
+  migration is leaf-up and component-by-component. The only cost
+  that genuinely *accretes* is this repo's own byte-identity
+  test ratchet: each new partial added under `html/template`
+  ships with a byte-exact pin (the
+  `TestRenderNoFieldNodeUnchanged` discipline), and every such
+  pin is one more test to rewrite at migration time because
+  `templ` minifies whitespace.
+  **Mitigation (keeps the deferral cheap):** new partials added
+  while `html/template` is the standing choice assert on
+  *semantic* output (presence/structure of the rendered markup),
+  not byte-exact snapshots. The existing pins
+  (`TestRenderNoFieldNodeUnchanged`, `TestRenderTwoRegionShell`)
+  stay as-is — they are load-bearing region-split falsifiers
+  today and rewriting them is only warranted if the re-trigger
+  fires — but the ratchet stops tightening for net-new render
+  surface. Verified by:
+  [`internal/site/forest_test.go:71-97`](../../../internal/site/forest_test.go)
+  (the byte-exact pin pattern this mitigation declines to
+  propagate); spike branch `spike/templ-render` @ `d19445b`
+  (the `templ` whitespace-minification behavior that makes
+  byte-exact pins migration-hostile).
 
 ## Out of Scope
 
