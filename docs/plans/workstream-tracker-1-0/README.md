@@ -72,9 +72,9 @@ them.
 
 ## Milestone Structure
 
-One landed milestone, one in-draft middle milestone, one
-early-estimate middle milestone, and a final integration
-milestone whose slug is allocated at registration time.
+Two landed milestones, one early-estimate middle milestone, and
+a final integration milestone whose slug is allocated at
+registration time.
 
 The original `m2` ("activity-first ordering") and `m3`
 ("sub-stage cells + richer actor presence") were early
@@ -110,8 +110,8 @@ rather than lost.
   parsing as a phase), expanded per-node display. Full task
   list and contracts in [`m1-v0-2.md`](m1/README.md).
 
-- `workstream-tracker-1-0-m2` (Proposed — task scope locked at
-  4 tasks; parent-promotion stubs seeded). **v0.3 — In-root
+- `workstream-tracker-1-0-m2` (Landed — all four tasks
+  complete). **v0.3 — In-root
   expanded view, doc-declared progress boxes, and session
   roster.** A root's contents
   render as nested epic → milestone → task → phase boxes with
