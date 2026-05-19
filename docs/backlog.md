@@ -405,3 +405,53 @@ else. Deferred, not 1.0-committed; re-deliberate when a producer
 that sends evolving per-heartbeat metadata actually exists (no
 current producer does — the `register` CLI sends a one-key
 `name` object or nothing).
+
+### work-instance-receipt-cache
+
+**Status:** Open
+
+Cache the registered work-instance id so `complete`/`abandon`
+reliably terminate *this* session's work-instance.
+
+Today the CLI caches only the generated per-session actor, not
+the work-instance-id receipt, so terminal commands must
+re-resolve the target and can mis-terminate or wrongly skip when
+the actor is ambiguous, rotated, or shared. The goal is a
+session→work-instance receipt that lets `complete`/`abandon` act
+on exactly the instance this session registered, never on a
+stale, foreign, or concurrent one. One option among several: an
+owner-scoped cached receipt (id tagged with the resolving actor;
+terminal commands act only on an owner match, else narrate a
+skip) — a fresh design pass owns the mechanism; this is not a
+prescription.
+
+**Prior effort & learnings.** An implementation was attempted
+and **abandoned** on branch
+`claude/fix-session-registration-JQOJa` (kept for reference,
+not a base to resume): too under-specified to survive PR review
+— the owning invariant was discovered reactively across four
+review rounds instead of stated up front. A re-attempt starts
+from a planned design and carries:
+
+- **Design the invariant first.** A cached wi-id with no owner
+  can't be told apart from a stale/foreign/concurrent one;
+  every reactive fix was "one face of an unspecified
+  invariant." Specify owner-scoping + skip semantics in the
+  plan, not in review.
+- **Defects that survived the first consolidation.** (a)
+  Re-deriving a *rotating* actor at terminal time (6h idle
+  window) wrongly skipped end-of-session completion for an
+  ordinary long session — resolve an explicit actor only at
+  complete, never rotate. (b) An actor-keyed post-success
+  clear wiped a still-live receipt when a *different* instance
+  was completed via `--id` — key the clear to the id actually
+  transitioned.
+- **Accepted residuals (state, don't engineer away).** Two
+  sessions sharing one resolved actor in one worktree;
+  env-inconsistent `WST_ACTOR` (safe skip); explicit `--id` as
+  operator override.
+
+Related: `deterministic-interactive-registration` /
+`interactive-registration-tripwire` (registration identity),
+and the session-close `completed` event this lifecycle
+underpins.
