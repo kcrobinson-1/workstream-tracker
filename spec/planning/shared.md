@@ -178,6 +178,27 @@ two paths are mutually exclusive per descendant — a slug is either
 pre-declared and asserted, or server-generated, never both — so no
 second allocator exists to diverge from the position counter.
 
+**Deterministic assertion when the slug is construction-known.**
+When a session's canonical slug is known *by construction* — carried
+into the session rather than resolved from a natural-language prompt —
+asserting it via the exact-slug create-or-attach path described under
+"Slug generation" above is **deterministic**: the slug is honored
+verbatim and no natural-language-resolution step precedes the
+assertion. This is not a new mechanism: it is that same exact-slug
+create-or-attach path exercised with a slug that needs no
+interpretation, so it adds no endpoint, request/response field,
+schema, or registration code path. The stand-in producer of a
+construction-known slug is the manual / CLI `--slug` argument. This
+deterministic path is **additive**: it sits alongside, and does not
+replace, the path a session must still take when its slug has to be
+resolved from a natural-language prompt before assertion. "Deterministic"
+here scopes only to identity being fixed by construction for a session
+that *did* launch: it does not assert the producer of the slug cannot
+itself be wrong — a wrong-by-construction slug still attaches under the
+trust-the-caller, orphan/unattached-work-instance residual already
+accepted and deferred above — and it makes no enrichment metadata
+load-bearing for attachment.
+
 **Slug is identity; path is layout.** The path the file lives at is
 governed by the layout convention (see
 [`planning-doc-location.md`](../planning-doc-location.md)). At

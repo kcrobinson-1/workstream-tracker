@@ -74,15 +74,16 @@ row, and m1's Inherited Contract](../README.md).)
 Both tasks were skeleton-seeded when this milestone passed its
 `In draft` → `Proposed` promotion gate (per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
-child contracts → Parent-promotion stub seeding"). **t1's task
-planning is complete** — scoped (decisions SD1–SD7) and drafted
-to a full task plan at `Status: Proposed`. **t2** still carries
-the inherited locked contract at `Status: In draft`; its per-task
-planning (HOW scoping) has not begun.
+child contracts → Parent-promotion stub seeding"). **t1 has
+landed** — scoped (decisions SD1–SD7), drafted to a full task
+plan, and its doc-only contract expression merged at
+`Status: Landed`. **t2** still carries the inherited locked
+contract at `Status: In draft`; its per-task planning (HOW
+scoping) has not begun.
 
 | Task | Slug | Skeleton | Status |
 |---|---|---|---|
-| t1 | `tool-originated-task-sessions-m1-t1` | [`t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md) | Proposed (task plan drafted; scoping SD1–SD7 resolved) |
+| t1 | `tool-originated-task-sessions-m1-t1` | [`t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md) | Landed (doc-only contract expression merged; scoping SD1–SD7 resolved) |
 | t2 | `tool-originated-task-sessions-m1-t2` | [`t2-determinism-proof-harness.md`](./t2-determinism-proof-harness.md) | In draft (skeleton; task planning not started) |
 
 Task count is this milestone-planning session's output and is an
