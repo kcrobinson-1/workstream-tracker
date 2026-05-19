@@ -74,13 +74,15 @@ row, and m1's Inherited Contract](../README.md).)
 Both tasks were skeleton-seeded when this milestone passed its
 `In draft` → `Proposed` promotion gate (per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
-child contracts → Parent-promotion stub seeding"); each carries
-the inherited locked contract at `Status: In draft`. Per-task
+child contracts → Parent-promotion stub seeding"). **t1's task
+planning is complete** — scoped (decisions SD1–SD7) and drafted
+to a full task plan at `Status: Proposed`. **t2** still carries
+the inherited locked contract at `Status: In draft`; its per-task
 planning (HOW scoping) has not begun.
 
 | Task | Slug | Skeleton | Status |
 |---|---|---|---|
-| t1 | `tool-originated-task-sessions-m1-t1` | [`t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md) | In draft (skeleton; task planning not started) |
+| t1 | `tool-originated-task-sessions-m1-t1` | [`t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md) | Proposed (task plan drafted; scoping SD1–SD7 resolved) |
 | t2 | `tool-originated-task-sessions-m1-t2` | [`t2-determinism-proof-harness.md`](./t2-determinism-proof-harness.md) | In draft (skeleton; task planning not started) |
 
 Task count is this milestone-planning session's output and is an
@@ -226,16 +228,24 @@ brushes against them.
   generic to construction-known slugs; it must not encode the
   node-affordance producer (that is m2).
 
-- **D3 — Defer to t1's task planning:** the exact section
-  placement and wording in
+- **D3 — Deferred to t1's task planning; now RESOLVED there.**
+  The exact section placement and wording in
   [`shared.md`](../../../../spec/planning/shared.md) and
   [`session-registration.md`](../../../../docs/agents/local/session-registration.md),
-  and the `rule-additions.md` retire-or-merge target for the
-  agent-rule addition. These are HOW, are not a cross-task
-  blocker (t2 does not depend on the wording, only on the named
-  determinism properties), and are resolvable by t1's planner
-  against then-merged docs. Deferring avoids recording wording
-  assumptions that won't survive contact with the merged spec.
+  and the `rule-additions.md` retire-or-merge target, were HOW
+  for t1's planning (not a cross-task blocker — t2 depends only
+  on the named determinism properties, not the wording).
+  Resolved by t1's scoping/plan: a **new first-class sibling
+  subsection** in `shared.md` adjacent to "Slug generation"; a
+  **new sibling section** after the byte-unchanged interactive
+  handshake in `session-registration.md`, with **no
+  confirm-equivalent**; the `rule-additions.md` target is
+  **answer (b) — no retire** (new failure class), leaving the
+  interactive-only "Scope and residual" determinism clause
+  unchanged. Detail and rejected alternatives in
+  [`t1`'s scoping doc](./scoping/t1-deterministic-path-contract.md)
+  (SD1–SD4); durable contract in
+  [`t1`'s plan](./t1-deterministic-path-contract.md) (C1–C4).
 
 ## Cross-Task Risks
 

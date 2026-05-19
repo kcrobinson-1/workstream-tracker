@@ -47,8 +47,8 @@ PORT=9000 DB_PATH=/tmp/wst.db go run ./cmd/workstream-tracker
 To build a standalone binary:
 
 ```sh
-go build -o workstream-tracker ./cmd/workstream-tracker
-./workstream-tracker
+go build -o bin/workstream-tracker ./cmd/workstream-tracker
+./bin/workstream-tracker
 ```
 
 To run the test suite:

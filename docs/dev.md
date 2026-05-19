@@ -72,7 +72,7 @@ needed yet.
 4. Build a standalone binary:
 
    ```sh
-   go build -o workstream-tracker ./cmd/workstream-tracker
+   go build -o bin/workstream-tracker ./cmd/workstream-tracker
    ```
 
 The SQLite file at `DB_PATH` is created on first run. Delete it
