@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m1-t1
-Status: In draft
+Status: Proposed
 short_description: Deterministic-path contract expression
 ---
 
