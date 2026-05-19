@@ -1,9 +1,16 @@
-# Session-start work-instance registration
+# Session work-instance lifecycle handshake
 
 Repo-owned universal rule. The root [`AGENTS.md`](../../../AGENTS.md)
 "Universal session rules" section points here; this file owns the
 detail. Lives in `AGENTS.md` + `docs/agents/local/` (not the
 vendored read-only `docs/agents/shared/**`).
+
+This rule owns the full session work-instance lifecycle: the
+session-start registration handshake and the symmetric session-end
+completion handshake. The completion half is not a separate rule —
+it is the closing bracket of the same observable best-effort
+narration contract; an open registration with no completion leaves
+the tree showing work that has finished.
 
 ## Why this rule exists
 
@@ -33,8 +40,12 @@ fails the session — whatever happens, you proceed.
    prose success claim.
 
    ```sh
-   workstream-tracker register --slug <canonical-slug>
+   go run ./cmd/workstream-tracker register --slug <canonical-slug>
    ```
+
+   Invoke it through `go run ./cmd/workstream-tracker` — the repo
+   ships no installed `workstream-tracker` binary on `PATH`, so a
+   bare `workstream-tracker …` will not resolve.
 
    (Slug also via `WST_SLUG`; actor via `--actor`/`WST_ACTOR`,
    defaulting to a generated per-session id — never the git user;
@@ -49,13 +60,43 @@ fails the session — whatever happens, you proceed.
 5. **Proceed.** Registration never gates task work. Continue
    whether it succeeded, failed, or was skipped.
 
+## The session-end handshake (completion)
+
+When the session's work is finished, close the bracket. Same
+best-effort contract: it never blocks or fails the session.
+
+1. **Invoke.** Run the completion subcommand. It resolves the
+   work-instance id from the receipt the session-start register
+   cached in this worktree — no id threading required.
+
+   ```sh
+   go run ./cmd/workstream-tracker complete
+   ```
+
+   (Use `abandon` instead of `complete` if the work is being
+   dropped rather than finished. Id also via `--id`/`WST_WI_ID`
+   when the register receipt was not cached — e.g. a separate
+   process or worktree; server via `--server`/`WST_SERVER`,
+   default `http://localhost:8080`.)
+2. **Echo real output.** Report the actual receipt — the real
+   event id and HTTP status it printed. A prose "marked complete"
+   with no echoed id/status is a `validation-honesty` violation.
+3. **Narrate failure explicitly.** If the command reports a
+   failure, or no work-instance id is resolvable, say so
+   explicitly and actionably — the tree will keep showing this
+   session active; the contributor can run the command by hand
+   against a running server. A silent skip is an
+   `error-surfacing-user-mutations` violation.
+
 ## Scope and residual
 
 This handshake is the only observability backstop for a missed
 registration: an unregistered session emits no signal the tool
 ever sees, so the rendered tree cannot distinguish it from
 genuinely no work. A present contributor noticing a missing or
-incongruent handshake line is the backstop. The determinism and
+incongruent handshake line is the backstop. A missed session-end
+completion is symmetric: the tree keeps showing the session active
+until the contributor notices the stale marker. The determinism and
 tree-side-affordance gaps are consciously accepted best-effort,
 tracked by the `deterministic-interactive-registration` backlog
 entry.

@@ -75,10 +75,31 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 		return 0
 	}
 
+	// Cache the real work-instance id so the symmetric `complete`
+	// handshake can resolve it without the session threading the id
+	// through the prompt. A cache-write failure is non-fatal: the
+	// session still registered, and complete falls back to --id.
+	if path, perr := wstCachePath("wi"); perr == nil {
+		_ = os.WriteFile(path, []byte(res.WorkInstanceID), 0o600)
+	}
+
 	fmt.Fprintf(stdout,
 		"register: ok work_instance_id=%s slug=%s actor=%s http_status=%d server=%s\n",
 		res.WorkInstanceID, res.Slug, actor, res.HTTPStatus, server)
 	return 0
+}
+
+// wstCachePath returns the per-worktree temp-file path for a cached
+// session value of the given kind ("actor", "wi"). Keying by the
+// absolute working directory namespaces parallel worktrees so their
+// sessions never collide on one cached value.
+func wstCachePath(kind string) (string, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("resolve working directory: %w", err)
+	}
+	sum := sha256.Sum256([]byte(wd))
+	return filepath.Join(os.TempDir(), "wst-"+kind+"-"+hex.EncodeToString(sum[:8])+".id"), nil
 }
 
 // sessionActorIdleWindow bounds how long a cached actor id is
@@ -110,12 +131,10 @@ const sessionActorIdleWindow = 6 * time.Hour
 // each reuse slides the window forward so an active session keeps
 // its actor, and a stale cache regenerates.
 func sessionActor() (string, error) {
-	wd, err := os.Getwd()
+	cachePath, err := wstCachePath("actor")
 	if err != nil {
-		return "", fmt.Errorf("resolve working directory: %w", err)
+		return "", err
 	}
-	sum := sha256.Sum256([]byte(wd))
-	cachePath := filepath.Join(os.TempDir(), "wst-actor-"+hex.EncodeToString(sum[:8])+".id")
 
 	if info, err := os.Stat(cachePath); err == nil && time.Since(info.ModTime()) <= sessionActorIdleWindow {
 		if existing, err := os.ReadFile(cachePath); err == nil {
