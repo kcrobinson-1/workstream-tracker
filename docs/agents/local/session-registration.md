@@ -68,6 +68,60 @@ fails the session — whatever happens, you proceed.
 5. **Proceed.** Registration never gates task work. Continue
    whether it succeeded, failed, or was skipped.
 
+## The deterministic path (construction-known slug)
+
+When a session's canonical slug is **known by construction** —
+carried into the session rather than resolved from a
+natural-language prompt — the interpretation the handshake above
+exists for has already been done. This is a sibling of the
+registration handshake, not a replacement for it, and it changes no
+registration endpoint, request field, schema, or code path: it is
+the same exact-slug create-or-attach path, asserted with a slug
+that needs no interpreting.
+
+Steps 1–2 (**Resolve**, **Confirm**) **do not apply**: there is no
+prompt to interpret into a slug, and there is **no
+confirm-equivalent** — no pre-invoke human-catch step. Nothing is
+being interpreted, so there is nothing for a present human to catch
+before invocation; the real-receipt echo below is the sole
+observability surface. The remaining steps are unchanged and still
+best-effort — it never blocks or fails the session:
+
+1. **Invoke.** Run the registration command with the
+   construction-known slug. The manual / CLI `--slug` argument is
+   the stand-in producer of such a slug.
+
+   ```sh
+   go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker register --slug <construction-known-slug>
+   ```
+
+   Invoke it through the full module path, with the same
+   environment-variable and `--actor`/`--server`/`--name`
+   equivalents and the same rationale as the interactive handshake
+   above.
+2. **Echo real output.** Report the *actual* command/server
+   response — the real work-instance id and HTTP status it printed.
+   The same `validation-honesty` obligation applies: report
+   observed fact, not a prose success claim. This real-receipt echo
+   is the sole observability surface, catching a
+   wrong-by-construction slug *post-hoc*, not pre-invoke.
+3. **Narrate failure explicitly.** If the command reports a
+   failure, say so explicitly and actionably — the session will not
+   appear in the tree; the contributor can run the command by hand
+   against a running server. A silent skip is an
+   `error-surfacing-user-mutations` violation.
+4. **Proceed.** Registration never gates task work. Continue
+   whether it succeeded, failed, or was skipped.
+
+Because identity is fixed by construction, this is a deterministic,
+handshake-free registration path. "Deterministic" scopes only to
+identity being fixed by construction for a session that *did*
+launch — not that the producer of the slug cannot itself be wrong.
+A slug that is wrong *by construction* (a typo'd `--slug` today)
+attaches an orphan work-instance: the already-accepted, deferred
+orphan/unattached-work-instance residual, kept observable post-hoc
+by the real-receipt echo.
+
 ## The session-end handshake (completion)
 
 When the session's work is finished, close the bracket. Same
