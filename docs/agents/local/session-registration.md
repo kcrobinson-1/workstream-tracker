@@ -108,22 +108,22 @@ entry.
 ### The cached-receipt contract
 
 `complete`/`abandon` resolve the work-instance id from a receipt
-`register` caches per worktree. That cache is **owner-scoped**: it
-records the registering actor alongside the id, and a terminal
-command uses it only when the actor it resolves matches. This is
-what keeps a stale or another session's receipt from being marked
-terminal — the failure class the implementation contract in
-`cmd/workstream-tracker/register.go` ("The wi-cache contract")
-states in full. Practical consequences for a session:
+`register` caches per worktree. The cache records the registering
+actor alongside the id; the full implementation contract is in
+`cmd/workstream-tracker/register.go` ("The wi-cache contract").
+Practical consequences for a session:
 
-- **Pin the actor across both halves.** With no explicit actor a
-  per-session id is generated and reused within the worktree; if
-  the harness sets `WST_ACTOR` (or you pass `--actor`), set the
-  *same* value for `complete` as for `register`, or pass `--id`.
-  A mismatch makes `complete` safely skip and say so — it never
-  marks the wrong work-instance terminal.
+- **A normal single session needs nothing.** Whether it lasts
+  minutes or many hours, `complete` reads the cached receipt and
+  works — it does not re-derive or rotate an identity, so a long
+  session is never falsely skipped.
+- **Pin `WST_ACTOR` only to disambiguate parallel sessions in one
+  worktree.** When set, it must be the *same* value for `complete`
+  as for `register` (or pass `--id`); a mismatch makes `complete`
+  safely skip and say so — it never marks the wrong work-instance
+  terminal.
 - **Accepted residuals** (same boundary as the backlog entry
-  above, not engineered away): two sessions sharing one resolved
-  actor in one worktree still collapse onto one receipt; an
-  explicit `--id`/`WST_WI_ID` is honored without the owner check
-  as a deliberate operator override.
+  above, not engineered away): with no pinned actor, two sessions
+  in one worktree share the single cached slot; an explicit
+  `--id`/`WST_WI_ID` is honored without the owner check as a
+  deliberate operator override.

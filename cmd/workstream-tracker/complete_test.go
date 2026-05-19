@@ -2,12 +2,16 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/kcrobinson-1/workstream-tracker/internal/registerclient"
 )
 
 func wiCachePath(t *testing.T) string {
@@ -153,6 +157,92 @@ func TestCompleteSkipsForeignOwnedCache(t *testing.T) {
 	}
 	if _, err := os.Stat(wiCachePath(t)); err != nil {
 		t.Fatalf("a foreign-owned cache entry must be left intact for its owner: %v", err)
+	}
+}
+
+// TestCompleteResolvesCachedIDForLongSessionWithoutPinnedActor is the
+// regression guard for the long-session false-skip: a session that
+// does not pin WST_ACTOR and outlives sessionActorIdleWindow must
+// still resolve its own cached receipt. complete must not re-derive
+// or rotate an actor.
+func TestCompleteResolvesCachedIDForLongSessionWithoutPinnedActor(t *testing.T) {
+	ts := startAPIServer(t)
+	cleanupCaches(t)
+	serverOnly := func(k string) string {
+		if k == "WST_SERVER" {
+			return ts.URL
+		}
+		return ""
+	}
+
+	var rout, rerr bytes.Buffer
+	if code := runRegister([]string{"--slug", "demo-root-m1-t2"}, serverOnly, &rout, &rerr); code != 0 {
+		t.Fatalf("register exit = %d; stderr=%q", code, rerr.String())
+	}
+	want := widPattern.FindStringSubmatch(rout.String())
+	if want == nil {
+		t.Fatalf("register echoed no work_instance_id: %q", rout.String())
+	}
+
+	// Age the actor cache past the idle window: under the old
+	// re-derive-and-rotate path this would make complete skip its
+	// own still-cached receipt.
+	stale := time.Now().Add(-sessionActorIdleWindow - time.Minute)
+	if err := os.Chtimes(sessionActorCachePath(t), stale, stale); err != nil {
+		t.Fatalf("chtimes actor cache: %v", err)
+	}
+
+	var cout, cerr bytes.Buffer
+	if code := runTerminal("complete", "completed", nil, serverOnly, &cout, &cerr); code != 0 {
+		t.Fatalf("complete exit = %d; stderr=%q", code, cerr.String())
+	}
+	if !strings.Contains(cout.String(), "complete: ok") || !strings.Contains(cout.String(), "work_instance_id="+want[1]) {
+		t.Fatalf("long session without pinned actor must still resolve its cached receipt; stdout=%q stderr=%q", cout.String(), cerr.String())
+	}
+}
+
+// TestExplicitIDDoesNotWipeOtherCachedReceipt is the regression guard
+// for the misattributed clear: completing some other id via --id must
+// not consume this session's still-live cached receipt.
+func TestExplicitIDDoesNotWipeOtherCachedReceipt(t *testing.T) {
+	ts := startAPIServer(t)
+	cleanupCaches(t)
+	env := pinnedEnv("wst-fixed", ts.URL)
+
+	var rout, rerr bytes.Buffer
+	if code := runRegister([]string{"--slug", "demo-root-m1-t2"}, env, &rout, &rerr); code != 0 {
+		t.Fatalf("register exit = %d; stderr=%q", code, rerr.String())
+	}
+	cachedID := widPattern.FindStringSubmatch(rout.String())[1]
+
+	// A different, independently created work-instance id (does not
+	// touch the wi cache — registerclient is pure HTTP).
+	other, err := registerclient.Register(context.Background(), ts.URL, "other-slug", "wst-fixed")
+	if err != nil {
+		t.Fatalf("seed other work-instance: %v", err)
+	}
+	if other.WorkInstanceID == cachedID {
+		t.Fatalf("seed produced the same id as the cached receipt")
+	}
+
+	var c1out, c1err bytes.Buffer
+	if code := runTerminal("complete", "completed", []string{"--id", other.WorkInstanceID}, env, &c1out, &c1err); code != 0 {
+		t.Fatalf("explicit-id complete exit = %d; stderr=%q", code, c1err.String())
+	}
+	if !strings.Contains(c1out.String(), "work_instance_id="+other.WorkInstanceID) {
+		t.Fatalf("explicit-id complete should transition the named id: %q", c1out.String())
+	}
+	if _, err := os.Stat(wiCachePath(t)); err != nil {
+		t.Fatalf("completing another id via --id must leave this session's cached receipt intact: %v", err)
+	}
+
+	// The real session's no---id complete still resolves its receipt.
+	var c2out, c2err bytes.Buffer
+	if code := runTerminal("complete", "completed", nil, env, &c2out, &c2err); code != 0 {
+		t.Fatalf("cached complete exit = %d; stderr=%q", code, c2err.String())
+	}
+	if !strings.Contains(c2out.String(), "work_instance_id="+cachedID) {
+		t.Fatalf("cached receipt should still resolve after the unrelated --id complete: %q stderr=%q", c2out.String(), c2err.String())
 	}
 }
 

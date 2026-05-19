@@ -40,7 +40,15 @@ func runTerminal(cmd, state string, args []string, getenv func(string) string, s
 	manualCmd := "go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker " + cmd
 
 	explicitID := firstNonEmpty(*idFlag, getenv("WST_WI_ID"))
-	actor, actorErr := resolveActor(*actorFlag, getenv)
+	// Explicit actor only — never sessionActor(). Re-deriving the
+	// generated per-session id here would rotate after the idle
+	// window and make an ordinary long session's complete skip its
+	// own still-cached receipt; and within the window two sessions
+	// derive the same generated id anyway, so it is no reliable owner
+	// signal. The reliable owner signal is a pinned WST_ACTOR/--actor;
+	// with none, the register-side lifecycle (clear-before-attempt +
+	// consume-on-success) is the guard (see the wi-cache contract).
+	explicitActor := firstNonEmpty(*actorFlag, getenv("WST_ACTOR"))
 
 	var id string
 	if explicitID != "" {
@@ -55,17 +63,10 @@ func runTerminal(cmd, state string, args []string, getenv func(string) string, s
 				cmd, manualCmd)
 			return 0
 		}
-		if actorErr != nil {
+		if explicitActor != "" && cachedActor != explicitActor {
 			fmt.Fprintf(stderr,
-				"%s: a cached receipt exists but a per-session actor could not be derived to verify it owns this session (%v); "+
-					"skipping, session proceeds — pass `--id <work_instance_id>` to act on it explicitly.\n",
-				cmd, actorErr)
-			return 0
-		}
-		if cachedActor != actor {
-			fmt.Fprintf(stderr,
-				"%s: a cached receipt exists but is owned by a different session (cached actor does not match this session's); "+
-					"skipping, session proceeds — this session never registered, or WST_ACTOR differs from the register. "+
+				"%s: a cached receipt exists but is owned by a different session (cached actor does not match the pinned WST_ACTOR/--actor); "+
+					"skipping, session proceeds. "+
 					"Run `%s --id <work_instance_id>` by hand to act on a specific work-instance.\n",
 				cmd, manualCmd)
 			return 0
@@ -87,12 +88,12 @@ func runTerminal(cmd, state string, args []string, getenv func(string) string, s
 		return 0
 	}
 
-	// Consume the cached id on a successful terminal transition, but
-	// only the entry this session owns: the work-instance is now
-	// terminal, so a later no---id complete must narrate "no current
-	// session" rather than re-transition it. A foreign entry (acted
-	// on via an explicit --id) is left untouched.
-	if cachedActor, _, ok := readWICache(); ok && actorErr == nil && cachedActor == actor {
+	// Consume the cache only when the entry IS the id just made
+	// terminal: a later no---id complete must then narrate "no
+	// current session" rather than re-transition it. Keyed on the id,
+	// not the actor — an explicit --id transitioning a different
+	// work-instance must not wipe this session's still-live receipt.
+	if _, cachedID, ok := readWICache(); ok && cachedID == id {
 		clearWICache()
 	}
 

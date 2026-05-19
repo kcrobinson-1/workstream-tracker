@@ -145,32 +145,36 @@ func worktreeRoot() (string, error) {
 // Enforced by exactly three operations, used everywhere instead of
 // touching the cache file directly:
 //   - register clears it before attempting and writes (actor, id)
-//     only on success.
-//   - complete/abandon reads it, USES the id only when the cached
-//     actor equals the actor this invocation resolves, and removes
-//     it on a successful terminal transition of an owned entry.
+//     only on success. resolveActor may generate a per-session id
+//     here (register is the writer, so generating once is correct).
+//   - complete/abandon reads it and resolves an actor from an
+//     explicit --actor/WST_ACTOR ONLY (never sessionActor(), which
+//     rotates). With a pinned actor it USES the id only when the
+//     cached actor matches; with no pin it USES the cached id and
+//     relies on the register-side clear/consume lifecycle. It
+//     removes the entry on success only when the cached id IS the
+//     id just transitioned.
 //
 // Accepted residuals (the irreducible part, deliberately not
 // engineered away; tracked by the deterministic-interactive-
 // registration backlog entry):
-//   - Two sessions sharing one resolved actor in one worktree
-//     (generated actors within sessionActorIdleWindow, or an
-//     identically pinned WST_ACTOR across true-parallel sessions)
-//     still collapse onto one slot — inherited from the actor
-//     cache, no worse.
+//   - With no pinned actor, two sessions in one worktree share the
+//     single slot; the register-side clear-before-attempt +
+//     consume-on-success lifecycle is the only guard, and the
+//     register skip paths (no slug) do not clear (clearing would
+//     destroy a valid same-session id). Same boundary as the
+//     pre-existing actor cache, no worse.
 //   - WST_ACTOR set inconsistently between register and complete
 //     makes complete safely SKIP (it narrates and suggests --id),
 //     never misattribute.
 //   - An explicit --id / WST_WI_ID is honored without the owner
 //     check: naming the instance is a deliberate operator override.
 
-// resolveActor returns the actor identity for this invocation,
-// resolved identically by register and complete so the wi-cache
-// owner check compares like with like: an explicit --actor, else
-// WST_ACTOR, else the generated per-session id. A session that pins
-// an explicit actor must pass it to both halves (or pin WST_ACTOR
-// for the whole session); otherwise complete cannot re-derive it
-// and safely skips.
+// resolveActor returns the actor identity for a register: an
+// explicit --actor, else WST_ACTOR, else a generated per-session id.
+// register is the cache writer, so generating here is correct;
+// complete deliberately does NOT use this (it resolves an explicit
+// actor only — see the wi-cache contract).
 func resolveActor(actorFlag string, getenv func(string) string) (string, error) {
 	if a := firstNonEmpty(actorFlag, getenv("WST_ACTOR")); a != "" {
 		return a, nil
