@@ -21,16 +21,22 @@ import "html/template"
 // Status-independent; there is no inheritance — each node's own
 // doc governs its own row.
 //
-// A box with children is a native <details>/<summary> (no
-// JavaScript, no route — m2 t2 C2): its summary is the clickable
-// header and its children render as nested boxes inside the body.
-// It renders expanded (`open`) iff it, or any descendant, has an
-// active work-instance (C3, via PlanNode.ActiveInSubtree). A leaf
-// box (no children) has no disclosure control and no expand state
-// (C5) — its header and detail are always visible.
-// node-header / node-detail are factored out so both the
-// collapsible and leaf branches render the identical preserved
-// surfaces (C5: actor markers, long description, related PRs).
+// Every box — leaf or not — is a native <details>/<summary> (no
+// JavaScript, no route — m2 t2 C2): the summary is the clickable
+// header (always visible: label, Status badge, actor markers) and
+// the body (progress row, long description, related PRs, child
+// boxes) is hidden until the box is expanded. A box renders
+// expanded (`open`) iff it, or any descendant, has an active
+// work-instance (C3, via PlanNode.ActiveInSubtree); otherwise it
+// is collapsed so the forest is a scannable header-only overview
+// rather than a wall of plan-file text. A childless box keeps the
+// box-leaf class for styling but is collapsible like any other.
+// node-header / node-detail are factored out so the structure is
+// identical regardless of whether the node has children.
+//
+// The long description is line-capped (truncateLongDesc) even when
+// expanded: the forest gives context and the goal, not the whole
+// plan file — read the doc itself for the full text.
 const forestTemplates = `
 {{define "forest"}}{{if .Roots}}
   {{range .Roots}}
@@ -49,7 +55,7 @@ const forestTemplates = `
 {{define "node-detail"}}
 {{- template "node-progress" .}}
 {{- if .LongDescription}}
-<div class="long-desc">{{.LongDescription}}</div>
+<div class="long-desc">{{truncateLongDesc .LongDescription}}</div>
 {{- end}}
 {{- if .RelatedPRs}}
 <ul class="related-prs">
@@ -59,20 +65,13 @@ const forestTemplates = `
 {{- end}}
 
 {{define "node"}}
-{{- if .Children}}
-<details class="box box-{{.NodeType}}"{{if .ActiveInSubtree}} open{{end}}>
+<details class="box box-{{.NodeType}}{{if not .Children}} box-leaf{{end}}"{{if .ActiveInSubtree}} open{{end}}>
 <summary><span class="box-header">{{template "node-header" .}}</span></summary>
 <div class="box-body">
 {{- template "node-detail" .}}
 {{range .Children}}{{template "node" .}}
 {{end}}</div>
 </details>
-{{- else}}
-<div class="box box-{{.NodeType}} box-leaf">
-<div class="box-header">{{template "node-header" .}}</div>
-{{- template "node-detail" .}}
-</div>
-{{- end}}
 {{end}}
 
 {{define "forest-style"}}    .root { margin-bottom: 1.5rem; }

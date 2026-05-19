@@ -15,8 +15,9 @@ import (
 // so no later task edits this shell to grow a region. Bare-bones
 // by design (see design/v0.1-design.md Section 7).
 var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
-	"statusClass": statusClass,
-	"isURL":       isAbsoluteURL,
+	"statusClass":      statusClass,
+	"isURL":            isAbsoluteURL,
+	"truncateLongDesc": truncateLongDesc,
 }).Parse(`<!doctype html>
 <html lang="en">
 <head>
@@ -81,6 +82,27 @@ func isAbsoluteURL(s string) bool {
 		return false
 	}
 	return u.Host != ""
+}
+
+// maxLongDescLines is the hard cap on how many lines of a node's
+// long description the forest renders, even when the box is
+// expanded. Plan docs are whole markdown files; the forest is a
+// context-and-goal overview, not a document viewer. Read the plan
+// file itself for the full text. Tunable — bump it if the cap
+// hides too much of the goal.
+const maxLongDescLines = 40
+
+// truncateLongDesc caps s at maxLongDescLines lines. A capped body
+// gets a trailing marker line so the truncation is visible rather
+// than silently dropping the tail. Returns a plain string, so
+// html/template still contextually escapes it (no raw HTML).
+func truncateLongDesc(s string) string {
+	lines := strings.Split(s, "\n")
+	if len(lines) <= maxLongDescLines {
+		return s
+	}
+	kept := strings.Join(lines[:maxLongDescLines], "\n")
+	return kept + "\n\n… (truncated — see the plan doc for the full text)"
 }
 
 // statusClass converts a Status string to a CSS class fragment.

@@ -40,7 +40,7 @@ func TestRenderTwoRegionShell(t *testing.T) {
 	// per-node box, not the flat bullet line). One sanctioned
 	// cross-file sub-assertion update — node shape is t2's surface
 	// (m2 t2 C6), not a shell-region boundary violation.
-	if !strings.Contains(html, `<div class="box box-root box-leaf">`) ||
+	if !strings.Contains(html, `<details class="box box-root box-leaf">`) ||
 		!strings.Contains(html, `<span class="label" title="alpha">alpha</span>`) {
 		t.Errorf("forest region lost the node render; html:\n%s", html)
 	}
