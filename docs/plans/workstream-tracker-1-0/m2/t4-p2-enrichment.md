@@ -14,7 +14,7 @@ plan [`t4-session-roster.md`](t4-session-roster.md)
 enrichment"), drafted just-in-time against merged code per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Just-in-time scoping and plan drafting." Its scoping doc is
-[`scoping/t4-p2-enrichment.md`](scoping/t4-p2-enrichment.md).
+`scoping/t4-p2-enrichment.md`.
 
 **What this covers.** p1 shipped a bare roster: every active
 session listed and classified bound/unbound, labelled by slug.
@@ -620,7 +620,7 @@ split:
   task plan; owns the task-level Contracts, Cross-Cutting
   Invariants, Phase Contracts, Backlog Impact, and Documentation
   Currency p2 inherits and cites.
-- [`scoping/t4-p2-enrichment.md`](scoping/t4-p2-enrichment.md) —
+- `scoping/t4-p2-enrichment.md` —
   p2 scoping doc (SD1–SD5 with rejected alternatives,
   reality-check inputs).
 - [`t4-p1-bare-roster.md`](t4-p1-bare-roster.md) — the landed

@@ -1,6 +1,6 @@
 ---
 slug: workstream-tracker-1-0-m2
-Status: Proposed
+Status: Landed
 short_description: In-root expanded view, doc-declared progress boxes, and a session roster
 ---
 
@@ -8,25 +8,31 @@ short_description: In-root expanded view, doc-declared progress boxes, and a ses
 
 ## Status
 
-`Proposed`. Drafting is complete and the
+`Landed`. All four tasks shipped — t1, t2, t3, and t4 (phases
+t4-p1 / t4-p2); see Task Status. This dedicated PR performs the
+pending milestone-terminal close-out: the `m2/scoping/` docs are
+batch-deleted and the parent epic's milestone row is advanced. No
+terminal convergence node was required — m2 predates the
+[`milestone.md`](../../../../spec/planning/milestone.md)
+multi-leaf convergence-node rule, and its Sequencing prose names
+t4 as the clearly-last task, so the close-out rides this focused
+PR per that rule's escape clause (it did not ride t4's own
+implementing PR as it otherwise would have).
+
+Drafting history: the milestone was promoted `In draft →
+Proposed` after the
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
-`In draft` → `Proposed` promotion gate" was walked before this
-flip: read end-to-end for cross-section coherence; Task
-Contracts decision-complete (no deferral names this milestone
-session as resolver — remaining HOW deferrals are bound to each
-child task's own drafting); `Verified by:` and reality-check
-inputs re-confirmed against current code; required sections
-present with the "Out of Scope" variance now carried in
-milestone.md's optional list; no content descended to
-implementation prescription. The child set is **locked at four
-tasks**, and the PR that carries this flip seeds their
-parent-promotion stubs per
-[`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
-child contracts":
+`In draft` → `Proposed` promotion gate" was walked (end-to-end
+coherence; Task Contracts decision-complete; `Verified by:` /
+reality-check re-confirmed; required sections present with the
+"Out of Scope" variance carried in milestone.md's optional
+list), the child set locked at four tasks and parent-promotion
+stubs seeded —
 [`m2-t1`](t1-site-skeleton.md),
 [`m2-t2`](t2-expanded-render.md),
 [`m2-t3`](t3-doc-declared-stages.md),
-[`m2-t4`](t4-session-roster.md).
+[`m2-t4`](t4-session-roster.md) — each then drafted and
+implemented to `Landed`.
 
 **Target mockup approved; the "how to get there" gate is
 resolved.** The finished-page target — plan-tree forest and
@@ -147,7 +153,7 @@ the new entries and the p2/t4/milestone-row `Landed` flips).
 is **`Landed`** (an N = 1 task plan): a spawned just-in-time
 drafting session replaced the stub with a full task plan and a
 paired
-[`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+`scoping/t3-doc-declared-stages.md`
 that decomposed the deferred frontmatter-shape decision into
 candidate shapes with trade-offs; the contributor resolved the
 decisions in-loop (2026-05-18; D1 = shape A2, `progress_stages`
@@ -397,7 +403,7 @@ their tasks draft.
   `<details>`. The decision against the v0.2 posture is
   recorded explicitly, not regressed silently, in
   [`m2-t2-expanded-render.md`](t2-expanded-render.md) C2 and
-  [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
+  `scoping/t2-expanded-render.md`
   S1. Verified by:
   [the v0.2 no-JS decision in m1-v0-2.md "Cross-Task
   Decisions"](../m1/README.md);
@@ -428,7 +434,7 @@ their tasks draft.
   this into candidate shapes (ordered stage-label list A1/A2/A3
   vs. per-stage counts B1/B2 vs. richer records C) with cited
   trade-offs in
-  [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+  `scoping/t3-doc-declared-stages.md`
   "Decisions resolved by human input" (D1–D6). The human resolved
   it: **D1 = A2** (ordered list of stage-label strings, one cell ≈
   one PR in the typical case); **D2** frontmatter key
@@ -463,7 +469,7 @@ their tasks draft.
   of truth. See
   [`t4-session-roster.md`](t4-session-roster.md) Contracts
   ("Reported data") and
-  [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
+  `scoping/t4-session-roster.md`
   decision D1. Verified by:
   [`schema.go`](../../../../internal/db/schema.go) (`events` has
   `metadata`, `work_instances` does not);
@@ -609,7 +615,7 @@ graduate from a backlog entry.
   effect to t4 plus the new independent-workstream premise; the
   backlog-file mutation executes in t4's implementing PR. See
   [`t4-session-roster.md`](t4-session-roster.md) Backlog Impact
-  and [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
+  and `scoping/t4-session-roster.md`
   decision D2.
 - [`stale-skeleton-on-parent-reopen`](../../../backlog.md#stale-skeleton-on-parent-reopen),
   [`repo-rooted-doc-links`](../../../backlog.md#repo-rooted-doc-links),
