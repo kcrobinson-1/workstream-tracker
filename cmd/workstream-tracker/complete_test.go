@@ -3,10 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -16,12 +13,11 @@ import (
 
 func wiCachePath(t *testing.T) string {
 	t.Helper()
-	root, err := worktreeRoot()
+	path, err := wstCachePath("wi")
 	if err != nil {
-		t.Fatalf("worktreeRoot: %v", err)
+		t.Fatalf("wstCachePath: %v", err)
 	}
-	sum := sha256.Sum256([]byte(root))
-	return filepath.Join(os.TempDir(), "wst-wi-"+hex.EncodeToString(sum[:8])+".id")
+	return path
 }
 
 // pinnedEnv models the documented contract: a session that wants the
@@ -39,12 +35,6 @@ func pinnedEnv(actor, server string) func(string) string {
 	}
 }
 
-func cleanupCaches(t *testing.T) {
-	t.Cleanup(func() {
-		_ = os.Remove(sessionActorCachePath(t))
-		_ = os.Remove(wiCachePath(t))
-	})
-}
 
 // TestRegisterThenCompleteResolvesCachedID exercises the symmetric
 // handshake end to end: a successful register caches the real
@@ -52,7 +42,7 @@ func cleanupCaches(t *testing.T) {
 // it from that cache with no --id threaded through.
 func TestRegisterThenCompleteResolvesCachedID(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 	env := pinnedEnv("wst-fixed", ts.URL)
 
 	var rout, rerr bytes.Buffer
@@ -79,7 +69,7 @@ func TestRegisterThenCompleteResolvesCachedID(t *testing.T) {
 
 func TestAbandonCommandRecordsAbandonedState(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 	env := pinnedEnv("wst-fixed", ts.URL)
 
 	var rout, rerr bytes.Buffer
@@ -103,7 +93,7 @@ func TestAbandonCommandRecordsAbandonedState(t *testing.T) {
 // the already-terminal work-instance.
 func TestCompleteConsumesCachedIDOnSuccess(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 	env := pinnedEnv("wst-fixed", ts.URL)
 
 	var rout, rerr bytes.Buffer
@@ -137,7 +127,7 @@ func TestCompleteConsumesCachedIDOnSuccess(t *testing.T) {
 // as a skip and left intact for its real owner.
 func TestCompleteSkipsForeignOwnedCache(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 
 	var rout, rerr bytes.Buffer
 	if code := runRegister([]string{"--slug", "demo-root-m1-t2"}, pinnedEnv("wst-A", ts.URL), &rout, &rerr); code != 0 {
@@ -167,7 +157,7 @@ func TestCompleteSkipsForeignOwnedCache(t *testing.T) {
 // or rotate an actor.
 func TestCompleteResolvesCachedIDForLongSessionWithoutPinnedActor(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 	serverOnly := func(k string) string {
 		if k == "WST_SERVER" {
 			return ts.URL
@@ -206,7 +196,7 @@ func TestCompleteResolvesCachedIDForLongSessionWithoutPinnedActor(t *testing.T) 
 // not consume this session's still-live cached receipt.
 func TestExplicitIDDoesNotWipeOtherCachedReceipt(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 	env := pinnedEnv("wst-fixed", ts.URL)
 
 	var rout, rerr bytes.Buffer
@@ -249,7 +239,7 @@ func TestExplicitIDDoesNotWipeOtherCachedReceipt(t *testing.T) {
 func TestCompleteCommandNoIDSkips(t *testing.T) {
 	// No cached id, no flag, no env: must narrate an explicit skip
 	// and still exit success — never blocks the session.
-	_ = os.Remove(wiCachePath(t))
+	isolateCaches(t)
 
 	var out, errb bytes.Buffer
 	code := runTerminal("complete", "completed", nil, noEnv, &out, &errb)
@@ -270,7 +260,7 @@ func TestCompleteCommandNoIDSkips(t *testing.T) {
 // an unrelated earlier work-instance terminal.
 func TestFailedRegisterInvalidatesPriorCachedID(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 	env := pinnedEnv("wst-fixed", ts.URL)
 
 	var rout, rerr bytes.Buffer
@@ -301,7 +291,7 @@ func TestFailedRegisterInvalidatesPriorCachedID(t *testing.T) {
 }
 
 func TestCompleteCommandServerDownProceeds(t *testing.T) {
-	cleanupCaches(t)
+	isolateCaches(t)
 	var out, errb bytes.Buffer
 	code := runTerminal(
 		"complete", "completed",
@@ -318,7 +308,7 @@ func TestCompleteCommandServerDownProceeds(t *testing.T) {
 
 func TestCompleteCommandIDFromEnv(t *testing.T) {
 	ts := startAPIServer(t)
-	cleanupCaches(t)
+	isolateCaches(t)
 
 	var rout, rerr bytes.Buffer
 	if code := runRegister(

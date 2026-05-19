@@ -104,13 +104,19 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 // their sessions never collide, while letting a register from the
 // repo root and a complete from a subdirectory of the same checkout
 // resolve the same cached receipt.
+// cacheBaseDir holds the per-worktree session cache files. It is
+// os.TempDir() in production; tests repoint it at a temp dir so
+// `go test` (which runs inside this repo, i.e. a real worktree root)
+// never reads, writes, or deletes a live session's actual cache.
+var cacheBaseDir = os.TempDir()
+
 func wstCachePath(kind string) (string, error) {
 	root, err := worktreeRoot()
 	if err != nil {
 		return "", err
 	}
 	sum := sha256.Sum256([]byte(root))
-	return filepath.Join(os.TempDir(), "wst-"+kind+"-"+hex.EncodeToString(sum[:8])+".id"), nil
+	return filepath.Join(cacheBaseDir, "wst-"+kind+"-"+hex.EncodeToString(sum[:8])+".id"), nil
 }
 
 // worktreeRoot resolves the git worktree root so a session's cached
