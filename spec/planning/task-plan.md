@@ -554,9 +554,18 @@ evidence that exception already requires. Absent recorded
 approval the task stays `Validating`; flipping `Landed` on
 merged code alone is the Status drift the completion gate
 forbids. For the **dedicated validation task node** shape, that
-node's own Validation Gate carries the walkthrough and its
-`Landed` flip records the approval; the leaf it depends on
-flips `Landed` on its own technical gate.
+node *is* the Mermaid-graph leaf (it has no outgoing edge): its
+own Validation Gate carries the walkthrough and its `Landed`
+flip records the approval, so `shared.md`'s mandatory-`Validating`
+binds *it*. The product-surface task it depends on is an
+**interior node** (it has an outgoing edge to the validation
+node), not a leaf — `shared.md`'s leaf-keyed rule therefore does
+not bind it, and it flips `Landed` on its own technical gate. No
+node carries conflicting lifecycle guidance: the
+product-acceptance obligation lives on whichever node is the
+leaf. (See [`milestone.md`](./milestone.md) "Product acceptance
+and per-leaf validation," which states this topology as the
+single source.)
 
 Approval is a human product decision: the spec requires the
 *walkthrough artifact* and the *recorded approval*, not a

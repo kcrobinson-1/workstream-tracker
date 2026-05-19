@@ -210,10 +210,21 @@ picks one of two shapes and records the choice in Sequencing:
   run, approval is recorded in the plan, then it flips `Landed`
   (per [`shared.md`](./shared.md) "Plan-doc Status" — `Validating`
   is mandatory, not skippable, for such a leaf).
-- **Dedicated validation task node.** A separate task node in
-  the graph depends on the leaf and owns its product validation.
-  Use this when the demo spans siblings or needs a deliberate
-  reviewer hand-off rather than riding the leaf's own PR.
+- **Dedicated validation task node.** A separate validation task
+  node is added that depends on the product-surface task.
+  Adding it **changes the graph topology**: the validation node
+  now has no outgoing edge, so **it** is the Mermaid-graph leaf,
+  and the product-surface task it depends on becomes an
+  **interior node** (it has an outgoing edge to the validation
+  node). The validation node owns the product validation and, as
+  the leaf, carries the mandatory `Validating` per
+  [`shared.md`](./shared.md) "Plan-doc Status"; the interior task
+  it depends on is not a leaf, so that leaf-keyed rule does not
+  bind it and it closes on its own technical gate. The
+  product-acceptance obligation always lives on whichever node is
+  the leaf — never on two nodes, never in conflict. Use this
+  shape when the demo spans siblings or needs a deliberate
+  reviewer hand-off rather than riding the task's own PR.
 
 This **composes with, and does not replace, the terminal
 convergence node** (see "A multi-leaf graph needs a terminal
