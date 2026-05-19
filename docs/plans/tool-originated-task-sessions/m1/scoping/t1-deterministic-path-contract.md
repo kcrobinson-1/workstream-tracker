@@ -372,6 +372,13 @@ For the plan-drafting session:
   (b)-answer trade-off articulation for the `docs/agents/local/**`
   edit (SD4); the SD7 coherence read; confirmation the interactive
   handshake section is byte-unchanged (additive-only).
+- **Status closeout the plan must own:** the plan carries a
+  Documentation Currency section assigning the implementing PR
+  the terminal-state currency of its own `Status` and the m1
+  `README.md` t1 Task Status row (the promotion-gate parent-doc
+  convention covers only the `In draft → Proposed` half). The
+  no-new-surface gate is a code/registration-surface check, not a
+  literal file allowlist, so these closeout edits do not trip it.
 - **PR-count:** a single doc PR is the estimate (narrow doc
   surface), subject to the
   [`task-plan.md`](../../../../../spec/planning/task-plan.md)

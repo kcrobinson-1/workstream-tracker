@@ -217,18 +217,24 @@ rules" session-registration pointer (`:116-121`);
   (C1 — additive subsection) and
   [`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md)
   (C2 — additive section).
+- **Modify at closeout (status currency — not new surface; see
+  Documentation Currency below):** this plan's own `Status`
+  frontmatter (`Proposed` → … → `Landed`) and the
+  [`../README.md`](../README.md) t1 Task Status row to its
+  terminal state. The `In draft → Proposed` half was done at
+  promotion; the promotion-gate parent-doc convention does **not**
+  cover the terminal half, so the implementing PR owns it.
 - **Intentionally not modified (expected):**
   [`AGENTS.md`](../../../../AGENTS.md) (C4 — only if the
   sole-path coherence check fires);
   [`design/v0.1-design.md`](../../../../design/v0.1-design.md)
   (a frozen v0.1 end-state record — not an authority or
   reconciliation target for this work; not touched);
-  `internal/**`, `cmd/**` (no code — D1);
-  [`../README.md`](../README.md) and the backlog (parent-doc
-  currency is handled per the promotion-gate parent-doc
-  convention, not by an implementing edit here).
-- **New:** none (no scoping doc is created by the implementing
-  PR; it already exists and is transient).
+  `internal/**`, `cmd/**` (no code — D1); the backlog (no
+  backlog entry — D1 / milestone Backlog Impact).
+- **New:** none. The paired scoping doc already exists, is
+  transient, and is deleted at the **milestone-terminal** PR —
+  not by t1's implementing PR.
 
 ## Validation Gate
 
@@ -240,9 +246,17 @@ Doc-only; the gate is verification, not a build.
    unchanged; the only changes are net-additive blocks. (Falsifier:
    any deletion/modification inside the interactive section or the
    exact-slug posture text fails the gate.)
-2. **No-new-surface check.** The diff touches only the two doc
-   files (plus, conditionally, `AGENTS.md`); no `internal/**`,
-   `cmd/**`, schema, or endpoint change.
+2. **No-new-surface check.** No new registration / code surface:
+   no `internal/**`, `cmd/**`, schema, endpoint, or CLI-flag
+   change (D1). The diff is the two carrier docs, plus
+   conditionally `AGENTS.md` (C4), plus the status-closeout edits
+   the Documentation Currency section names (this plan's own
+   `Status`; the m1 `README.md` t1 Task Status row). This is a
+   *surface* check, **not a literal file allowlist** — the
+   status-closeout edits are expected and are not a violation.
+   (Falsifier: any `internal/**` / `cmd/**` / schema / endpoint /
+   CLI-flag change fails the gate; a `Status` or parent-row
+   currency edit does not.)
 3. **Generic-language check.** Neither added block contains
    tool-origination, spawn-UX, node-affordance, or Claude-Code
    terms; the only named producer is the manual / CLI `--slug`
@@ -254,9 +268,16 @@ Doc-only; the gate is verification, not a build.
 5. **AGENTS.md coherence read** performed against the final
    C1/C2 wording; C4 clause added only if the sole-path reading
    fires.
-6. **Reality-check re-confirm.** The four code citations in C1–C3
-   still hold against then-merged code (the scoping doc's
-   Reality-check inputs list is the falsifier set).
+6. **Reality-check re-confirm.** *Every* input named in the
+   scoping doc's "Reality-check inputs" list — the full enumerated
+   set, not only the subset surfaced in Contracts C1–C4 — still
+   holds against then-merged code. This explicitly includes the
+   `internal/registerclient/client.go` behavior and the
+   `cmd/workstream-tracker/register_test.go`
+   (`TestRegisterCommandSuccessAndIdempotentRepeat`) end-to-end
+   determinism proof the Context preamble leans on, not just the
+   carrier-contract citations. That full named list is the
+   falsifier set; a stale entry anywhere in it fails the gate.
 
 ## Self-Review Audits
 
@@ -274,6 +295,41 @@ Diff surface maps to these seeded audits
   the tree, but confirm the `AGENTS.md` "Mandatory pre-edit reads"
   trigger map (`spec/**`, `docs/plans/**`) still matches reality
   after the edit.
+
+## Documentation Currency
+
+Status-bearing docs the implementing PR must keep current (per
+[`task-plan.md`](../../../../spec/planning/task-plan.md)
+"Plan-to-PR Completion Gate" and
+[`shared.md`](../../../../spec/planning/shared.md) "Plan-doc
+Status"). These edits are expected closeout, not a
+"no-new-surface" violation (Validation Gate step 2).
+
+- **This plan's own `Status`.** The implementing PR transitions
+  it `Proposed → In progress` on start and `→ Landed` at close —
+  no `Validating` (doc-only; no post-merge gate). Frontmatter is
+  authoritative.
+- **The m1 `README.md` t1 Task Status row.** Currently
+  `Proposed (task plan drafted; scoping SD1–SD7 resolved)`
+  ([`../README.md`](../README.md) "Task Status"). The implementing
+  PR's terminal commit moves that row to the matching terminal
+  state and narrows the adjacent "t1's task planning is complete"
+  prose if needed. This is the **task-terminal** parent-row
+  reconciliation: the `In draft → Proposed` half landed at
+  promotion, and the promotion-gate parent-doc convention has no
+  symmetric step at `Landed`, so ownership falls here. Without
+  this, the parent row drifts stale after t1 lands.
+- **`AGENTS.md`** — only if C4's sole-path coherence check fires
+  (then it is a carrier edit, not status currency).
+- **Not t1's to delete: the paired scoping doc.**
+  [`scoping/t1-deterministic-path-contract.md`](./scoping/t1-deterministic-path-contract.md)
+  is transient but is deleted in the **milestone-terminal** batch
+  (m1's close, after t2) per
+  [`planning-doc-location.md`](../../../../spec/planning-doc-location.md)
+  "scoping/ subfolder is transient" and
+  [`task-plan.md`](../../../../spec/planning/task-plan.md)
+  "Scoping owns / plan owns" — t1's task-terminal PR is not the
+  milestone-terminal PR, so it must **not** delete scoping.
 
 ## Out Of Scope
 
