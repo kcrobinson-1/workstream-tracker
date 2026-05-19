@@ -98,6 +98,49 @@ func TestCompleteCommandNoIDSkips(t *testing.T) {
 	}
 }
 
+// TestFailedRegisterInvalidatesPriorCachedID guards the false-signal
+// hazard: a prior session cached an id, then a later session's
+// register fails. The stale id must not survive for complete to mark
+// an unrelated earlier work-instance terminal.
+func TestFailedRegisterInvalidatesPriorCachedID(t *testing.T) {
+	ts := startAPIServer(t)
+	t.Cleanup(func() {
+		_ = os.Remove(sessionActorCachePath(t))
+		_ = os.Remove(wiCachePath(t))
+	})
+
+	var rout, rerr bytes.Buffer
+	if code := runRegister(
+		[]string{"--slug", "demo-root-m1-t2", "--actor", "wst-fixed", "--server", ts.URL},
+		noEnv, &rout, &rerr,
+	); code != 0 {
+		t.Fatalf("first register exit = %d; stderr=%q", code, rerr.String())
+	}
+	if _, err := os.Stat(wiCachePath(t)); err != nil {
+		t.Fatalf("successful register should have cached an id: %v", err)
+	}
+
+	// A later session's register fails (server unreachable).
+	var fout, ferr bytes.Buffer
+	runRegister(
+		[]string{"--slug", "demo-root-m1-t2", "--actor", "wst-later", "--server", "http://127.0.0.1:0"},
+		noEnv, &fout, &ferr,
+	)
+	if _, err := os.Stat(wiCachePath(t)); !os.IsNotExist(err) {
+		t.Fatalf("failed register must invalidate the prior cached id, stat err=%v", err)
+	}
+
+	// complete must now narrate an explicit skip, not act on the
+	// stale id from the first session.
+	var cout, cerr bytes.Buffer
+	if code := runTerminal("complete", "completed", []string{"--server", ts.URL}, noEnv, &cout, &cerr); code != 0 {
+		t.Fatalf("complete exit = %d; stderr=%q", code, cerr.String())
+	}
+	if !strings.Contains(cerr.String(), "no work-instance id") {
+		t.Fatalf("complete should skip after invalidated cache, got stderr=%q stdout=%q", cerr.String(), cout.String())
+	}
+}
+
 func TestCompleteCommandServerDownProceeds(t *testing.T) {
 	var out, errb bytes.Buffer
 	code := runTerminal(

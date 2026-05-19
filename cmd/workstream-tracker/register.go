@@ -64,6 +64,16 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 		actor = a
 	}
 
+	// Invalidate any cached work-instance id from a prior session
+	// before attempting: if this registration fails, a stale id must
+	// not survive for `complete` to act on — marking an unrelated
+	// earlier work-instance terminal is a false signal worse than no
+	// signal. The real id is re-cached only on success below.
+	wiCache, wiCacheErr := wstCachePath("wi")
+	if wiCacheErr == nil {
+		_ = os.Remove(wiCache)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), registerTimeout)
 	defer cancel()
 
@@ -71,7 +81,7 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 	if err != nil {
 		fmt.Fprintf(stderr,
 			"register: attempt failed (%v); session proceeds — this session will not appear in the tree. "+
-				"Run `workstream-tracker register --slug %s` by hand against a running server to register it.\n",
+				"Run `go run ./cmd/workstream-tracker register --slug %s` by hand against a running server to register it.\n",
 			err, slug)
 		return 0
 	}
@@ -80,8 +90,8 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 	// handshake can resolve it without the session threading the id
 	// through the prompt. A cache-write failure is non-fatal: the
 	// session still registered, and complete falls back to --id.
-	if path, perr := wstCachePath("wi"); perr == nil {
-		_ = os.WriteFile(path, []byte(res.WorkInstanceID), 0o600)
+	if wiCacheErr == nil {
+		_ = os.WriteFile(wiCache, []byte(res.WorkInstanceID), 0o600)
 	}
 
 	fmt.Fprintf(stdout,
