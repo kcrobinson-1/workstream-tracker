@@ -12,11 +12,11 @@ import (
 
 func wiCachePath(t *testing.T) string {
 	t.Helper()
-	wd, err := os.Getwd()
+	root, err := worktreeRoot()
 	if err != nil {
-		t.Fatalf("getwd: %v", err)
+		t.Fatalf("worktreeRoot: %v", err)
 	}
-	sum := sha256.Sum256([]byte(wd))
+	sum := sha256.Sum256([]byte(root))
 	return filepath.Join(os.TempDir(), "wst-wi-"+hex.EncodeToString(sum[:8])+".id")
 }
 

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -91,15 +92,35 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 
 // wstCachePath returns the per-worktree temp-file path for a cached
 // session value of the given kind ("actor", "wi"). Keying by the
-// absolute working directory namespaces parallel worktrees so their
-// sessions never collide on one cached value.
+// resolved worktree root (not cwd) namespaces parallel worktrees so
+// their sessions never collide, while letting a register from the
+// repo root and a complete from a subdirectory of the same checkout
+// resolve the same cached receipt.
 func wstCachePath(kind string) (string, error) {
+	root, err := worktreeRoot()
+	if err != nil {
+		return "", err
+	}
+	sum := sha256.Sum256([]byte(root))
+	return filepath.Join(os.TempDir(), "wst-"+kind+"-"+hex.EncodeToString(sum[:8])+".id"), nil
+}
+
+// worktreeRoot resolves the git worktree root so a session's cached
+// values are shared across every directory within the same checkout.
+// It falls back to the working directory when git is unavailable or
+// the path is not a work tree — the best-effort contract must never
+// block on cache keying.
+func worktreeRoot() (string, error) {
+	if out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output(); err == nil {
+		if root := strings.TrimSpace(string(out)); root != "" {
+			return root, nil
+		}
+	}
 	wd, err := os.Getwd()
 	if err != nil {
-		return "", fmt.Errorf("resolve working directory: %w", err)
+		return "", fmt.Errorf("resolve worktree root: %w", err)
 	}
-	sum := sha256.Sum256([]byte(wd))
-	return filepath.Join(os.TempDir(), "wst-"+kind+"-"+hex.EncodeToString(sum[:8])+".id"), nil
+	return wd, nil
 }
 
 // sessionActorIdleWindow bounds how long a cached actor id is
@@ -127,9 +148,9 @@ const sessionActorIdleWindow = 6 * time.Hour
 // idempotency), distinct for a later session (idle window expiry),
 // and distinct across parallel worktrees (so parallel agents never
 // collapse onto one marker). It is never the git user. The id is
-// cached in a temp file keyed by the absolute working directory;
-// each reuse slides the window forward so an active session keeps
-// its actor, and a stale cache regenerates.
+// cached in a temp file keyed by the resolved worktree root; each
+// reuse slides the window forward so an active session keeps its
+// actor, and a stale cache regenerates.
 func sessionActor() (string, error) {
 	cachePath, err := wstCachePath("actor")
 	if err != nil {
