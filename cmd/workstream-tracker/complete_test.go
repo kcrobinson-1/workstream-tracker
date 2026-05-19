@@ -80,6 +80,46 @@ func TestAbandonCommandRecordsAbandonedState(t *testing.T) {
 	}
 }
 
+// TestCompleteConsumesCachedIDOnSuccess guards the symmetric stale-id
+// hazard at session end: once a terminal transition succeeds, the
+// cached id must be consumed so a later no---id complete in the same
+// worktree narrates an explicit skip instead of re-transitioning the
+// already-terminal work-instance.
+func TestCompleteConsumesCachedIDOnSuccess(t *testing.T) {
+	ts := startAPIServer(t)
+	t.Cleanup(func() {
+		_ = os.Remove(sessionActorCachePath(t))
+		_ = os.Remove(wiCachePath(t))
+	})
+
+	var rout, rerr bytes.Buffer
+	if code := runRegister(
+		[]string{"--slug", "demo-root-m1-t2", "--actor", "wst-fixed", "--server", ts.URL},
+		noEnv, &rout, &rerr,
+	); code != 0 {
+		t.Fatalf("register exit = %d; stderr=%q", code, rerr.String())
+	}
+
+	var c1out, c1err bytes.Buffer
+	if code := runTerminal("complete", "completed", []string{"--server", ts.URL}, noEnv, &c1out, &c1err); code != 0 {
+		t.Fatalf("first complete exit = %d; stderr=%q", code, c1err.String())
+	}
+	if !strings.Contains(c1out.String(), "complete: ok") {
+		t.Fatalf("first complete should succeed: %q", c1out.String())
+	}
+	if _, err := os.Stat(wiCachePath(t)); !os.IsNotExist(err) {
+		t.Fatalf("successful terminal transition must consume the cached id, stat err=%v", err)
+	}
+
+	var c2out, c2err bytes.Buffer
+	if code := runTerminal("complete", "completed", []string{"--server", ts.URL}, noEnv, &c2out, &c2err); code != 0 {
+		t.Fatalf("second complete exit = %d; stderr=%q", code, c2err.String())
+	}
+	if !strings.Contains(c2err.String(), "no work-instance id") {
+		t.Fatalf("second complete must skip, not reuse the terminal id; stderr=%q stdout=%q", c2err.String(), c2out.String())
+	}
+}
+
 func TestCompleteCommandNoIDSkips(t *testing.T) {
 	// No cached id, no flag, no env: must narrate an explicit skip
 	// and still exit success — never blocks the session.

@@ -67,6 +67,15 @@ func runTerminal(cmd, state string, args []string, getenv func(string) string, s
 		return 0
 	}
 
+	// Consume the cached id on a successful terminal transition: the
+	// work-instance is now terminal, so a later no-`--id` complete in
+	// this worktree must narrate "no current session" rather than
+	// re-transition this stale id into a duplicate/misattributed
+	// terminal event.
+	if path, perr := wstCachePath("wi"); perr == nil {
+		_ = os.Remove(path)
+	}
+
 	fmt.Fprintf(stdout,
 		"%s: ok event_id=%s work_instance_id=%s state=%s http_status=%d server=%s\n",
 		cmd, res.EventID, id, state, res.HTTPStatus, server)
