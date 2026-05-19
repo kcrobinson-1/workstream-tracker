@@ -93,7 +93,23 @@ the start of a milestone, before any per-task planning.
   each plan lands), as part of the milestone's terminal PR or a
   focused cleanup PR. The reason: sibling scoping docs reference
   each other, so deleting one early creates link rot elsewhere.
-  The milestone doc may override the batch-deletion rule for an
+  **The same terminal/cleanup PR that deletes the scoping docs
+  must also de-link every inbound reference to them in the same
+  change.** Durable milestone and task/phase plans routinely cite
+  scoping by live markdown link (a decision's `Verified by:`, a
+  Related Docs entry); those links dangle the instant the targets
+  are deleted, so a close-out that deletes scoping without the
+  de-link sweep ships broken links and is reviewer-flag. The
+  canonical de-link form is a **non-link inline-code reference**
+  (`` `scoping/<name>.md` ``): the decision identifiers already
+  carried in the citing prose ("scoping D1", "S4", "SD2")
+  preserve the provenance, and the deleted doc remains in git
+  history — so no content is lost by dropping the link. This is a
+  consequence of the scoping-is-transient / plan-owns-the-durable-
+  record split (see [`task-plan.md`](./task-plan.md) "Scoping owns
+  / plan owns"): a durable plan should not hold a live link to a
+  doc the spec guarantees will be deleted. The milestone doc may
+  override the batch-deletion rule for an
   unusual lifecycle, but should record the override explicitly.
   Cross-task decision record lives inside the milestone doc, not
   as a separate file.
