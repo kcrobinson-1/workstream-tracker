@@ -185,12 +185,24 @@ implementation owns the *how to demo it* — the step-by-step
 walkthrough, per [`task-plan.md`](./task-plan.md) "Product-facing
 leaf tasks output a demo walkthrough."
 
-**Every Mermaid-graph leaf is product-validated before the
-milestone closes.** A leaf node (a task with no outgoing edge)
-must not flip `Landed` on merged code alone — its product
-acceptance must be demonstrated and approval recorded. Milestone
-planning picks one of two shapes per leaf and records the choice
-in Sequencing:
+Not every task has a product surface. A purely internal task —
+a refactor, a tooling or build change, anything a product
+reviewer cannot meaningfully *do or see* — gets **no**
+product-acceptance contract and is validated by its technical
+gate alone. This is the same `no-product-surface work` carve-out
+[`shared.md`](./shared.md) "Plan-doc Status" names when scoping
+mandatory `Validating`; the two specs are deliberately aligned
+so a planner cannot reach opposite conclusions from them.
+
+**Every product-facing Mermaid-graph leaf is product-validated
+before the milestone closes.** Such a leaf (a task with no
+outgoing edge that the milestone gave a product-acceptance
+contract) must not flip `Landed` on merged code alone — its
+product acceptance must be demonstrated and approval recorded. A
+leaf with **no** product surface carries no product-acceptance
+contract, closes on its technical gate alone, and is exempt from
+this section. For each product-facing leaf, milestone planning
+picks one of two shapes and records the choice in Sequencing:
 
 - **In-task validation box.** The leaf task carries the
   validation in its own lifecycle: its implementing PR merges at
@@ -237,15 +249,21 @@ forward.
   approval is recorded, then `Landed`. The milestone does not
   close on that leaf until then.
 - **Defer to a later milestone.** The gap is acceptable to ship
-  with. The leaf's product-acceptance contract is **explicitly
-  narrowed to carve out the finding** (recorded in Task
-  Contracts — the leaf then genuinely meets its *as-narrowed*
-  acceptance and may flip `Landed`; it is never `Landed` against
-  an unmet contract), and the carved-out issue is captured as a
-  [`backlog.md`](../backlog.md) entry through the **milestone
-  retrospective** (see "Milestone retrospective" above — the
-  existing seam, not a parallel path), graduating into the next
-  milestone or a standalone task per that mechanism.
+  with. In the **deferring leaf's own PR** (the same PR that
+  flips it `Landed` — not deferred to milestone end): the leaf's
+  product-acceptance contract is **explicitly narrowed to carve
+  out the finding** (recorded in Task Contracts — the leaf then
+  genuinely meets its *as-narrowed* acceptance and may flip
+  `Landed`; it is never `Landed` against an unmet contract), and
+  the carved-out issue is captured **immediately** as a
+  [`backlog.md`](../backlog.md) entry. The **milestone
+  retrospective** (see "Milestone retrospective" above) then
+  *reviews and routes* the milestone's accumulated deferrals
+  forward — graduating them into the next milestone or a
+  standalone task per that mechanism. The retrospective is the
+  forward-routing seam, **not** the capture gate: leaf-level
+  `Landed` never waits on the milestone-end retrospective, which
+  is non-gating by construction.
 
 **The deciding factor — "is shipping with this gap acceptable?"
 — is a subjective product call the spec does not adjudicate.**
