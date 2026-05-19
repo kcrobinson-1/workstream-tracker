@@ -59,7 +59,7 @@ direction. The gate walk:
 
 Resolved decisions (full decomposition, rejected shapes, and
 `Verified by:` grounding in
-[`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+`scoping/t3-doc-declared-stages.md`
 "Decisions resolved by human input"):
 
 - **D1 (was OQ1, central)** — field shape: **A2**, an ordered
@@ -151,7 +151,7 @@ D1–D5** (2026-05-18); D6 (phase split, N = 1) is structural and
 lives in the Status section, not a Contract clause; no clause
 remains conditional. HOW
 grounding and the decomposition with rejected shapes live in
-[`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+`scoping/t3-doc-declared-stages.md`
 "Decisions resolved by human input."
 
 - **C1 — Additive optional frontmatter field.** A plan doc may
@@ -529,13 +529,13 @@ D5; surfaced, not decided here).
   Cross-Task Decisions entry are reconciled to this drafting and
   the in-session gate flip (pointed at scoping; RESOLVED by human
   input D1–D6; gate walked; t3 row `Proposed`).
-- [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+- `scoping/t3-doc-declared-stages.md`
   — the decision-space decomposition (D1–D6 with shapes,
   trade-offs, `Verified by:` grounding, rejected alternatives, and
   the human resolutions) this plan realizes (Contracts realize the
   WHAT decisions D1–D5; D6 fixes the phase split at N = 1).
 - [`t2-expanded-render.md`](t2-expanded-render.md) and
-  [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
+  `scoping/t2-expanded-render.md`
   — the Landed sibling whose per-node box hosts the progress-cell
   row, and the semantic-not-byte-exact test precedent (C7).
 - [`../../stub-children-on-parent-promotion/README.md`](../../stub-children-on-parent-promotion/README.md)

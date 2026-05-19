@@ -14,7 +14,7 @@ This is **phase 1** of the N ≥ 2 task plan
 enrichment"), drafted just-in-time against merged code per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Just-in-time scoping and plan drafting." Its scoping doc is
-[`scoping/t4-p1-bare-roster.md`](scoping/t4-p1-bare-roster.md).
+`scoping/t4-p1-bare-roster.md`.
 
 **What this covers.** The workstream-tracker page today renders a
 plan-tree forest plus t1's deliberate roster-region *placeholder*.
@@ -466,7 +466,7 @@ it re-enters scope at p2.
 - [`t4-session-roster.md`](t4-session-roster.md) — parent N ≥ 2
   task plan; owns the task-level Contracts, Cross-Cutting
   Invariants, and Phase Contracts p1 inherits and cites.
-- [`scoping/t4-p1-bare-roster.md`](scoping/t4-p1-bare-roster.md)
+- `scoping/t4-p1-bare-roster.md`
   — p1 scoping doc (SD1 classification source, SD2 label/identity,
   reality-check inputs).
 - [`t1-site-skeleton.md`](t1-site-skeleton.md) — the landed

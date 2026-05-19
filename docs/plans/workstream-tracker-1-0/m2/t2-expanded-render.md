@@ -19,7 +19,7 @@ were observed against a real `go run` reading the `docs/plans/`
 dogfood tree and a populated `DB_PATH` (active subtrees open,
 idle collapsed, stubs render as leaf boxes, the `@media
 (max-width: 48rem)` degrade rule served). No estimate deviations.
-The transient [`scoping/`](scoping/t2-expanded-render.md) doc is
+The transient `scoping/` doc is
 intentionally retained — it deletes in batch with sibling
 scoping docs at the milestone-terminal PR (t3/t4 are still
 undrafted stubs), not at this task-terminal PR.
@@ -61,7 +61,7 @@ boxes with children) is resolved.
 
 Drafting deliberation, rejected alternatives, and `Verified by:`
 grounding for every decision below live in
-[`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
+`scoping/t2-expanded-render.md`
 (S1–S5) and are referenced by name here, not restated, per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 "Scoping owns / plan owns."
@@ -119,7 +119,7 @@ not a collision.
 ## Contracts
 
 Final WHAT shape. HOW grounding is in
-[`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md).
+`scoping/t2-expanded-render.md`.
 
 - **C1 — Nested per-node boxes replace the bullet list.** The
   recursive node render emits each node as a box whose header
@@ -136,7 +136,7 @@ Final WHAT shape. HOW grounding is in
   milestone's deferred collapse-mechanism decision; rationale
   and the supersession of the m1 t4 "no expand/collapse"
   decision are recorded in
-  [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
+  `scoping/t2-expanded-render.md`
   S1, and the m2 README "Cross-Task Decisions" entry is
   reconciled to point at it in the same change as this plan.
 - **C3 — Default expand state from active work.** Expand/collapse
@@ -366,7 +366,7 @@ graduates, is deleted, split, or shifted by this task.
 - [`README.md`](README.md) — parent milestone; its Task Status
   table and collapsible-mechanism decision entry are reconciled
   in the same change as this plan.
-- [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
+- `scoping/t2-expanded-render.md`
   — drafting deliberation, rejected alternatives, and `Verified
   by:` grounding (S1–S5).
 - [`../m1/README.md`](../m1/README.md) and

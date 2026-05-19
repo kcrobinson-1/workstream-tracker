@@ -54,7 +54,7 @@ a premature `Proposed`.
 
 The load-bearing HOW calls the parent milestone deferred to t4 are
 resolved in the scoping doc
-([`scoping/t4-session-roster.md`](scoping/t4-session-roster.md),
+(`scoping/t4-session-roster.md`,
 decisions D1–D5); no "input from prior task" is pending (t1 is
 `Landed`; t4 is independent of t2/t3 per the milestone Sequencing
 graph). The
@@ -519,7 +519,7 @@ relationship."
 - [`README.md`](README.md) — parent milestone; t4 Task Contract,
   Cross-Task Invariants/Decisions/Risks this plan honors and whose
   deferral notes it resolves.
-- [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md) —
+- `scoping/t4-session-roster.md` —
   the scoping doc (decisions D1–D5, open decisions, reality-check
   inputs).
 - [`t1-site-skeleton.md`](t1-site-skeleton.md) — the landed shell;

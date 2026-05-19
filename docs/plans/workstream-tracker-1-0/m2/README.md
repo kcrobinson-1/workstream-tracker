@@ -153,7 +153,7 @@ the new entries and the p2/t4/milestone-row `Landed` flips).
 is **`Landed`** (an N = 1 task plan): a spawned just-in-time
 drafting session replaced the stub with a full task plan and a
 paired
-[`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+`scoping/t3-doc-declared-stages.md`
 that decomposed the deferred frontmatter-shape decision into
 candidate shapes with trade-offs; the contributor resolved the
 decisions in-loop (2026-05-18; D1 = shape A2, `progress_stages`
@@ -403,7 +403,7 @@ their tasks draft.
   `<details>`. The decision against the v0.2 posture is
   recorded explicitly, not regressed silently, in
   [`m2-t2-expanded-render.md`](t2-expanded-render.md) C2 and
-  [`scoping/t2-expanded-render.md`](scoping/t2-expanded-render.md)
+  `scoping/t2-expanded-render.md`
   S1. Verified by:
   [the v0.2 no-JS decision in m1-v0-2.md "Cross-Task
   Decisions"](../m1/README.md);
@@ -434,7 +434,7 @@ their tasks draft.
   this into candidate shapes (ordered stage-label list A1/A2/A3
   vs. per-stage counts B1/B2 vs. richer records C) with cited
   trade-offs in
-  [`scoping/t3-doc-declared-stages.md`](scoping/t3-doc-declared-stages.md)
+  `scoping/t3-doc-declared-stages.md`
   "Decisions resolved by human input" (D1–D6). The human resolved
   it: **D1 = A2** (ordered list of stage-label strings, one cell ≈
   one PR in the typical case); **D2** frontmatter key
@@ -469,7 +469,7 @@ their tasks draft.
   of truth. See
   [`t4-session-roster.md`](t4-session-roster.md) Contracts
   ("Reported data") and
-  [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
+  `scoping/t4-session-roster.md`
   decision D1. Verified by:
   [`schema.go`](../../../../internal/db/schema.go) (`events` has
   `metadata`, `work_instances` does not);
@@ -615,7 +615,7 @@ graduate from a backlog entry.
   effect to t4 plus the new independent-workstream premise; the
   backlog-file mutation executes in t4's implementing PR. See
   [`t4-session-roster.md`](t4-session-roster.md) Backlog Impact
-  and [`scoping/t4-session-roster.md`](scoping/t4-session-roster.md)
+  and `scoping/t4-session-roster.md`
   decision D2.
 - [`stale-skeleton-on-parent-reopen`](../../../backlog.md#stale-skeleton-on-parent-reopen),
   [`repo-rooted-doc-links`](../../../backlog.md#repo-rooted-doc-links),
