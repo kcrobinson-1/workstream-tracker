@@ -1,6 +1,7 @@
 package site
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,6 +24,33 @@ func TestRenderLongDescriptionInline(t *testing.T) {
 	}
 	if !strings.Contains(html, "Second paragraph.</div>") {
 		t.Errorf("multi-paragraph body not fully rendered; html:\n%s", html)
+	}
+}
+
+// TestRenderLongDescriptionLineCapped asserts a long description
+// past the line cap is truncated even when the box is expanded:
+// the head lines render, the tail is dropped, and a visible
+// truncation marker is appended (the forest is a context-and-goal
+// overview, not a full plan-file viewer).
+func TestRenderLongDescriptionLineCapped(t *testing.T) {
+	var b strings.Builder
+	for i := 0; i < maxLongDescLines+50; i++ {
+		fmt.Fprintf(&b, "line %d\n", i)
+	}
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed", LongDescription: b.String()},
+	}, nil)
+	html := renderTree(t, roots)
+
+	if !strings.Contains(html, "line 0") {
+		t.Errorf("head of long description should render; html:\n%s", html)
+	}
+	if !strings.Contains(html, "… (truncated — see the plan doc for the full text)") {
+		t.Errorf("truncation marker missing; html:\n%s", html)
+	}
+	// A line well past the cap must not appear.
+	if strings.Contains(html, fmt.Sprintf("line %d", maxLongDescLines+40)) {
+		t.Errorf("tail past the line cap should be dropped; html:\n%s", html)
 	}
 }
 
@@ -86,7 +114,7 @@ func TestRenderNestedBoxesReplaceBulletList(t *testing.T) {
 	if !strings.Contains(html, `<summary><span class="box-header">`) {
 		t.Errorf("collapsible box missing summary header; html:\n%s", html)
 	}
-	if !strings.Contains(html, `<div class="box box-milestone box-leaf">`) {
+	if !strings.Contains(html, `<details class="box box-milestone box-leaf">`) {
 		t.Errorf("child node not rendered as a nested leaf box; html:\n%s", html)
 	}
 	if !strings.Contains(html, `<span class="label" title="alpha-m1">m1</span>`) {
@@ -118,22 +146,27 @@ func TestRenderFieldlessNodeEmitsNoDetailMarkup(t *testing.T) {
 	}
 }
 
-// TestRenderLeafAndStubBox asserts the C5 leaf/stub contract: a
-// node with no children renders as a valid box with NO disclosure
-// control (no <details>/<summary> for that node), and a bare
-// `slug` + `Status: In draft` stub still renders as a leaf box
-// with just its badge and label.
+// TestRenderLeafAndStubBox asserts the leaf/stub contract: a node
+// with no children renders as a collapsible <details> box (with
+// the box-leaf class for styling), closed by default when there is
+// no active work so its body text is hidden until expanded, and a
+// bare `slug` + `Status: In draft` stub still renders as a leaf
+// box with its badge and label.
 func TestRenderLeafAndStubBox(t *testing.T) {
-	// Single root, no children: a leaf box, no disclosure control.
+	// Single root, no children: a collapsible leaf box, closed by
+	// default (no active work), so no body text shows until opened.
 	roots := buildTree([]parsedDoc{
 		{Slug: "alpha", Status: "Proposed"},
 	}, nil)
 	html := renderTree(t, roots)
-	if !strings.Contains(html, `<div class="box box-root box-leaf">`) {
-		t.Errorf("childless root not rendered as a leaf box; html:\n%s", html)
+	if !strings.Contains(html, `<details class="box box-root box-leaf">`) {
+		t.Errorf("childless root not rendered as a collapsible leaf box; html:\n%s", html)
 	}
-	if strings.Contains(html, "<details") || strings.Contains(html, "<summary") {
-		t.Errorf("leaf box must have no disclosure control; html:\n%s", html)
+	if strings.Contains(html, `box box-root box-leaf" open`) {
+		t.Errorf("idle leaf box must be closed by default (no open attr); html:\n%s", html)
+	}
+	if !strings.Contains(html, `<summary><span class="box-header">`) {
+		t.Errorf("leaf box must carry its header in a <summary>; html:\n%s", html)
 	}
 
 	// A `slug` + `Status: In draft` stub renders as a valid leaf
@@ -141,7 +174,7 @@ func TestRenderLeafAndStubBox(t *testing.T) {
 	stub := renderTree(t, buildTree([]parsedDoc{
 		{Slug: "beta", Status: "In draft"},
 	}, nil))
-	if !strings.Contains(stub, `<div class="box box-root box-leaf">`) {
+	if !strings.Contains(stub, `<details class="box box-root box-leaf">`) {
 		t.Errorf("stub not rendered as a valid leaf box; html:\n%s", stub)
 	}
 	if !strings.Contains(stub, `<span class="badge status-in-draft">In draft</span>`) ||
@@ -206,8 +239,8 @@ func TestRenderEmptyStateInForestRegion(t *testing.T) {
 // state: a collapsible box with an active work-instance anywhere
 // in its subtree renders `open`, an idle subtree renders closed,
 // and an active leaf forces its ancestor boxes open ("or any
-// descendant") so the leaf is visible. Leaf boxes have no
-// disclosure control and no expand state.
+// descendant") so the leaf is visible. Leaf boxes are collapsible
+// too: an idle leaf is closed, an active leaf renders open.
 func TestRenderDefaultOpenByActiveWork(t *testing.T) {
 	docs := []parsedDoc{
 		// active root: active leaf m1 forces alpha open.
@@ -231,9 +264,14 @@ func TestRenderDefaultOpenByActiveWork(t *testing.T) {
 	if !strings.Contains(html, `<details class="box box-root">`) {
 		t.Errorf("idle root box should render closed (no open attr); html:\n%s", html)
 	}
-	// The active leaf alpha-m1 has no disclosure control at all.
-	if !strings.Contains(html, `<div class="box box-milestone box-leaf">`) {
-		t.Errorf("leaf box must have no expand state; html:\n%s", html)
+	// The active leaf alpha-m1 is a collapsible box rendered open
+	// (its own active work-instance makes it active-in-subtree).
+	if !strings.Contains(html, `<details class="box box-milestone box-leaf" open>`) {
+		t.Errorf("active leaf box should render open; html:\n%s", html)
+	}
+	// The idle leaf beta-m1 is collapsible but closed by default.
+	if !strings.Contains(html, `<details class="box box-milestone box-leaf">`) {
+		t.Errorf("idle leaf box should render closed (no open attr); html:\n%s", html)
 	}
 }
 
