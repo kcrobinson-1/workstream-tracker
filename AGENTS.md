@@ -69,6 +69,7 @@ enumerated in the table.
 | Addressing review feedback | [`docs/agents/shared/workflows/review-fixes.md`](docs/agents/shared/workflows/review-fixes.md) |
 | Debugging a failing validation | [`docs/agents/shared/workflows/debugging.md`](docs/agents/shared/workflows/debugging.md) |
 | UI review / screenshot capture (if applicable) | [`docs/agents/shared/workflows/ui-review.md`](docs/agents/shared/workflows/ui-review.md) |
+| Opening a PR / writing a change description — **any** session, before `gh pr create` | [`docs/agents/shared/pr-conventions/pr-body-shape.md`](docs/agents/shared/pr-conventions/pr-body-shape.md) + [`docs/agents/shared/pr-conventions/commits.md`](docs/agents/shared/pr-conventions/commits.md) |
 
 Reference files under [`docs/agents/local/reference/`](docs/agents/local/reference/)
 are topic-organized constraint sets specific to this repo. They are
