@@ -8,14 +8,16 @@ short_description: Deterministic-path contract expression
 
 ## Context preamble
 
-Today the only registration procedure written down anywhere is the
-**interactive best-effort grounded narration handshake** in
-[`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md):
-an agent resolves a canonical slug from a natural-language prompt,
-confirms it, invokes `workstream-tracker register`, echoes the
-real receipt, and narrates any failure. That handshake exists
-because turning prose intent into a slug is interpretation only
-the agent can do mid-session.
+Today the only *registration* procedure written down anywhere is
+the **interactive best-effort grounded narration handshake** in
+[`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md)
+(since PR #45 a *lifecycle* rule that also documents a symmetric
+session-end completion handshake — orthogonal to t1): an agent
+resolves a canonical slug from a natural-language prompt, confirms
+it, invokes the register subcommand, echoes the real receipt, and
+narrates any failure. That handshake exists because turning prose
+intent into a slug is interpretation only the agent can do
+mid-session.
 
 But the registration *mechanism* in the merged binary is already
 deterministic when the slug does not need interpreting: the
@@ -95,8 +97,9 @@ two sites disagree.
 
 - **Additive-only.** Neither edit changes the interactive
   handshake text, the exact-slug create-or-attach posture, or the
-  API/request/schema. The interactive section of
-  `session-registration.md` is **byte-unchanged**; the
+  API/request/schema. The interactive handshake section **and**
+  the PR #45 session-end completion section of
+  `session-registration.md` are both **byte-unchanged**; the
   `shared.md` exact-slug assertion posture text is unchanged. The
   new content is purely additional.
 - **No new registration surface.** No endpoint, request/response
@@ -146,9 +149,8 @@ pure consumer,
 
 ### C2 — `docs/agents/local/session-registration.md`: additive sibling section, no confirm-equivalent
 
-A new section is added **after** the interactive handshake
-section of
-[`session-registration.md`](../../../../docs/agents/local/session-registration.md),
+A new section is added to
+[`session-registration.md`](../../../../docs/agents/local/session-registration.md)
 stating that when the canonical slug is known by construction the
 resolve/confirm interpretation steps do not apply, while the
 invoke / echo-the-real-receipt / narrate-failure-explicitly /
@@ -158,15 +160,23 @@ confirm-equivalent** (no pre-invoke human-catch step): the
 real-receipt echo is the sole observability surface, catching a
 wrong-by-construction slug post-hoc — consistent with the
 already-accepted, deferred orphan/unattached-work-instance
-residual. The interactive handshake section must be
-**byte-unchanged**. *Verified by:* the current file structure
-that the new section sits beside,
+residual. **Placement (re-grounded against the PR #45 rebase):**
+the file is now a *lifecycle* rule carrying, in order, Why
+(`:15-23`), "## The handshake (interactive natural-language
+session)" (`:25-69`), "## The session-end handshake (completion)"
+(`:71-95`, added by #45), and "## Scope and residual" (`:97-114`).
+The new section is placed **after the interactive handshake and
+before the session-end completion section** — it is a sibling of
+the *registration* handshake, not a completion concern. The
+interactive handshake section **and** the #45 completion section
+must both be **byte-unchanged** (additive-only). *Verified by:*
+the rebased file structure the new section sits within,
 [`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md)
 ("## The handshake (interactive natural-language session)",
-`:18-55`); the binary already performs no resolve/confirm given a
-slug,
+`:25-69`; "## The session-end handshake (completion)", `:71-95`);
+the binary already performs no resolve/confirm given a slug,
 [`cmd/workstream-tracker/register.go`](../../../../cmd/workstream-tracker/register.go)
-`runRegister` (`:38-96`); the server trusts the caller's slug and
+`runRegister` (`:39-93`); the server trusts the caller's slug and
 is repo-blind (orphan residual),
 [`internal/slugs/slugs.go`](../../../../internal/slugs/slugs.go)
 `IsWellFormed` (`:73-117`).
@@ -187,24 +197,31 @@ anchors). *Verified by:*
 [`rule-additions.md`](../../../../docs/agents/shared/meta/rule-additions.md)
 "The rule" (a)/(b);
 [`AGENTS.md`](../../../../AGENTS.md) "Adding to this rule set"
-(`:137-144`); the clause left unchanged,
+(`:143`); the clause left unchanged (re-confirmed: #45 left it
+verbatim),
 [`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md)
-"Scope and residual" (`:57-65`).
+"Scope and residual" (`:97-114`).
 
 ### C4 — `AGENTS.md` pointer coherence
 
 [`AGENTS.md`](../../../../AGENTS.md) is **not** edited: under C2
 the interactive handshake is byte-unchanged, so the "Universal
-session rules" summary (which describes the interactive
-handshake) stays accurate, and the router pointer's "this file
-owns the detail" reaches the new section. The implementer
-performs a one-line coherence read of that summary against the
-final C1/C2 wording; an additive coherence clause is added **only
-if** the final wording makes the summary read as asserting the
-narration handshake is the *sole* registration path. *Verified
-by:* [`AGENTS.md`](../../../../AGENTS.md) "Universal session
-rules" session-registration pointer (`:116-121`);
-[`../README.md`](../README.md) "Documentation Currency".
+session rules" pointer summary stays accurate, and the router
+pointer's "this file owns the detail" reaches the new section.
+Re-grounded against the PR #45 rebase: #45 already rewrote that
+pointer to "Session work-instance lifecycle handshake",
+summarizing the full register **and** completion lifecycle (and
+the `go run <module-path>` invocation). That makes it even more
+plainly a non-exhaustive overview, not a sole-path assertion, so
+the conclusion is unchanged. The implementer performs a one-line
+coherence read of that summary against the final C1/C2 wording;
+an additive coherence clause is added **only if** the final
+wording makes the summary read as asserting the narration
+handshake is the *sole* registration path (less likely
+post-#45). *Verified by:* [`AGENTS.md`](../../../../AGENTS.md)
+"Universal session rules" lifecycle-handshake pointer (`:116`,
+rebased post-#45 summary); [`../README.md`](../README.md)
+"Documentation Currency".
 
 ## Files to touch — new / modify / intentionally not touched
 
@@ -241,11 +258,13 @@ rules" session-registration pointer (`:116-121`);
 Doc-only; the gate is verification, not a build.
 
 1. **Additive-only diff check.** `git diff` shows the interactive
-   handshake section of `session-registration.md` byte-unchanged
-   and the `shared.md` "Slug generation" assertion-posture text
-   unchanged; the only changes are net-additive blocks. (Falsifier:
-   any deletion/modification inside the interactive section or the
-   exact-slug posture text fails the gate.)
+   handshake section **and** the PR #45 session-end completion
+   section of `session-registration.md` byte-unchanged, and the
+   `shared.md` "Slug generation" assertion-posture text unchanged;
+   the only changes are net-additive blocks. (Falsifier: any
+   deletion/modification inside the interactive section, the
+   completion section, or the exact-slug posture text fails the
+   gate.)
 2. **No-new-surface check.** No new registration / code surface:
    no `internal/**`, `cmd/**`, schema, endpoint, or CLI-flag
    change (D1). The diff is the two carrier docs, plus

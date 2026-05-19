@@ -55,6 +55,14 @@ re-confirms them against then-merged code per
 [`task-plan.md`](../../../../../spec/planning/task-plan.md)
 "Reality-check pass before plan-drafting".
 
+Re-confirmed against the base rebased onto **PR #45 ("Add session
+work-instance CLI: register + complete/abandon")**. #45 left
+`internal/api/handlers.go` and `internal/slugs/slugs.go`
+untouched (t1's D1 core mechanism is intact) and restructured
+`session-registration.md` into a *lifecycle* rule and the
+registration CLI; every substantive finding below still holds,
+with citations re-grounded to the rebased line ranges.
+
 - **The deterministic registration mechanism already exists
   end-to-end in merged code; t1 adds no registration code
   surface.** The server's exact-slug branch validates slug grammar
@@ -75,15 +83,22 @@ re-confirms them against then-merged code per
 - **The single-request client posts exactly that, with no retry,
   no derivation, no plan-tree reading.** *Verified by:*
   [`internal/registerclient/client.go`](../../../../../internal/registerclient/client.go)
-  package doc and `Register` (`:1-7`, `:42-93`).
+  package doc (`:1-6`) and `Register` (`:42`). (Rebased onto
+  PR #45: the package now also carries `RecordState` (`:109`) for
+  the `complete`/`abandon` terminal event; the package doc still
+  states "no retry, no derivation, no plan-tree reading" and
+  `Register`'s single-request exact-slug behavior is unchanged.)
 - **The CLI is already deterministic and handshake-free given a
-  slug: it carries `--slug`/`WST_SLUG`, `--actor`/`WST_ACTOR`,
-  `--server`/`WST_SERVER` and an optional `--name`/`WST_NAME`,
-  performs no natural-language resolution, always exits 0, prints
-  the real observed receipt on success, and narrates failure
-  explicitly.** *Verified by:*
+  slug: `register` carries `--slug`/`WST_SLUG`,
+  `--actor`/`WST_ACTOR`, `--server`/`WST_SERVER` and an optional
+  `--name`/`WST_NAME`, performs no natural-language resolution,
+  always exits 0, prints the real observed receipt on success, and
+  narrates failure explicitly.** *Verified by:*
   [`cmd/workstream-tracker/register.go`](../../../../../cmd/workstream-tracker/register.go)
-  `runRegister` (`:38-96`).
+  `runRegister` (`:39-93`). (Rebased onto PR #45: a
+  `register`/`complete`/`abandon` subcommand dispatcher was added
+  in `main.go`; this is not t1's surface — t1 adds no subcommand
+  or flag, D1 — and `register`'s determinism is unchanged.)
 - **An end-to-end test already proves determinism: a verbatim slug
   supplied as an explicit argument registers against the real
   exact-slug create-or-attach flow and an idempotent repeat
@@ -91,15 +106,15 @@ re-confirms them against then-merged code per
   [`cmd/workstream-tracker/register_test.go`](../../../../../cmd/workstream-tracker/register_test.go)
   `TestRegisterCommandSuccessAndIdempotentRepeat` (verbatim
   `demo-root-m1-t2`, asserts `http_status=201` and same
-  `work_instance_id` on repeat, `:46-81`).
+  `work_instance_id` on repeat, `:44-81`).
 - **The "narration handshake" is not in the binary** — it is a
   layered agent procedure described only in the interactive
   section of
   [`docs/agents/local/session-registration.md`](../../../../../docs/agents/local/session-registration.md)
   ("## The handshake (interactive natural-language session)",
-  `:18-55`); `runRegister` contains no resolve/confirm step.
+  `:25-69`); `runRegister` contains no resolve/confirm step.
   *Verified by:* the two citations above
-  (`register.go:38-96`; `session-registration.md:18-55`).
+  (`register.go:39-93`; `session-registration.md:25-69`).
 - **The exact-slug flow adds no endpoint, request/response field,
   or schema change, and PR #38's `--name` enrichment is the
   orthogonal best-effort *enrichment* leg, not the deterministic
@@ -114,9 +129,9 @@ re-confirms them against then-merged code per
   `work_instances` tables (`:247-266`);
   [`internal/registerclient/client.go`](../../../../../internal/registerclient/client.go)
   `Register` (posts `exact_slug` / `actor` / optional `metadata`
-  to the existing endpoint, `:42-93`);
+  to the existing endpoint, `:42`);
   [`cmd/workstream-tracker/register.go`](../../../../../cmd/workstream-tracker/register.go)
-  `runRegister` name→metadata handling (`:68-78`). (Grounded on
+  `runRegister` name→metadata handling (`:65-78`). (Grounded on
   merged code, not `design/v0.1-design.md` — see SD6.)
 
 ## Settled by inherited contract / merged code (not open)
@@ -194,14 +209,29 @@ consumer of the existing flow, `:197-201`).
 
 ### SD2 — `session-registration.md` placement: a new sibling section, interactive untouched
 
-**Decision.** Add a **new sibling section** after the interactive
-handshake in
+**Decision.** Add a **new sibling section** in
 [`session-registration.md`](../../../../../docs/agents/local/session-registration.md)
 (e.g. a "deterministic path (construction-known slug)" section):
 because identity is given by construction, the resolve step does
 not apply; invoke / echo-the-real-receipt / narrate-failure /
 proceed remain the same observable best-effort steps. The
 interactive handshake section is left **textually unchanged**.
+
+*Placement, re-grounded against the PR #45 rebase.* #45
+restructured this file from a registration-only rule into a
+**lifecycle handshake** ("# Session work-instance lifecycle
+handshake"): it now carries "## Why this rule exists" (`:15-23`),
+"## The handshake (interactive natural-language session)"
+(`:25-69`), a new "## The session-end handshake (completion)"
+(`:71-95`, added by #45), and "## Scope and residual" (`:97-114`).
+The deterministic path is a sibling of the *registration*
+handshake, so the new section is placed **after "## The handshake
+(interactive natural-language session)" and before "## The
+session-end handshake (completion)"** — it concerns registration,
+not completion. This is a HOW re-grounding of the placement; it
+does not loosen the locked WHAT (additive; interactive section
+byte-unchanged; the completion section is likewise left
+unchanged).
 
 **Rejected.** *B2 — refactor to a shared invoke/echo/narrate/
 proceed core with thin "interactive" and "deterministic"
@@ -215,9 +245,11 @@ section.
 
 **Verified by:**
 [`session-registration.md`](../../../../../docs/agents/local/session-registration.md)
-current structure (`:8-65`); [`../README.md`](../README.md)
-Cross-Task Invariants "Additive only" and Cross-Task Risks
-"Agent-rule edit inadvertently weakens the interactive handshake".
+rebased structure (headings at `:1` title, `:15` Why, `:25`
+interactive handshake, `:71` session-end completion, `:97` Scope
+and residual); [`../README.md`](../README.md) Cross-Task
+Invariants "Additive only" and Cross-Task Risks "Agent-rule edit
+inadvertently weakens the interactive handshake".
 
 ### SD3 — no confirm-equivalent in the deterministic section
 
@@ -278,13 +310,16 @@ over-claiming (it states a now-interactive-only accepted gap in
 general terms). Accepted as a documented wart, deliberately **not**
 fixed, to keep the edit strictly additive and avoid touching
 interactive-adjacent prose the backlog tripwire anchors on.
+(Re-confirmed against the PR #45 rebase: #45 added a completion
+handshake but left that determinism clause **verbatim** in "##
+Scope and residual" — SD4's premise is intact.)
 
 **Verified by:**
 [`rule-additions.md`](../../../../../docs/agents/shared/meta/rule-additions.md)
 "The rule" (a)/(b); [`AGENTS.md`](../../../../../AGENTS.md)
-"Adding to this rule set" (`:137-144`);
+"Adding to this rule set" (`:143`);
 [`session-registration.md`](../../../../../docs/agents/local/session-registration.md)
-"Scope and residual" (`:57-65`).
+"Scope and residual" (`:97-114`).
 
 ### SD5 — scoping docs carry no `Status` field
 
@@ -316,10 +351,21 @@ no `design/v0.1-design.md` citation by design.
 
 **Decision.** **No edit to `AGENTS.md`.** Under SD2 the interactive
 handshake is textually unchanged, so the `AGENTS.md` "Universal
-session rules" summary (which describes the interactive handshake)
-stays accurate; a router pointer may be non-exhaustive and the
-deterministic section is reachable via the existing "this file
-owns the detail" pointer.
+session rules" summary stays accurate; a router pointer may be
+non-exhaustive and the deterministic section is reachable via the
+existing "this file owns the detail" pointer.
+
+*Re-grounded against the PR #45 rebase.* #45 already rewrote that
+summary: the pointer is now "Session work-instance lifecycle
+handshake" and the summary describes the full register **and**
+completion lifecycle (and the `go run <module-path>` invocation).
+That makes it *even more clearly a non-exhaustive overview* rather
+than a sole-path assertion, so the conclusion is unchanged: no
+`AGENTS.md` edit is needed; the deterministic registration section
+is reachable through the same pointer. The F2 trigger
+(final wording makes the summary read as asserting the narration
+handshake is the *sole* registration path) is, if anything, less
+likely to fire post-#45.
 
 **Rejected.** *F2 — a minimal additive coherence clause in the
 `AGENTS.md` summary:* re-trips the `rule-additions.md` discipline
@@ -330,10 +376,11 @@ one-line coherence read the plan-drafting session performs against
 the concrete wording, not expected to fire under SD2.
 
 **Verified by:** [`AGENTS.md`](../../../../../AGENTS.md)
-"Universal session rules" session-registration pointer
-(`:116-121`); [`../README.md`](../README.md) "Documentation
-Currency" ("t1 must also keep `AGENTS.md`'s session-registration
-pointer coherent if the agent-rule's shape changes").
+"Universal session rules" lifecycle-handshake pointer (`:116`,
+the rebased post-#45 summary); [`../README.md`](../README.md)
+"Documentation Currency" ("t1 must also keep `AGENTS.md`'s
+session-registration pointer coherent if the agent-rule's shape
+changes").
 
 ## Open decisions to make at plan-drafting (handoff)
 
