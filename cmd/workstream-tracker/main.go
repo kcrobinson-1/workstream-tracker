@@ -22,11 +22,20 @@ import (
 )
 
 // main dispatches subcommands. With no subcommand the binary runs
-// the server (unchanged v0.1 behavior); the `register` subcommand
-// performs one best-effort work-instance registration.
+// the server (unchanged v0.1 behavior). The `register` subcommand
+// performs one best-effort work-instance registration; `complete`
+// and `abandon` perform the symmetric best-effort terminal-state
+// transition at session end.
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "register" {
-		os.Exit(runRegister(os.Args[2:], os.Getenv, os.Stdout, os.Stderr))
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "register":
+			os.Exit(runRegister(os.Args[2:], os.Getenv, os.Stdout, os.Stderr))
+		case "complete":
+			os.Exit(runTerminal("complete", "completed", os.Args[2:], os.Getenv, os.Stdout, os.Stderr))
+		case "abandon":
+			os.Exit(runTerminal("abandon", "abandoned", os.Args[2:], os.Getenv, os.Stdout, os.Stderr))
+		}
 	}
 	runServer()
 }

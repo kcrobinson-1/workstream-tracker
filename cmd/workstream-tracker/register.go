@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -55,14 +56,10 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 
 	server := firstNonEmpty(*serverFlag, getenv("WST_SERVER"), defaultServer)
 
-	actor := firstNonEmpty(*actorFlag, getenv("WST_ACTOR"))
-	if actor == "" {
-		a, err := sessionActor()
-		if err != nil {
-			fmt.Fprintf(stderr, "register: could not derive a per-session actor id (%v); skipping registration, session proceeds\n", err)
-			return 0
-		}
-		actor = a
+	actor, err := resolveActor(*actorFlag, getenv)
+	if err != nil {
+		fmt.Fprintf(stderr, "register: could not derive a per-session actor id (%v); skipping registration, session proceeds\n", err)
+		return 0
 	}
 
 	// The sole conventionally-read metadata key is the optional
@@ -84,7 +81,7 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 	if err != nil {
 		fmt.Fprintf(stderr,
 			"register: attempt failed (%v); session proceeds — this session will not appear in the tree. "+
-				"Run `workstream-tracker register --slug %s` by hand against a running server to register it.\n",
+				"Run `go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker register --slug %s` by hand against a running server to register it.\n",
 			err, slug)
 		return 0
 	}
@@ -93,6 +90,54 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 		"register: ok work_instance_id=%s slug=%s actor=%s http_status=%d server=%s\n",
 		res.WorkInstanceID, res.Slug, actor, res.HTTPStatus, server)
 	return 0
+}
+
+// cacheBaseDir holds the per-worktree actor-cache file. It is
+// os.TempDir() in production; tests repoint it at a temp dir so
+// `go test` (which runs inside this repo, i.e. a real worktree root)
+// never reads, writes, or deletes a live session's actual cache.
+var cacheBaseDir = os.TempDir()
+
+// wstCachePath returns the per-worktree temp-file path for the
+// generated per-session actor (the only cached value). Keying by the
+// resolved worktree root (not cwd) namespaces parallel worktrees so
+// their sessions never collide on one actor.
+func wstCachePath(kind string) (string, error) {
+	root, err := worktreeRoot()
+	if err != nil {
+		return "", err
+	}
+	sum := sha256.Sum256([]byte(root))
+	return filepath.Join(cacheBaseDir, "wst-"+kind+"-"+hex.EncodeToString(sum[:8])+".id"), nil
+}
+
+// worktreeRoot resolves the git worktree root so a session's cached
+// values are shared across every directory within the same checkout.
+// It falls back to the working directory when git is unavailable or
+// the path is not a work tree — the best-effort contract must never
+// block on cache keying.
+func worktreeRoot() (string, error) {
+	if out, err := exec.Command("git", "rev-parse", "--show-toplevel").Output(); err == nil {
+		if root := strings.TrimSpace(string(out)); root != "" {
+			return root, nil
+		}
+	}
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("resolve worktree root: %w", err)
+	}
+	return wd, nil
+}
+
+// resolveActor returns the actor identity for a register: an
+// explicit --actor, else WST_ACTOR, else a generated per-session id
+// (server-side idempotency dedupes active registrations by
+// (slug, actor)).
+func resolveActor(actorFlag string, getenv func(string) string) (string, error) {
+	if a := firstNonEmpty(actorFlag, getenv("WST_ACTOR")); a != "" {
+		return a, nil
+	}
+	return sessionActor()
 }
 
 // sessionActorIdleWindow bounds how long a cached actor id is
@@ -120,16 +165,14 @@ const sessionActorIdleWindow = 6 * time.Hour
 // idempotency), distinct for a later session (idle window expiry),
 // and distinct across parallel worktrees (so parallel agents never
 // collapse onto one marker). It is never the git user. The id is
-// cached in a temp file keyed by the absolute working directory;
-// each reuse slides the window forward so an active session keeps
-// its actor, and a stale cache regenerates.
+// cached in a temp file keyed by the resolved worktree root; each
+// reuse slides the window forward so an active session keeps its
+// actor, and a stale cache regenerates.
 func sessionActor() (string, error) {
-	wd, err := os.Getwd()
+	cachePath, err := wstCachePath("actor")
 	if err != nil {
-		return "", fmt.Errorf("resolve working directory: %w", err)
+		return "", err
 	}
-	sum := sha256.Sum256([]byte(wd))
-	cachePath := filepath.Join(os.TempDir(), "wst-actor-"+hex.EncodeToString(sum[:8])+".id")
 
 	if info, err := os.Stat(cachePath); err == nil && time.Since(info.ModTime()) <= sessionActorIdleWindow {
 		if existing, err := os.ReadFile(cachePath); err == nil {

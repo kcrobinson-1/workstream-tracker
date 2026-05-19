@@ -104,6 +104,60 @@ func TestRegisterServerUnreachable(t *testing.T) {
 	}
 }
 
+func TestRecordStateSuccess(t *testing.T) {
+	var gotBody map[string]string
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/work-instances/wi-9/events" || r.Method != http.MethodPost {
+			t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
+		}
+		raw, _ := io.ReadAll(r.Body)
+		_ = json.Unmarshal(raw, &gotBody)
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write([]byte(`{"id":"ev-1"}`))
+	}))
+	defer ts.Close()
+
+	res, err := RecordState(context.Background(), ts.URL, "wi-9", "completed")
+	if err != nil {
+		t.Fatalf("RecordState: %v", err)
+	}
+	if res.EventID != "ev-1" || res.HTTPStatus != http.StatusCreated {
+		t.Fatalf("unexpected result: %+v", res)
+	}
+	if gotBody["state"] != "completed" {
+		t.Fatalf("unexpected request body: %v", gotBody)
+	}
+}
+
+func TestRecordStateNonSuccessStatus(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte(`{"error":"work-instance \"wi-x\" not found"}`))
+	}))
+	defer ts.Close()
+
+	res, err := RecordState(context.Background(), ts.URL, "wi-x", "completed")
+	if err == nil {
+		t.Fatal("expected error on non-2xx, got nil")
+	}
+	if res.HTTPStatus != http.StatusNotFound {
+		t.Fatalf("expected observed status 404, got %d", res.HTTPStatus)
+	}
+	if !strings.Contains(err.Error(), "404") {
+		t.Fatalf("error should carry the real status: %v", err)
+	}
+}
+
+func TestRecordStateServerUnreachable(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	url := ts.URL
+	ts.Close() // nothing is listening now
+
+	if _, err := RecordState(context.Background(), url, "wi-1", "completed"); err == nil {
+		t.Fatal("expected error when server is unreachable, got nil")
+	}
+}
+
 func TestRegisterContextTimeout(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(200 * time.Millisecond)

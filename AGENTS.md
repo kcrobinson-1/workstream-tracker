@@ -113,11 +113,18 @@ session loads them; they are not optional.
 
 Repo-owned universal rule (not vendored shared):
 
-- [Session-start work-instance registration](docs/agents/local/session-registration.md)
+- [Session work-instance lifecycle handshake](docs/agents/local/session-registration.md)
   — before task work, perform the observable best-effort grounded
   narration handshake (resolve slug → confirm → echo the real
-  `workstream-tracker register` receipt → narrate failure
-  explicitly → proceed). Never blocks or fails the session.
+  `go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker register`
+  receipt → narrate failure explicitly → proceed); at session end,
+  close the bracket with the symmetric
+  `go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker complete`
+  handshake. Invoke via the full module path (not `./cmd/...`, a
+  cwd-relative path that only resolves from the repo root) so the
+  command works from any directory in the checkout; there is no
+  installed `workstream-tracker` binary on `PATH`. Never blocks or
+  fails the session.
 
 ## Self-review
 

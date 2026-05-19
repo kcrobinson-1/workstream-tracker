@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -44,6 +42,7 @@ func noEnv(string) string { return "" }
 var widPattern = regexp.MustCompile(`work_instance_id=(\S+)`)
 
 func TestRegisterCommandSuccessAndIdempotentRepeat(t *testing.T) {
+	isolateCaches(t)
 	ts := startAPIServer(t)
 
 	run := func() (string, string, int) {
@@ -81,6 +80,7 @@ func TestRegisterCommandSuccessAndIdempotentRepeat(t *testing.T) {
 }
 
 func TestRegisterCommandServerDownProceeds(t *testing.T) {
+	isolateCaches(t)
 	var out, errb bytes.Buffer
 	code := runRegister(
 		[]string{"--slug", "demo-root-m1-t2", "--actor", "a", "--server", "http://127.0.0.1:0"},
@@ -95,6 +95,7 @@ func TestRegisterCommandServerDownProceeds(t *testing.T) {
 }
 
 func TestRegisterCommandNoSlugSkips(t *testing.T) {
+	isolateCaches(t)
 	var out, errb bytes.Buffer
 	code := runRegister(nil, noEnv, &out, &errb)
 	if code != 0 {
@@ -109,6 +110,7 @@ func TestRegisterCommandNoSlugSkips(t *testing.T) {
 }
 
 func TestRegisterCommandSlugFromEnv(t *testing.T) {
+	isolateCaches(t)
 	ts := startAPIServer(t)
 	env := func(k string) string {
 		switch k {
@@ -130,18 +132,29 @@ func TestRegisterCommandSlugFromEnv(t *testing.T) {
 	}
 }
 
+// isolateCaches points the session cache at a per-test temp dir for
+// the duration of the test, so the suite never reads, writes, or
+// deletes a live session's real /tmp/wst-* files (the cache is keyed
+// by the real worktree root, which during tests is this repo). Every
+// cache-touching test must call this first.
+func isolateCaches(t *testing.T) {
+	t.Helper()
+	prev := cacheBaseDir
+	cacheBaseDir = t.TempDir()
+	t.Cleanup(func() { cacheBaseDir = prev })
+}
+
 func sessionActorCachePath(t *testing.T) string {
 	t.Helper()
-	wd, err := os.Getwd()
+	path, err := wstCachePath("actor")
 	if err != nil {
-		t.Fatalf("getwd: %v", err)
+		t.Fatalf("wstCachePath: %v", err)
 	}
-	sum := sha256.Sum256([]byte(wd))
-	return filepath.Join(os.TempDir(), "wst-actor-"+hex.EncodeToString(sum[:8])+".id")
+	return path
 }
 
 func TestSessionActorStableAndNamespaced(t *testing.T) {
-	t.Cleanup(func() { _ = os.Remove(sessionActorCachePath(t)) })
+	isolateCaches(t)
 
 	a, err := sessionActor()
 	if err != nil {
@@ -160,8 +173,8 @@ func TestSessionActorStableAndNamespaced(t *testing.T) {
 }
 
 func TestSessionActorRotatesAfterIdleWindow(t *testing.T) {
+	isolateCaches(t)
 	cachePath := sessionActorCachePath(t)
-	t.Cleanup(func() { _ = os.Remove(cachePath) })
 
 	first, err := sessionActor()
 	if err != nil {
