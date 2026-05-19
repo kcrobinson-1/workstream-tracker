@@ -581,6 +581,18 @@ Status lifecycle that gate produces. The canonical lifecycle
 values are defined in [`shared.md`](./shared.md) "Plan-doc
 Status"; this gate binds the transitions out of `Proposed`.
 
+The PR body itself follows the mandatory section schema in
+[`docs/agents/shared/pr-conventions/pr-body-shape.md`](../../docs/agents/shared/pr-conventions/pr-body-shape.md)
+(every section, in order, no omission or rename) — the
+`## Documentation` / `## Estimate Deviations` headings this gate
+names below are sections *of that schema*, not a freestanding PR
+shape. This binds **every** implementing PR including doc-only
+and planning PRs (scoping doc, plan-drafting, promotion): a
+planning PR fills the code-shaped sections (`User Behavior`,
+`Target Shape Evidence`, `UX Review`) with `N/A` rather than
+substituting ad-hoc sections of its own. Do not fall back to a
+generic `Summary` / `Test plan` shape.
+
 A PR that implements a plan must leave the plan in a terminal
 state. "Most of the plan" is not "the plan." A plan doc that
 still says `Proposed` or `In progress` after its implementation
