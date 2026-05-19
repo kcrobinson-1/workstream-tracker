@@ -89,12 +89,16 @@ handshake"). The manual command invocations are the documented
 fallback when the handshake did not run or failed:
 
 ```sh
-go run ./cmd/workstream-tracker register --slug <canonical-slug>
-go run ./cmd/workstream-tracker complete
+go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker register --slug <canonical-slug>
+go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker complete
 ```
 
-Invoke through `go run ./cmd/workstream-tracker` — the repo ships
-no installed `workstream-tracker` binary on `PATH`. `--slug` (or
+Invoke through the full module path — the repo ships no installed
+`workstream-tracker` binary on `PATH`, and a cwd-relative
+`go run ./cmd/...` only resolves from the repo root (it breaks
+once a session has `cd`'d into a package directory). The module
+path resolves against the current module from any directory in
+the checkout. `--slug` (or
 `WST_SLUG`) is the canonical plan-doc slug; `--actor` (or
 `WST_ACTOR`) defaults to a generated per-session id; `--server`
 (or `WST_SERVER`) defaults to `http://localhost:8080`. The command

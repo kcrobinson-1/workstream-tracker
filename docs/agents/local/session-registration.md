@@ -40,12 +40,16 @@ fails the session — whatever happens, you proceed.
    prose success claim.
 
    ```sh
-   go run ./cmd/workstream-tracker register --slug <canonical-slug>
+   go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker register --slug <canonical-slug>
    ```
 
-   Invoke it through `go run ./cmd/workstream-tracker` — the repo
-   ships no installed `workstream-tracker` binary on `PATH`, so a
-   bare `workstream-tracker …` will not resolve.
+   Invoke it through the full module path. The repo ships no
+   installed `workstream-tracker` binary on `PATH`, so a bare
+   `workstream-tracker …` will not resolve; and a cwd-relative
+   `go run ./cmd/...` only resolves from the repo root, so it
+   breaks once the session has `cd`'d into a package directory.
+   The module path resolves against the current module from any
+   directory in the checkout.
 
    (Slug also via `WST_SLUG`; actor via `--actor`/`WST_ACTOR`,
    defaulting to a generated per-session id — never the git user;
@@ -70,7 +74,7 @@ best-effort contract: it never blocks or fails the session.
    cached in this worktree — no id threading required.
 
    ```sh
-   go run ./cmd/workstream-tracker complete
+   go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker complete
    ```
 
    (Use `abandon` instead of `complete` if the work is being

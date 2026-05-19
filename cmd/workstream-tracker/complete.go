@@ -48,7 +48,7 @@ func runTerminal(cmd, state string, args []string, getenv func(string) string, s
 		fmt.Fprintf(stderr,
 			"%s: no work-instance id (--id or WST_WI_ID, and no id cached by a prior register in this worktree); "+
 				"skipping, session proceeds — the tree will keep showing this session active. "+
-				"Run `go run ./cmd/workstream-tracker %s --id <work_instance_id>` by hand against a running server to record it.\n",
+				"Run `go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker %s --id <work_instance_id>` by hand against a running server to record it.\n",
 			cmd, cmd)
 		return 0
 	}
@@ -62,7 +62,7 @@ func runTerminal(cmd, state string, args []string, getenv func(string) string, s
 	if err != nil {
 		fmt.Fprintf(stderr,
 			"%s: attempt failed (%v); session proceeds — the tree will keep showing this session active. "+
-				"Run `go run ./cmd/workstream-tracker %s --id %s` by hand against a running server to record it.\n",
+				"Run `go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker %s --id %s` by hand against a running server to record it.\n",
 			cmd, err, cmd, id)
 		return 0
 	}

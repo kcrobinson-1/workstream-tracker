@@ -81,7 +81,7 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 	if err != nil {
 		fmt.Fprintf(stderr,
 			"register: attempt failed (%v); session proceeds — this session will not appear in the tree. "+
-				"Run `go run ./cmd/workstream-tracker register --slug %s` by hand against a running server to register it.\n",
+				"Run `go run github.com/kcrobinson-1/workstream-tracker/cmd/workstream-tracker register --slug %s` by hand against a running server to register it.\n",
 			err, slug)
 		return 0
 	}
