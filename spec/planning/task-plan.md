@@ -528,6 +528,43 @@ walk is the same shape of drift as a plan flipped to `Landed`
 without satisfying its Validation Gate — the Status claim is
 wrong.
 
+### Product-facing leaf tasks output a demo walkthrough
+
+When the milestone gives a task a **product acceptance** (see
+[`milestone.md`](./milestone.md) "Product acceptance and
+per-leaf validation"), the task plan's required **Validation
+Gate** section must produce a concrete **step-by-step product
+demo walkthrough**: the ordered actions a product reviewer
+performs, and the observable result at each step, to reproduce
+and approve the milestone-defined product acceptance. "Run the
+test suite" is not a demo walkthrough — the walkthrough is
+reviewer-facing and reproducible without reading the diff. This
+is the *how to demo it* the milestone deferred to
+implementation: milestone planning owns the *what*, the
+implementing task owns the *how*.
+
+For a leaf validated via the **in-task validation box** shape,
+the `Validating → Landed` transition is bound: the implementing
+PR merges at Status `Validating`, and the follow-up doc-only
+commit that flips `Landed` (the "Post-merge validation"
+exception in "Plan-to-PR Completion Gate" below) records the
+product approval against the walkthrough — who approved and
+against which walkthrough revision — as the durable external
+evidence that exception already requires. Absent recorded
+approval the task stays `Validating`; flipping `Landed` on
+merged code alone is the Status drift the completion gate
+forbids. For the **dedicated validation task node** shape, that
+node's own Validation Gate carries the walkthrough and its
+`Landed` flip records the approval; the leaf it depends on
+flips `Landed` on its own technical gate.
+
+Approval is a human product decision: the spec requires the
+*walkthrough artifact* and the *recorded approval*, not a
+guarantee about the reviewer's verdict. A rejected walkthrough
+triggers the fix-now-vs-defer triage in
+[`milestone.md`](./milestone.md) "Product-validation findings:
+fix now or defer"; it does not make the gate optional.
+
 ### Plan-to-PR Completion Gate
 
 The gate that an implementing PR walks before merge, and the

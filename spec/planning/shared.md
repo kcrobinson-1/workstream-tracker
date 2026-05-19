@@ -299,9 +299,19 @@ Every plan-tree doc carries a `Status` field in frontmatter, alongside
 - `In progress` — an implementing agent has begun work; not yet
   landed.
 - `Validating` — code has merged but a post-merge validation gate
-  (manual walkthrough, prod smoke, async verification) is outstanding.
-  **Optional**: projects without a meaningful post-merge gap skip
-  this state and transition `In progress` → `Landed` directly.
+  (manual walkthrough, prod smoke, async verification, **product
+  approval**) is outstanding. **Optional in general**: projects
+  without a meaningful post-merge gap skip this state and
+  transition `In progress` → `Landed` directly. **Mandatory for a
+  product-facing leaf task** — a Mermaid-graph leaf whose milestone
+  gave it a product-acceptance contract (see
+  [`milestone.md`](./milestone.md) "Product acceptance and per-leaf
+  validation"): such a task holds at `Validating` after its code
+  merges until the milestone's product-acceptance walkthrough is
+  run and approval is recorded in the plan, then flips `Landed`.
+  The skip applies to non-leaf and no-product-surface work; it
+  never applies to a leaf the milestone gave a product-acceptance
+  contract.
 - `Landed` — implementation merged; validation (if any) passed; the
   plan reached its goal.
 - `Deferred — <reason>` — drafting is intentionally paused. The
