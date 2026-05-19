@@ -41,6 +41,12 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 	slugFlag := fs.String("slug", "", "canonical plan-doc slug to register a work-instance for (or WST_SLUG)")
 	actorFlag := fs.String("actor", "", "actor label (or WST_ACTOR; defaults to a generated per-session id)")
 	serverFlag := fs.String("server", "", "server base URL (or WST_SERVER; default "+defaultServer+")")
+	// The early skip paths below deliberately do NOT clear the wi
+	// cache: owner-scoping already makes a skipped new session safe
+	// (a different actor's complete will not match), and clearing on
+	// every skip would destroy a still-valid id when a tool
+	// re-invokes register without a slug mid-session. The same-actor
+	// skip case is an accepted residual (see the wi-cache contract).
 	if err := fs.Parse(args); err != nil {
 		fmt.Fprintf(stderr, "register: %v; skipping registration, session proceeds\n", err)
 		return 0
@@ -54,25 +60,18 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 
 	server := firstNonEmpty(*serverFlag, getenv("WST_SERVER"), defaultServer)
 
-	actor := firstNonEmpty(*actorFlag, getenv("WST_ACTOR"))
-	if actor == "" {
-		a, err := sessionActor()
-		if err != nil {
-			fmt.Fprintf(stderr, "register: could not derive a per-session actor id (%v); skipping registration, session proceeds\n", err)
-			return 0
-		}
-		actor = a
+	actor, err := resolveActor(*actorFlag, getenv)
+	if err != nil {
+		fmt.Fprintf(stderr, "register: could not derive a per-session actor id (%v); skipping registration, session proceeds\n", err)
+		return 0
 	}
 
-	// Invalidate any cached work-instance id from a prior session
-	// before attempting: if this registration fails, a stale id must
-	// not survive for `complete` to act on — marking an unrelated
-	// earlier work-instance terminal is a false signal worse than no
-	// signal. The real id is re-cached only on success below.
-	wiCache, wiCacheErr := wstCachePath("wi")
-	if wiCacheErr == nil {
-		_ = os.Remove(wiCache)
-	}
+	// Invalidate any cached work-instance id before attempting: if
+	// this registration fails, a stale id must not survive for
+	// `complete` to act on. The owner-scoped re-write on success
+	// below is the load-bearing guard (see the wi-cache contract);
+	// this clear is defense-in-depth for the same-actor case.
+	clearWICache()
 
 	ctx, cancel := context.WithTimeout(context.Background(), registerTimeout)
 	defer cancel()
@@ -86,13 +85,12 @@ func runRegister(args []string, getenv func(string) string, stdout, stderr io.Wr
 		return 0
 	}
 
-	// Cache the real work-instance id so the symmetric `complete`
-	// handshake can resolve it without the session threading the id
-	// through the prompt. A cache-write failure is non-fatal: the
+	// Cache the real work-instance id, scoped to the actor that owns
+	// it, so the symmetric `complete` resolves it without the session
+	// threading the id through the prompt — and only when the same
+	// session owns it. A cache-write failure is non-fatal: the
 	// session still registered, and complete falls back to --id.
-	if wiCacheErr == nil {
-		_ = os.WriteFile(wiCache, []byte(res.WorkInstanceID), 0o600)
-	}
+	writeWICache(actor, res.WorkInstanceID)
 
 	fmt.Fprintf(stdout,
 		"register: ok work_instance_id=%s slug=%s actor=%s http_status=%d server=%s\n",
@@ -131,6 +129,96 @@ func worktreeRoot() (string, error) {
 		return "", fmt.Errorf("resolve worktree root: %w", err)
 	}
 	return wd, nil
+}
+
+// The wi-cache contract — the single invariant every register and
+// complete path must preserve. Each of the four review rounds on
+// this change was one face of this contract being implicit:
+//
+//	The wi cache holds "<actor>\n<work-instance-id>" for a worktree
+//	iff a live, non-terminal work-instance, owned by that actor, is
+//	the current session's instance in that worktree. It is keyed by
+//	the resolved worktree root (not cwd) so every directory in one
+//	checkout shares it and parallel worktrees stay distinct; it is
+//	scoped by actor so a stale or foreign id is never acted on.
+//
+// Enforced by exactly three operations, used everywhere instead of
+// touching the cache file directly:
+//   - register clears it before attempting and writes (actor, id)
+//     only on success.
+//   - complete/abandon reads it, USES the id only when the cached
+//     actor equals the actor this invocation resolves, and removes
+//     it on a successful terminal transition of an owned entry.
+//
+// Accepted residuals (the irreducible part, deliberately not
+// engineered away; tracked by the deterministic-interactive-
+// registration backlog entry):
+//   - Two sessions sharing one resolved actor in one worktree
+//     (generated actors within sessionActorIdleWindow, or an
+//     identically pinned WST_ACTOR across true-parallel sessions)
+//     still collapse onto one slot — inherited from the actor
+//     cache, no worse.
+//   - WST_ACTOR set inconsistently between register and complete
+//     makes complete safely SKIP (it narrates and suggests --id),
+//     never misattribute.
+//   - An explicit --id / WST_WI_ID is honored without the owner
+//     check: naming the instance is a deliberate operator override.
+
+// resolveActor returns the actor identity for this invocation,
+// resolved identically by register and complete so the wi-cache
+// owner check compares like with like: an explicit --actor, else
+// WST_ACTOR, else the generated per-session id. A session that pins
+// an explicit actor must pass it to both halves (or pin WST_ACTOR
+// for the whole session); otherwise complete cannot re-derive it
+// and safely skips.
+func resolveActor(actorFlag string, getenv func(string) string) (string, error) {
+	if a := firstNonEmpty(actorFlag, getenv("WST_ACTOR")); a != "" {
+		return a, nil
+	}
+	return sessionActor()
+}
+
+// writeWICache records the owning actor and work-instance id. Best
+// effort by contract: a non-writable temp dir must not fail the
+// session — complete then falls back to --id.
+func writeWICache(actor, id string) {
+	path, err := wstCachePath("wi")
+	if err != nil {
+		return
+	}
+	_ = os.WriteFile(path, []byte(actor+"\n"+id), 0o600)
+}
+
+// readWICache returns the cached owning actor and work-instance id.
+// ok is false when the cache is absent, unreadable, or not in the
+// owner-scoped two-line form — all of which mean "no usable cached
+// id," never "use it unverified."
+func readWICache() (actor, id string, ok bool) {
+	path, err := wstCachePath("wi")
+	if err != nil {
+		return "", "", false
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return "", "", false
+	}
+	parts := strings.SplitN(strings.TrimRight(string(raw), "\n"), "\n", 2)
+	if len(parts) != 2 {
+		return "", "", false
+	}
+	actor = strings.TrimSpace(parts[0])
+	id = strings.TrimSpace(parts[1])
+	if actor == "" || id == "" {
+		return "", "", false
+	}
+	return actor, id, true
+}
+
+// clearWICache removes the cached entry. Best effort by contract.
+func clearWICache() {
+	if path, err := wstCachePath("wi"); err == nil {
+		_ = os.Remove(path)
+	}
 }
 
 // sessionActorIdleWindow bounds how long a cached actor id is

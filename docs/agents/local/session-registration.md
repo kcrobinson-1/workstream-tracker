@@ -104,3 +104,26 @@ until the contributor notices the stale marker. The determinism and
 tree-side-affordance gaps are consciously accepted best-effort,
 tracked by the `deterministic-interactive-registration` backlog
 entry.
+
+### The cached-receipt contract
+
+`complete`/`abandon` resolve the work-instance id from a receipt
+`register` caches per worktree. That cache is **owner-scoped**: it
+records the registering actor alongside the id, and a terminal
+command uses it only when the actor it resolves matches. This is
+what keeps a stale or another session's receipt from being marked
+terminal — the failure class the implementation contract in
+`cmd/workstream-tracker/register.go` ("The wi-cache contract")
+states in full. Practical consequences for a session:
+
+- **Pin the actor across both halves.** With no explicit actor a
+  per-session id is generated and reused within the worktree; if
+  the harness sets `WST_ACTOR` (or you pass `--actor`), set the
+  *same* value for `complete` as for `register`, or pass `--id`.
+  A mismatch makes `complete` safely skip and say so — it never
+  marks the wrong work-instance terminal.
+- **Accepted residuals** (same boundary as the backlog entry
+  above, not engineered away): two sessions sharing one resolved
+  actor in one worktree still collapse onto one receipt; an
+  explicit `--id`/`WST_WI_ID` is honored without the owner check
+  as a deliberate operator override.
