@@ -121,7 +121,7 @@ const forestTemplates = `
        (render.go, max-width 60rem). */
     @media (max-width: 48rem) {
       .box-header { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
-      .status-group { align-self: flex-start; }
+      .status-group { align-self: flex-start; margin-left: 0; }
     }{{end}}`
 
 func init() {
