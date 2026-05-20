@@ -1,6 +1,6 @@
 ---
 slug: post-m2-ux-correction-p3
-Status: Proposed
+Status: Validating
 short_description: Contract-revisiting + task-terminal — default D/P/I/V cells (F3a) + nested-details body disclosure (F7) + every-entry-opens roster (F9); carries the full product-acceptance walkthrough
 ---
 
@@ -8,7 +8,28 @@ short_description: Contract-revisiting + task-terminal — default D/P/I/V cells
 
 ## Status
 
-`Proposed`. p3 is the **task-terminal** phase of the
+`Validating`. The implementing PR shipped F3a + F7 + F9 with the
+gate-walk-locked OD resolutions (goldmark-native Renderer
+customization for OD3; additive `RegisteredAt int64` +
+`LastEventAt int64` on `sessionMeta` and `RosterEntry` per OD6,
+populated inside `loadSessionMetadata`'s existing baseline /
+latest distinction loop; render-altitude deferrals on OD1 / OD2
+/ OD4 / OD5 picked at this PR per the conservative starting
+points named at the gate). The full six-finding task-terminal
+walkthrough was observed against a `go run` rendering on the
+implementing branch — F1 / F8 carried forward from p1 (Landed
+PR #57), F4 carried forward from p2 (Landed PR #60), F3a / F7 /
+F9 shipped here. Per
+[`shared.md`](../../../spec/planning/shared.md) "Plan-doc
+Status," the mandatory-`Validating` rule binds the product-
+facing leaf, so the implementing PR merges at this state; the
+post-merge doc-only commit that records product approval flips
+both this phase plan and the parent task plan
+`Validating → Landed` in a single commit per
+[`task-plan.md`](../../../spec/planning/task-plan.md) "Task
+plan terminal state when N ≥ 2."
+
+p3 is the **task-terminal** phase of the
 [`post-m2-ux-correction`](README.md) task: it ships the three
 contract-revisiting findings (F7 nested-`<details>` body
 disclosure; F3a default D / P / I / V Status-driven cell row;
@@ -216,6 +237,173 @@ the flip.
   p3 is a phase plan with no further phase children; the
   parent task plan is N = 3 (p1 / p2 / p3) and seeded its
   three phase skeletons when *it* was promoted.
+
+### Implementation history
+
+What shipped at the implementing PR. The OD walk had already
+locked the WHAT-altitude shapes (OD3 / OD6); render-altitude
+deferrals (OD1 / OD2 / OD4 / OD5) closed at this PR per the
+conservative starting points named at the gate, so this block
+is one-line confirmations rather than rationale records.
+
+- **OD6 data-flow extension (C3 + OD6.a).** Added `RegisteredAt
+  int64` and `LastEventAt int64` to `sessionMeta` and
+  `RosterEntry` in
+  [`site.go`](../../../internal/site/site.go); populated inside
+  the existing `loadSessionMetadata` baseline / latest
+  distinction loop from values already in scope. The
+  `WHERE metadata IS NOT NULL` filter was dropped from the
+  loader query so register events with no metadata still
+  surface their `received_at` as the K3 "registered-at" field
+  (observable conditions (b) and (d) need this); the
+  fold-into-Detail logic in `resolveSessionMeta` already
+  handles null metadata so the change is timestamp-coverage-
+  only, not Detail-rendering-affecting. The "every active
+  work-instance gets a sessionMeta entry now even when none
+  was reported" semantic change is the K3 enabler: the
+  loader's `out` map writes for every id, not just the
+  metadata-bearing ones.
+- **F3a default-cells row (C2).** Generalized
+  [`forest.go`](../../../internal/site/forest.go)
+  `node-progress` template to the field-presence branch:
+  `if .ProgressStages` keeps the m2 t3 declared-stages row
+  unchanged (the supersession applies only to the no-field
+  branch); `else` renders the default D / P / I / V row using
+  the new `progressCellClass` template helper in
+  [`render.go`](../../../internal/site/render.go). Added four
+  CSS variants `.progress-cell-landed` / `.progress-cell-in-
+  draft` / `.progress-cell-neutral` / `.progress-cell-empty`
+  per OD1's conservative starting point (reuse the
+  `.status-landed` and `.status-unknown` badge palette values
+  so a cell fill matches its Status badge). Cell DOM stays
+  per-cell across both branches per C-INV-1 (cell-anchor) —
+  verified by `TestRenderProgressRowCellDOMPreservedAcrossBranches`.
+- **F7 body-disclosure (C1).** Wrapped the long description +
+  related-PR list in a nested `<details class="body-disclosure">`
+  in
+  [`forest.go`](../../../internal/site/forest.go)
+  `node-detail` template, with the same inline-triangle marker
+  treatment p1 introduced for the outer collapse. Added the
+  `renderLongDescBody` template helper in
+  [`render.go`](../../../internal/site/render.go): truncates
+  first via the existing `truncateLongDesc` cap (the
+  defense-in-depth tail), then markdown-renders via the
+  package-level `bodyMarkdown` goldmark instance, then returns
+  `template.HTML`. The goldmark instance carries a custom
+  `stripLinksRenderer` at priority 100 (lower than the default
+  html renderer at 1000); under goldmark's "lower priority
+  registers last, overwrites" pattern this overrides `KindLink`
+  + `KindAutoLink` to emit no `<a>` wrappers — the Walk
+  continues into Link children so the link text survives as
+  plain text; AutoLink emits its label as escaped plain text.
+  Picked OD2's summary text as "Show description" — discoverable
+  and matches the discloses-the-description intent. The
+  `goldmark/renderer/html` package was added to scope at
+  import — `walker.go`'s pre-existing goldmark imports already
+  covered `goldmark`, `goldmark-meta`, `goldmark/parser`,
+  `goldmark/text`; `render.go` added `goldmark`, `goldmark/ast`,
+  `goldmark/renderer`, `goldmark/util` (all from the same
+  already-listed `go.mod` `github.com/yuin/goldmark v1.8.2`
+  module — no `go.mod` change).
+- **F9 K3 every-entry-opens (C3).** Generalized
+  [`roster.go`](../../../internal/site/roster.go) `roster`
+  template: removed the `{{if .Detail}}...{{else}}...{{end}}`
+  branch (the t4 plain-row case D3 supersedes); every entry
+  now renders a `<details class="roster-disclosure">` with a
+  summary identical to the prior shape, and the disclosed
+  body carries (a) the K3 known-facts header — a
+  `<dl class="roster-facts">` two-column grid of slug, actor
+  id, registered timestamp, last-event timestamp — followed by
+  either the raw-JSON block (when `.Detail` present) or the
+  `<p class="roster-empty-meta">(no reported metadata)</p>`
+  sentinel (when not). Picked OD4 field order: slug, actor id,
+  registered, last-event (visual reading order); each label
+  follows `Label:` / value convention. Picked OD5 sentinel
+  wording: "(no reported metadata)" matching the parent C4
+  prose. Added the `formatEventTime` helper in
+  [`render.go`](../../../internal/site/render.go) — UTC
+  RFC-3339-without-T format ("2006-01-02 15:04:05 UTC") for
+  human readability; zero renders as em-dash; the template
+  falls back from `.LastEventAt` to `.RegisteredAt` when the
+  former is zero. Added five `.roster-*` CSS classes for the
+  K3 body / facts grid / sentinel.
+- **OD8 test coverage (semantic-not-byte-exact per m2 t3 C7;
+  presence-and-absence posture per p2 OD4.a).** All three
+  candidate-assertion blocks shipped as planned coverage. Six
+  prior tests updated for the superseded contracts (the prior
+  test names like `TestRenderLongDescriptionInline`,
+  `TestRenderProgressRowFieldlessOnlyDrafting`,
+  `TestRenderProgressRowStubOnlyDrafting`,
+  `TestRenderRosterExpandableDetailVsPlainRow` reflected the
+  m2 t3 / t4 / stub-children contracts now superseded by D1 /
+  D2 / D3; they're replaced by tests reflecting the new
+  contracts, with new names like
+  `TestRenderLongDescriptionInsideBodyDisclosure`,
+  `TestRenderDefaultProgressRowPerStatusBucket`,
+  `TestRenderProgressRowCellDOMPreservedAcrossBranches`,
+  `TestRenderRosterEveryEntryOpensToK3Disclosure`,
+  `TestRenderBodyHeaderOnlyByDefault`,
+  `TestRenderBodyDisclosureStripsAnchors`,
+  `TestRenderBodyDisclosureIndependentOfParentCollapse`,
+  `TestRenderRosterFourObservableStatesAllOpen`,
+  `TestRenderRosterK3TimestampsRender`). The
+  `TestRenderRosterNameLabelAndSlugFallback` assertion was
+  narrowed to scan `.roster-label` elements only (a new
+  `rosterLabelContents` helper) — the K3 known-facts header
+  IS allowed to surface the actor id as a deliberately-labeled
+  facts-block field, so the prior whole-roster uuid-absence
+  assertion was too strict. Forest + roster tests pass; the
+  full toolchain gate (gofmt, build, vet, test ./...) passes.
+- **Reviewer-facing walkthrough observed.** Started
+  `go run ./cmd/workstream-tracker` against the worktree's
+  `docs/plans` tree; registered four sessions covering the
+  four observable conditions ((a) name-bearing bound, (b)
+  no-name bound, (c) name-bearing unbound, (d) no-name
+  unbound); curl'd the rendered page and verified per-finding
+  acceptances structurally: F1 body rule carries
+  `background-color: #fff` + `color-scheme: light`; F3a
+  default-row variants present across the seven Status values
+  in their three buckets, In-draft leaves render D filled +
+  P / I / V dashed empty placeholders (verified on
+  `demo-workstream-m1-t2` / `demo-workstream-m1-t2-p1` /
+  `tool-originated-task-sessions-m2-*` / `workstream-tracker-1-0`);
+  F4 forest actor-marker renders the name (slug fallback) for
+  every bound session, no wst-<uuid> in any actor-marker; F7
+  body-disclosure renders nested inside the per-node
+  `<details>`, default-closed (header-only first view), opens
+  to markdown-rendered body with zero `<a>` tags inside any
+  `.long-desc` element; F8 inline-triangle marker treatment
+  preserved (the `summary { list-style: none; }` rule + the
+  `<span class="triangle">` in every summary); F9 each of the
+  four observable states renders a roster-disclosure with K3
+  known-facts header, two with the raw-JSON block (the
+  name-bearing entries) and two with the no-metadata sentinel
+  (the no-name entries), no wst-<uuid> in any `.roster-label`
+  across all four states. The OS dark / light mode observation
+  is the human-side check the post-merge approval-recording
+  commit captures; the structural acceptance above is the
+  reproducible-without-the-diff portion the implementing PR
+  carries into review.
+- **No `## Estimate Deviations` callout.** The file inventory
+  shipped exactly as the gate-locked Files-to-touch named —
+  `forest.go` + `roster.go` + `site.go` + `render.go` +
+  `forest_test.go` + `roster_test.go` (the `render.go` slot
+  was already on the certain list for the three new helpers).
+  The OD6 verification at the gate had already promoted
+  `site.go` from "possibly" to "certain" so the additive
+  struct fields are recorded as planned scope. No additional
+  files touched.
+- **Slug-grammar limitation hit (OD9 confirmed out-of-scope).**
+  Session registration for `post-m2-ux-correction-p3` was
+  rejected by
+  [`internal/slugs/slugs.go`](../../../internal/slugs/slugs.go)
+  `IsWellFormed` per the known constraint (same as p1 and p2
+  drafting sessions); the implementing session proceeded
+  without a registered `work_instance_id`. Non-blocking per
+  the CLI's "session proceeds without registration" fallback.
+  Reviewer-facing walkthrough used naturally-well-formed
+  slugs (`demo-workstream-m1-t1`, `nonexistent-demo`) so the
+  acceptance observation was unaffected.
 
 ### Open decisions
 

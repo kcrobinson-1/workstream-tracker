@@ -170,9 +170,14 @@ func TestRenderRosterListsBoundAndUnbound(t *testing.T) {
 }
 
 // TestRenderRosterNameLabelAndSlugFallback pins the task-level
-// name-then-slug rule: the reported name is the label when
-// present, the slug when not, and the wst-<uuid> actor is never
-// rendered in the roster region in either case.
+// name-then-slug rule across the rendered .roster-label
+// surface: the reported name is the label when present, the
+// slug when not, and the wst-<uuid> actor never surfaces in any
+// .roster-label element in either case. p3 F9 K3 introduces an
+// explicit "Actor id:" facts-block field inside the disclosed
+// body — the actor id is allowed there as a deliberately
+// labeled facts-block surface, just not in the entry's label
+// (the identity rendering rule t4 and p2 locked).
 func TestRenderRosterNameLabelAndSlugFallback(t *testing.T) {
 	roots := buildTree([]parsedDoc{{Slug: "alpha"}}, nil)
 	html := renderRoster(t, roots, []RosterEntry{
@@ -191,41 +196,101 @@ func TestRenderRosterNameLabelAndSlugFallback(t *testing.T) {
 		t.Errorf("no-name session must fall back to the slug; roster html:\n%s", rosterHTML)
 	}
 	for _, uuid := range []string{"wst-deadbeef-1234", "wst-cafe-5678"} {
-		if strings.Contains(rosterHTML, uuid) {
-			t.Errorf("roster must never render the wst-<uuid> actor (%q); roster html:\n%s", uuid, rosterHTML)
+		for _, content := range rosterLabelContents(rosterHTML) {
+			if strings.Contains(content, uuid) {
+				t.Errorf("roster label must never carry the wst-<uuid> actor (%q in %q); roster html:\n%s",
+					uuid, content, rosterHTML)
+			}
+		}
+		// The K3 facts block IS allowed to surface the actor id;
+		// confirm each uuid appears there (positive guard that the
+		// data is reaching the disclosure, not the negative guard
+		// the rule is about).
+		if !strings.Contains(rosterHTML, `<dd class="roster-fact-actor">`+uuid+`</dd>`) {
+			t.Errorf("K3 known-facts header must surface actor id %q; roster html:\n%s", uuid, rosterHTML)
 		}
 	}
 }
 
-// TestRenderRosterExpandableDetailVsPlainRow pins scoping SD5: an
-// entry with reported metadata is expandable (native <details>),
-// an entry with none is a plain row with no disclosure (additive
-// — absence is not a drop).
-func TestRenderRosterExpandableDetailVsPlainRow(t *testing.T) {
+// rosterLabelContents extracts the text content of every
+// <span class="roster-label...">...</span> element in the
+// rendered roster HTML. Used by the F9 + p2 identity-rendering
+// invariant tests to assert the wst-<uuid> actor never surfaces
+// as an entry's identity label, while still allowing it to
+// appear inside the K3 known-facts header's Actor id field.
+func rosterLabelContents(html string) []string {
+	const open = `<span class="roster-label`
+	const close = `</span>`
+	var out []string
+	rest := html
+	for {
+		i := strings.Index(rest, open)
+		if i < 0 {
+			return out
+		}
+		// Skip to the closing '>' of the opening tag.
+		gt := strings.Index(rest[i:], ">")
+		if gt < 0 {
+			return out
+		}
+		start := i + gt + 1
+		j := strings.Index(rest[start:], close)
+		if j < 0 {
+			return out
+		}
+		out = append(out, rest[start:start+j])
+		rest = rest[start+j+len(close):]
+	}
+}
+
+// TestRenderRosterEveryEntryOpensToK3Disclosure pins p3 F9
+// (parent C3; supersedes t4's "no metadata ⇒ plain row" under
+// parent D3): every roster entry — bound or unbound, with or
+// without reported metadata — opens to the same K3-shape
+// disclosure. The metadata-bearing entry shows the raw-JSON
+// block; the no-metadata entry shows the no-metadata sentinel
+// in place of the block; both share the K3 known-facts header.
+// The same outer disclosure structure across every entry is
+// what the contract locks.
+func TestRenderRosterEveryEntryOpensToK3Disclosure(t *testing.T) {
 	roots := buildTree([]parsedDoc{{Slug: "alpha"}}, nil)
 	html := renderRoster(t, roots, []RosterEntry{
 		{Slug: "alpha", Actor: "wst-a", Bound: true, Name: "Has detail",
-			Detail: `{"name":"Has detail","pr":"#42"}`},
-		{Slug: "bare-slug", Actor: "wst-b", Bound: false},
+			Detail:       `{"name":"Has detail","pr":"#42"}`,
+			RegisteredAt: 1700000000, LastEventAt: 1700000600},
+		{Slug: "bare-slug", Actor: "wst-b", Bound: false,
+			RegisteredAt: 1700000100},
 	})
 	rosterStart := strings.Index(html, `<aside class="roster">`)
 	rosterHTML := html[rosterStart:]
 
-	if !strings.Contains(rosterHTML, `<details class="roster-disclosure"><summary`) {
-		t.Errorf("metadata-bearing entry must be expandable via <details>; html:\n%s", rosterHTML)
+	// Every entry opens to a <details> — superseded D3: no plain
+	// row branch for no-metadata entries.
+	if n := strings.Count(rosterHTML, `<details class="roster-disclosure">`); n != 2 {
+		t.Errorf("every entry must open to a roster-disclosure <details>; got %d (want 2); html:\n%s",
+			n, rosterHTML)
 	}
-	if !strings.Contains(rosterHTML, `#42`) || !strings.Contains(rosterHTML, `<pre class="roster-detail">`) {
-		t.Errorf("expanded detail must show the raw reported JSON; html:\n%s", rosterHTML)
+	// Every entry's body carries the K3 known-facts header.
+	if n := strings.Count(rosterHTML, `<dl class="roster-facts">`); n != 2 {
+		t.Errorf("every entry must render the K3 known-facts header; got %d (want 2); html:\n%s",
+			n, rosterHTML)
 	}
-	// The no-metadata entry renders, but as a plain row: its label
-	// is present and it is NOT wrapped in a <details>.
-	bareAt := strings.Index(rosterHTML, `>bare-slug</span>`)
-	if bareAt < 0 {
-		t.Fatalf("no-metadata session must still list; html:\n%s", rosterHTML)
+	// Metadata-bearing entry: raw-JSON block present, no
+	// no-metadata sentinel inside its body.
+	if !strings.Contains(rosterHTML, `<pre class="roster-detail">`) ||
+		!strings.Contains(rosterHTML, `#42`) {
+		t.Errorf("metadata-bearing entry must show the raw-JSON block; html:\n%s", rosterHTML)
 	}
-	// Exactly one <details> in the roster (the metadata-bearing one).
-	if n := strings.Count(rosterHTML, "<details"); n != 1 {
-		t.Errorf("want exactly one <details> (the metadata entry), got %d; html:\n%s", n, rosterHTML)
+	// No-metadata entry: sentinel present in place of the
+	// raw-JSON block.
+	if !strings.Contains(rosterHTML, `<p class="roster-empty-meta">(no reported metadata)</p>`) {
+		t.Errorf("no-metadata entry must show the no-metadata sentinel; html:\n%s", rosterHTML)
+	}
+	// Same outer disclosure structure for every entry: counting
+	// the per-entry <div class="roster-body"> wrappers.
+	if n := strings.Count(rosterHTML, `<div class="roster-body">`); n != 2 {
+		t.Errorf("every entry must wrap its disclosed body identically; got %d (want 2); html:\n%s",
+			n, rosterHTML)
 	}
 }
 
@@ -238,6 +303,122 @@ func TestRenderRosterSessionReportingNothingStillLists(t *testing.T) {
 	})
 	if !strings.Contains(html, `>alpha</span>`) {
 		t.Errorf("a session reporting nothing must still list; html:\n%s", html)
+	}
+}
+
+// TestRenderRosterFourObservableStatesAllOpen asserts p3 F9 across
+// the four observable conditions the parent task plan's Validation
+// Gate names: (a) name-bearing bound, (b) no-name bound, (c)
+// name-bearing unbound, (d) no-name unbound. Every state renders
+// the same outer disclosure (roster-disclosure <details> + body
+// + K3 known-facts header + raw-JSON or sentinel branch). No
+// wst-<uuid> surfaces in any .roster-label across any state.
+func TestRenderRosterFourObservableStatesAllOpen(t *testing.T) {
+	roots := buildTree([]parsedDoc{{Slug: "alpha"}}, nil)
+	html := renderRoster(t, roots, []RosterEntry{
+		{Slug: "alpha", Actor: "wst-aaaa", Bound: true, Name: "DemoBoundNamed",
+			Detail: `{"name":"DemoBoundNamed"}`, RegisteredAt: 1700000000, LastEventAt: 1700000600},
+		{Slug: "alpha", Actor: "wst-bbbb", Bound: true,
+			RegisteredAt: 1700000100},
+		{Slug: "unbound-named", Actor: "wst-cccc", Bound: false, Name: "DemoUnboundNamed",
+			Detail: `{"name":"DemoUnboundNamed"}`, RegisteredAt: 1700000200, LastEventAt: 1700000700},
+		{Slug: "unbound-bare", Actor: "wst-dddd", Bound: false,
+			RegisteredAt: 1700000300},
+	})
+	rosterStart := strings.Index(html, `<aside class="roster">`)
+	rosterHTML := html[rosterStart:]
+
+	// Four entries, each opens to a roster-disclosure.
+	if n := strings.Count(rosterHTML, `<details class="roster-disclosure">`); n != 4 {
+		t.Errorf("every observable state must open; got %d disclosures (want 4); html:\n%s",
+			n, rosterHTML)
+	}
+	if n := strings.Count(rosterHTML, `<dl class="roster-facts">`); n != 4 {
+		t.Errorf("every observable state must render the K3 known-facts header; got %d (want 4); html:\n%s",
+			n, rosterHTML)
+	}
+	// Two metadata-bearing entries → two raw-JSON blocks; two
+	// no-metadata entries → two sentinels.
+	if n := strings.Count(rosterHTML, `<pre class="roster-detail">`); n != 2 {
+		t.Errorf("metadata-bearing entries must show raw-JSON block; got %d (want 2); html:\n%s",
+			n, rosterHTML)
+	}
+	if n := strings.Count(rosterHTML, `<p class="roster-empty-meta">(no reported metadata)</p>`); n != 2 {
+		t.Errorf("no-metadata entries must show the sentinel; got %d (want 2); html:\n%s",
+			n, rosterHTML)
+	}
+	// No wst-<uuid> text in any .roster-label across all four
+	// states (the identity-rendering rule from t4 + p2; F9's K3
+	// header surfaces actor id only inside the K3 facts block,
+	// not in the entry label).
+	for _, content := range rosterLabelContents(rosterHTML) {
+		if strings.Contains(content, "wst-") {
+			t.Errorf("no .roster-label may carry wst-<uuid>; saw %q in:\n%s",
+				content, rosterHTML)
+		}
+	}
+}
+
+// TestRenderRosterK3TimestampsRender asserts p3 F9 OD6: the K3
+// known-facts header renders the registered-at and last-event
+// timestamps from the per-request loader's already-tracked
+// values. The "Last event" field falls back to the
+// registered-at timestamp when no later event has been seen
+// (LastEventAt == 0). Zero registered-at renders as the
+// em-dash placeholder.
+func TestRenderRosterK3TimestampsRender(t *testing.T) {
+	roots := buildTree([]parsedDoc{{Slug: "alpha"}}, nil)
+	html := renderRoster(t, roots, []RosterEntry{
+		// Has both timestamps — both render.
+		{Slug: "alpha", Actor: "wst-1", Bound: true, Name: "Both",
+			RegisteredAt: 1700000000, LastEventAt: 1700000600},
+		// Only register seen (LastEventAt == 0) — last-event
+		// falls back to registered-at.
+		{Slug: "alpha", Actor: "wst-2", Bound: true, Name: "RegisterOnly",
+			RegisteredAt: 1700000100},
+		// Neither (both zero) — placeholder for both.
+		{Slug: "alpha", Actor: "wst-3", Bound: true, Name: "NoTimestamps"},
+	})
+	rosterStart := strings.Index(html, `<aside class="roster">`)
+	rosterHTML := html[rosterStart:]
+
+	// Both-timestamps entry: each timestamp surfaces in its own
+	// <dd> cell. The exact rendered string format is the
+	// formatEventTime helper's UTC RFC-3339-without-T shape;
+	// asserting on the prefix "2023-" (the year Unix-epoch
+	// 1700000000 falls in) keeps the test format-tolerant.
+	if !strings.Contains(rosterHTML, `<dd>2023-11-14 22:13:20 UTC</dd>`) {
+		t.Errorf("registered-at must render formatted; html:\n%s", rosterHTML)
+	}
+	if !strings.Contains(rosterHTML, `<dd>2023-11-14 22:23:20 UTC</dd>`) {
+		t.Errorf("last-event must render formatted when distinct from registered; html:\n%s", rosterHTML)
+	}
+	// Register-only entry: last-event falls back to register
+	// timestamp. Both <dd> cells for THAT entry render the
+	// register's formatted string; asserting the count >= 2 of
+	// the register timestamp tests the fallback without
+	// over-constraining the rest of the rendered output.
+	registerOnlyAt := strings.Index(rosterHTML, `<span class="roster-label">RegisterOnly`)
+	if registerOnlyAt < 0 {
+		t.Fatalf("RegisterOnly entry missing; html:\n%s", rosterHTML)
+	}
+	// Find the bounded HTML of this one entry.
+	registerOnlyEnd := strings.Index(rosterHTML[registerOnlyAt:], `</li>`)
+	registerOnlyHTML := rosterHTML[registerOnlyAt : registerOnlyAt+registerOnlyEnd]
+	if n := strings.Count(registerOnlyHTML, `<dd>2023-11-14 22:15:00 UTC</dd>`); n != 2 {
+		t.Errorf("register-only entry must repeat registered timestamp for last-event; got %d (want 2); entry html:\n%s",
+			n, registerOnlyHTML)
+	}
+	// No-timestamps entry: em-dash placeholder for both fields.
+	noTimestampsAt := strings.Index(rosterHTML, `<span class="roster-label">NoTimestamps`)
+	if noTimestampsAt < 0 {
+		t.Fatalf("NoTimestamps entry missing; html:\n%s", rosterHTML)
+	}
+	noTimestampsEnd := strings.Index(rosterHTML[noTimestampsAt:], `</li>`)
+	noTimestampsHTML := rosterHTML[noTimestampsAt : noTimestampsAt+noTimestampsEnd]
+	if n := strings.Count(noTimestampsHTML, `<dd>—</dd>`); n != 2 {
+		t.Errorf("zero-timestamp entry must render em-dash for both fields; got %d (want 2); entry html:\n%s",
+			n, noTimestampsHTML)
 	}
 }
 

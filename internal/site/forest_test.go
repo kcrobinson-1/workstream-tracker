@@ -14,16 +14,38 @@ import (
 // region. Relocated from render_test.go by the m2 t1
 // region-ownership split — this is t2's owned test surface.
 
-func TestRenderLongDescriptionInline(t *testing.T) {
+// TestRenderLongDescriptionInsideBodyDisclosure asserts p3 F7
+// (parent C2): the long description does not render in the
+// header-only first view; it sits inside a nested <details> body
+// disclosure that the reader opens explicitly. When opened, the
+// body renders as markdown via goldmark (paragraphs wrapped in
+// <p>) per F7 OD3 = I2b.
+func TestRenderLongDescriptionInsideBodyDisclosure(t *testing.T) {
 	roots := buildTree([]parsedDoc{
 		{Slug: "alpha", Status: "Proposed", LongDescription: "First paragraph.\n\nSecond paragraph."},
 	}, nil)
 	html := renderTree(t, roots)
-	if !strings.Contains(html, `<div class="long-desc">First paragraph.`) {
-		t.Errorf("long description not rendered inline; html:\n%s", html)
+
+	// The body sits inside a body-disclosure <details>, not free
+	// in the node body. The .long-desc wrapper still exists for
+	// styling but lives under .body-disclosure.
+	bodyDiscAt := strings.Index(html, `<details class="body-disclosure">`)
+	if bodyDiscAt < 0 {
+		t.Fatalf("body-disclosure <details> wrapper missing; html:\n%s", html)
 	}
-	if !strings.Contains(html, "Second paragraph.</div>") {
-		t.Errorf("multi-paragraph body not fully rendered; html:\n%s", html)
+	longDescAt := strings.Index(html, `<div class="long-desc">`)
+	if longDescAt < 0 || longDescAt < bodyDiscAt {
+		t.Errorf("long-desc must render inside body-disclosure; bodyDisc=%d longDesc=%d html:\n%s",
+			bodyDiscAt, longDescAt, html)
+	}
+	// goldmark wraps each paragraph in <p>; the markdown render
+	// is what surfaces the body content (not the raw plain-text
+	// fall-through path the pre-p3 inline render used).
+	if !strings.Contains(html, "<p>First paragraph.</p>") {
+		t.Errorf("first paragraph not rendered as markdown <p>; html:\n%s", html)
+	}
+	if !strings.Contains(html, "<p>Second paragraph.</p>") {
+		t.Errorf("multi-paragraph body not fully rendered through markdown; html:\n%s", html)
 	}
 }
 
@@ -397,47 +419,90 @@ func TestRenderProgressRowDeclaredStages(t *testing.T) {
 	}
 }
 
-// TestRenderProgressRowFieldlessOnlyDrafting asserts m2 t3 C3: a
-// field-omitting doc renders exactly the one reserved Drafting
-// cell as an intentional observed state — no declared cells, no
-// errored or empty row.
-func TestRenderProgressRowFieldlessOnlyDrafting(t *testing.T) {
-	roots := buildTree([]parsedDoc{
-		{Slug: "alpha", Status: "Proposed"},
-	}, nil)
-	html := renderTree(t, roots)
+// TestRenderDefaultProgressRowPerStatusBucket asserts p3 F3a
+// (parent C2; supersedes m2 t3 D5 under parent D1 and the
+// stub-children stub-render contract under parent D2): a doc
+// declaring no progress_stages renders the default D / P / I / V
+// row, Status-driven, in one of three shape buckets:
+//   - Landed ⇒ all four cells "landed" (filled green).
+//   - In draft ⇒ D filled "in-draft" (amber); P / I / V "empty"
+//     (dashed border). The stub case (slug + Status: In draft)
+//     reads this branch — supersedes the previous stub-only
+//     Drafting cell render.
+//   - Everything else (In progress, Proposed, Validating,
+//     Deferred, any unrecognized Status) ⇒ all four "neutral"
+//     (filled grey). Reads the statusClass fallback to "unknown"
+//     for the unrecognized case.
+//
+// Across all three buckets the per-cell DOM is preserved as
+// every-cell-is-its-own-element per C-INV-1 (cell-anchor) — the
+// F3b future per-cell attachment surface is what depends on this.
+func TestRenderDefaultProgressRowPerStatusBucket(t *testing.T) {
+	cases := []struct {
+		name        string
+		status      string
+		wantClasses [4]string
+	}{
+		{"Landed", "Landed", [4]string{"landed", "landed", "landed", "landed"}},
+		{"In draft", "In draft", [4]string{"in-draft", "empty", "empty", "empty"}},
+		{"In progress", "In progress", [4]string{"neutral", "neutral", "neutral", "neutral"}},
+		{"Proposed", "Proposed", [4]string{"neutral", "neutral", "neutral", "neutral"}},
+		{"Validating", "Validating", [4]string{"neutral", "neutral", "neutral", "neutral"}},
+		{"Deferred", "Deferred", [4]string{"neutral", "neutral", "neutral", "neutral"}},
+		{"Deferred with reason", "Deferred — out of scope", [4]string{"neutral", "neutral", "neutral", "neutral"}},
+		{"unrecognized falls through to neutral", "Frobnicating", [4]string{"neutral", "neutral", "neutral", "neutral"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			roots := buildTree([]parsedDoc{
+				{Slug: "alpha", Status: tc.status},
+			}, nil)
+			html := renderTree(t, roots)
 
-	if !strings.Contains(html, `<div class="progress-row">`) {
-		t.Errorf("field-omitting doc must still render the progress row; html:\n%s", html)
-	}
-	if got := draftingCellCount(html); got != 1 {
-		t.Errorf("Drafting cell count = %d, want exactly 1; html:\n%s", got, html)
-	}
-	if got := declaredCellCount(html); got != 0 {
-		t.Errorf("declared cell count = %d, want 0 for a field-omitting doc; html:\n%s", got, html)
+			// The default row replaces the prior "exactly one
+			// reserved Drafting cell" render for a field-omitting
+			// doc (parent D1 / D2 supersession): there must be no
+			// Drafting cell in the default branch.
+			if draftingCellCount(html) != 0 {
+				t.Errorf("default row must not carry a Drafting cell (superseded by D1/D2); html:\n%s", html)
+			}
+			labels := [4]string{"D", "P", "I", "V"}
+			for i, label := range labels {
+				want := `<span class="progress-cell progress-cell-` + tc.wantClasses[i] + `">` + label + `</span>`
+				if !strings.Contains(html, want) {
+					t.Errorf("cell %d (%s) shape mismatch; want %q in:\n%s", i, label, want, html)
+				}
+			}
+		})
 	}
 }
 
-// TestRenderProgressRowStubOnlyDrafting asserts m2 t3 C3 for the
-// already-supported `slug` + `Status: In draft` stub: it renders
-// exactly the one Drafting cell, Status-independently (C5 — the
-// gating is field presence, never the Status token).
-func TestRenderProgressRowStubOnlyDrafting(t *testing.T) {
-	stub := renderTree(t, buildTree([]parsedDoc{
-		{Slug: "beta", Status: "In draft"},
+// TestRenderProgressRowCellDOMPreservedAcrossBranches asserts
+// p3 C-INV-1 (cell-anchor): both the default row (no
+// progress_stages) and the declared row (progress_stages
+// present) emit per-cell DOM elements — the F3b future per-cell
+// attachment surface. Counting <span class="progress-cell ...">
+// occurrences per branch is the structural check.
+func TestRenderProgressRowCellDOMPreservedAcrossBranches(t *testing.T) {
+	defaultRow := renderTree(t, buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "In progress"},
 	}, nil))
+	if got := strings.Count(defaultRow, `<span class="progress-cell `); got != 4 {
+		t.Errorf("default row must emit 4 per-cell DOM elements (C-INV-1); got %d in:\n%s", got, defaultRow)
+	}
 
-	if got := draftingCellCount(stub); got != 1 {
-		t.Errorf("stub Drafting cell count = %d, want exactly 1; html:\n%s", got, stub)
+	declared := renderTree(t, buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "In progress", ProgressStages: []string{"Spec", "Render"}},
+	}, nil))
+	// Declared branch: 1 Drafting cell (carries
+	// progress-cell-drafting modifier) + 2 declared cells (bare
+	// progress-cell). The C-INV-1 invariant: every cell is its
+	// own DOM element regardless of which row drew it.
+	if got := draftingCellCount(declared); got != 1 {
+		t.Errorf("declared row must carry exactly one Drafting cell; got %d in:\n%s", got, declared)
 	}
-	if got := declaredCellCount(stub); got != 0 {
-		t.Errorf("stub declared cell count = %d, want 0; html:\n%s", got, stub)
-	}
-	// The stub still renders its badge and label (preserved t2
-	// surface) alongside the new progress row.
-	if !strings.Contains(stub, `<span class="badge status-in-draft">In draft</span>`) ||
-		!strings.Contains(stub, `<span class="label" title="beta">beta</span>`) {
-		t.Errorf("stub lost its badge or label; html:\n%s", stub)
+	if got := declaredCellCount(declared); got != 2 {
+		t.Errorf("declared row must carry one cell per declared stage; got %d in:\n%s", got, declared)
 	}
 }
 
@@ -477,9 +542,15 @@ func TestRenderProgressRowMalformedNeverDropsNode(t *testing.T) {
 }
 
 // TestRenderProgressRowCoexistsWithPreservedSurfaces asserts m2 t3
-// C4: the progress row renders alongside — not in place of — the
-// preserved t2 surfaces (Status badge, actor markers, long
-// description, related-PR list).
+// C4 carried forward through p3: the progress row renders
+// alongside — not in place of — the preserved t2 surfaces
+// (Status badge, actor markers). p3 F7 (C1) relocates the long
+// description and the related-PR list inside a nested
+// body-disclosure <details>; both still render, just behind the
+// disclosure gesture. The long description now renders as
+// markdown (paragraphs wrap in <p>); the related-PR anchors are
+// unchanged because related-PRs are not the markdown body —
+// they're authored URLs the existing isURL branch linkifies.
 func TestRenderProgressRowCoexistsWithPreservedSurfaces(t *testing.T) {
 	roots := buildTree([]parsedDoc{
 		{Slug: "alpha", Status: "In progress",
@@ -494,13 +565,173 @@ func TestRenderProgressRowCoexistsWithPreservedSurfaces(t *testing.T) {
 	for _, want := range []string{
 		`<span class="badge status-in-progress">In progress</span>`,
 		`<span class="actor-marker">agent-1</span>`,
-		`<div class="long-desc">The long body.</div>`,
+		// The long description now markdown-renders inside the
+		// body-disclosure; goldmark wraps the single paragraph
+		// in a <p> tag.
+		`<div class="long-desc"><p>The long body.</p>`,
 		`<a href="https://github.com/o/r/pull/9">https://github.com/o/r/pull/9</a>`,
 		`<div class="progress-row">`,
+		`<details class="body-disclosure">`,
 	} {
 		if !strings.Contains(html, want) {
 			t.Errorf("preserved/added surface missing %q; html:\n%s", want, html)
 		}
+	}
+}
+
+// TestRenderBodyHeaderOnlyByDefault asserts p3 F7 (parent C1):
+// every node box's first view is header-only — no .long-desc
+// and no .related-prs render outside the body-disclosure
+// wrapper. A node with no body content emits no body-disclosure
+// either (the {{if or .LongDescription .RelatedPRs}} gate); a
+// node with body content wraps both .long-desc and .related-prs
+// inside the .body-disclosure <details>, so neither surfaces in
+// the header-only first view.
+func TestRenderBodyHeaderOnlyByDefault(t *testing.T) {
+	// (1) field-less node: no body-disclosure emitted at all.
+	bare := renderTree(t, buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed"},
+	}, nil))
+	if strings.Contains(bare, `<details class="body-disclosure">`) {
+		t.Errorf("field-less node must not emit a body-disclosure; html:\n%s", bare)
+	}
+	if strings.Contains(bare, `<div class="long-desc">`) ||
+		strings.Contains(bare, `<ul class="related-prs">`) {
+		t.Errorf("field-less node must emit no body markup; html:\n%s", bare)
+	}
+
+	// (2) body-bearing node: body-disclosure wraps both
+	// .long-desc and .related-prs; neither escapes outside the
+	// disclosure to render in the header-only first view.
+	bodied := renderTree(t, buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed",
+			LongDescription: "Body.",
+			RelatedPRs:      []string{"https://github.com/o/r/pull/1"}},
+	}, nil))
+	bodyDiscAt := strings.Index(bodied, `<details class="body-disclosure">`)
+	if bodyDiscAt < 0 {
+		t.Fatalf("body-bearing node must emit a body-disclosure; html:\n%s", bodied)
+	}
+	bodyDiscClose := strings.Index(bodied[bodyDiscAt:], `</details>`)
+	if bodyDiscClose < 0 {
+		t.Fatalf("body-disclosure has no closing tag; html:\n%s", bodied)
+	}
+	disclosed := bodied[bodyDiscAt : bodyDiscAt+bodyDiscClose+len(`</details>`)]
+	if !strings.Contains(disclosed, `<div class="long-desc">`) {
+		t.Errorf("long-desc must render inside the body-disclosure; disclosed=%q", disclosed)
+	}
+	if !strings.Contains(disclosed, `<ul class="related-prs">`) {
+		t.Errorf("related-prs must render inside the body-disclosure; disclosed=%q", disclosed)
+	}
+	// And neither must render anywhere OUTSIDE the body-disclosure
+	// in the surrounding node markup.
+	outside := bodied[:bodyDiscAt] + bodied[bodyDiscAt+bodyDiscClose+len(`</details>`):]
+	if strings.Contains(outside, `<div class="long-desc">`) {
+		t.Errorf("long-desc must not render outside body-disclosure; outside=%q", outside)
+	}
+	if strings.Contains(outside, `<ul class="related-prs">`) {
+		t.Errorf("related-prs must not render outside body-disclosure; outside=%q", outside)
+	}
+}
+
+// TestRenderBodyDisclosureStripsAnchors asserts p3 F7 OD3 = I2b:
+// when the body disclosure is open, the long description renders
+// as markdown with <a> (anchor) tags stripped. Inline link text
+// survives as plain text (the Walk continues into the Link node's
+// children); autolinks emit their URL as escaped plain text. The
+// markdown formatting around the links still renders (paragraph,
+// emphasis, etc.) — only the <a> wrappers are suppressed.
+func TestRenderBodyDisclosureStripsAnchors(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed",
+			LongDescription: "See [the spec](./spec.md) and *details*.\n\nBare URL: <http://example.com/page>"},
+	}, nil)
+	html := renderTree(t, roots)
+
+	// Find the body-disclosure region to scope assertions there.
+	bodyDiscAt := strings.Index(html, `<details class="body-disclosure">`)
+	if bodyDiscAt < 0 {
+		t.Fatalf("body-disclosure missing; html:\n%s", html)
+	}
+	bodyDiscEnd := strings.Index(html[bodyDiscAt:], `</details>`)
+	if bodyDiscEnd < 0 {
+		t.Fatalf("body-disclosure close tag missing; html:\n%s", html)
+	}
+	disclosed := html[bodyDiscAt : bodyDiscAt+bodyDiscEnd]
+
+	// No <a tags inside the disclosed body. The summary text
+	// "Show description" does not contain anchors; the long-desc
+	// content is the only candidate. (The related-PRs ul is the
+	// separate authored-PR list — also inside body-disclosure but
+	// it intentionally linkifies absolute URLs; this test
+	// targets the markdown-body anchor strip, so we restrict to
+	// the .long-desc element.)
+	longDescAt := strings.Index(disclosed, `<div class="long-desc">`)
+	if longDescAt < 0 {
+		t.Fatalf("long-desc missing inside body-disclosure; disclosed=%q", disclosed)
+	}
+	longDescEnd := strings.Index(disclosed[longDescAt:], `</div>`)
+	if longDescEnd < 0 {
+		t.Fatalf("long-desc close tag missing; disclosed=%q", disclosed)
+	}
+	longDescHTML := disclosed[longDescAt : longDescAt+longDescEnd]
+	if strings.Contains(longDescHTML, "<a ") || strings.Contains(longDescHTML, "<a>") {
+		t.Errorf("F7 markdown-rendered body must carry no <a> tags; longDescHTML=%q", longDescHTML)
+	}
+	// Link text "the spec" survives as plain text.
+	if !strings.Contains(longDescHTML, "the spec") {
+		t.Errorf("link text must survive the anchor strip; longDescHTML=%q", longDescHTML)
+	}
+	// Surrounding markdown formatting (emphasis) renders.
+	if !strings.Contains(longDescHTML, "<em>details</em>") {
+		t.Errorf("non-link markdown must still render; longDescHTML=%q", longDescHTML)
+	}
+	// Autolink emits its URL as text, not <a>.
+	if !strings.Contains(longDescHTML, "http://example.com/page") {
+		t.Errorf("autolink URL must render as text after strip; longDescHTML=%q", longDescHTML)
+	}
+}
+
+// TestRenderBodyDisclosureIndependentOfParentCollapse asserts
+// p3 F7 (parent C1): the per-node outer <details> (the box
+// collapse) and the nested body-disclosure <details> are
+// structurally independent — they are two separate DOM elements
+// at different nesting depths, each with its own `open` state.
+// Opening one cannot toggle the other (the native <details>
+// semantics; the test asserts the structural independence the
+// observable independence rides on).
+func TestRenderBodyDisclosureIndependentOfParentCollapse(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "In progress",
+			LongDescription: "Body."},
+	}, map[string][]*ActiveWorkInstance{
+		"alpha": {{Actor: "wst-1", Name: "agent-1", Slug: "alpha"}},
+	})
+	html := renderTree(t, roots)
+
+	// Both <details> exist as separate DOM elements.
+	outerAt := strings.Index(html, `<details class="box box-root box-leaf"`)
+	if outerAt < 0 {
+		t.Fatalf("outer per-node <details> missing; html:\n%s", html)
+	}
+	bodyAt := strings.Index(html, `<details class="body-disclosure">`)
+	if bodyAt < 0 {
+		t.Fatalf("body-disclosure <details> missing; html:\n%s", html)
+	}
+	if !(outerAt < bodyAt) {
+		t.Errorf("body-disclosure must nest inside the outer <details>; outerAt=%d bodyAt=%d",
+			outerAt, bodyAt)
+	}
+	// The outer renders `open` (active subtree); the body
+	// disclosure does NOT carry `open` (it defaults closed —
+	// "header-only first view").
+	outerOpenAt := strings.Index(html, `<details class="box box-root box-leaf" open>`)
+	if outerOpenAt < 0 {
+		t.Errorf("outer <details> must render open for active subtree; html:\n%s", html)
+	}
+	bodyOpenAt := strings.Index(html, `<details class="body-disclosure" open>`)
+	if bodyOpenAt >= 0 {
+		t.Errorf("body-disclosure must default closed (header-only first view); html:\n%s", html)
 	}
 }
 

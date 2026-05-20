@@ -50,17 +50,21 @@ const forestTemplates = `
 
 {{define "node-header"}}<span class="label-group"><span class="label" title="{{.Slug}}">{{.Label}}</span>{{range .WorkInstances}}<span class="actor-marker">{{if .Name}}{{.Name}}{{else}}{{.Slug}}{{end}}</span>{{end}}</span><span class="status-group"><span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span></span>{{end}}
 
-{{define "node-progress"}}<div class="progress-row"><span class="progress-cell progress-cell-drafting">Drafting</span>{{range .ProgressStages}}<span class="progress-cell">{{.}}</span>{{end}}</div>{{end}}
+{{define "node-progress"}}<div class="progress-row">{{if .ProgressStages}}<span class="progress-cell progress-cell-drafting">Drafting</span>{{range .ProgressStages}}<span class="progress-cell">{{.}}</span>{{end}}{{else}}<span class="progress-cell progress-cell-{{progressCellClass .Status "d"}}">D</span><span class="progress-cell progress-cell-{{progressCellClass .Status "p"}}">P</span><span class="progress-cell progress-cell-{{progressCellClass .Status "i"}}">I</span><span class="progress-cell progress-cell-{{progressCellClass .Status "v"}}">V</span>{{end}}</div>{{end}}
 
 {{define "node-detail"}}
 {{- template "node-progress" .}}
+{{- if or .LongDescription .RelatedPRs}}
+<details class="body-disclosure"><summary class="body-disclosure-summary"><span class="triangle" aria-hidden="true">&#9656;</span>Show description</summary>
 {{- if .LongDescription}}
-<div class="long-desc">{{truncateLongDesc .LongDescription}}</div>
+<div class="long-desc">{{renderLongDescBody .LongDescription}}</div>
 {{- end}}
 {{- if .RelatedPRs}}
 <ul class="related-prs">
 {{range .RelatedPRs}}<li>{{if isURL .}}<a href="{{.}}">{{.}}</a>{{else}}{{.}}{{end}}</li>
 {{end}}</ul>
+{{- end}}
+</details>
 {{- end}}
 {{- end}}
 
@@ -109,10 +113,37 @@ const forestTemplates = `
     .related-prs li { padding: 0.1rem 0; }
     /* m2 t3: the doc-declared progress-cell row. A
        render-side-reserved Drafting cell followed by one cell per
-       declared progress_stages entry, in document order. */
+       declared progress_stages entry, in document order.
+       p3 F3a (C2): when a doc declares no progress_stages, the
+       default D / P / I / V row renders instead — every cell is
+       its own DOM element across both branches per C-INV-1, so
+       the F3b future per-cell attachment is preserved. */
     .progress-row { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.25rem 0 0.25rem 0; }
     .progress-cell { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 0.25rem; font-size: 0.8em; background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
     .progress-cell-drafting { background: #f3f4f6; color: #4b5563; border-color: #d1d5db; }
+    /* p3 F3a default-row variants (OD1's conservative starting
+       point: reuse the .status-landed and .status-unknown badge
+       palette values so a cell's fill matches its Status badge). */
+    .progress-cell-landed   { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+    .progress-cell-in-draft { background: #fef3c7; color: #78350f; border-color: #fcd34d; }
+    .progress-cell-neutral  { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
+    .progress-cell-empty    { background: #ffffff; color: #9ca3af; border-style: dashed; border-color: #d1d5db; }
+    /* p3 F7 (C1): the per-node body disclosure — a nested
+       <details>/<summary> inside the per-node <details> box,
+       independent of the parent tree-collapse. The summary uses
+       the same inline-triangle treatment p1 introduced for the
+       outer collapse (the global summary list-style:none rule
+       above suppresses the UA marker for nested summaries too,
+       so an inline triangle is needed for visual parity). */
+    .body-disclosure { margin: 0.25rem 0 0.25rem 0; }
+    .body-disclosure-summary { display: inline-flex; align-items: baseline; gap: 0.4rem; cursor: pointer; color: #4b5563; font-size: 0.85em; padding: 0.15rem 0; }
+    .body-disclosure-summary .triangle { color: #9ca3af; }
+    /* triangle rotation reuses the existing details[open] >
+       summary .triangle rule above, which matches both the
+       outer per-node summary and the nested body-disclosure
+       summary independently — each tied to its own immediate
+       parent <details>[open] state. The two disclosures stay
+       structurally independent per parent C2. */
     /* m2 t2 C4: t2 owns the per-node-row narrow-window degrade.
        When the forest column is narrow the right-aligned Status
        group reflows below the label group as an intentional
