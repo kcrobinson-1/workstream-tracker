@@ -58,10 +58,11 @@ tool moving from observe-only to launching agents is the
 largest posture change in the product's history. Those
 scope-locking vision/technical-direction questions are now
 resolved (see "Open Questions Resolved By This Epic"), so the
-child set is locked at two milestones and m1's WHAT contract is
-locked; the UX milestone is named with its vision inputs
-resolved but its WHAT sealed at its own milestone-planning
-session. Remaining Open Questions are milestone-time or
+child set is locked at two milestones; **both** milestones'
+WHAT contracts are now locked — m1's at the epic-promotion
+PR, m2's at its own milestone-planning session (PR
+[#58](https://github.com/kcrobinson-1/workstream-tracker/pull/58)).
+Remaining Open Questions are milestone-time or
 conscious-tracking, not scope-locking.
 
 ## Why This Epic
@@ -287,14 +288,10 @@ milestone lives in the milestone doc when it drafts. Required
 section per [`epic.md`](../../../spec/planning/epic.md)
 "Required and optional sections" and
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts." The child set is locked at two milestones.
-**m1's WHAT contract is locked** (row below). The **UX
-milestone is explicitly scope-not-yet-locked** — its vision
-inputs are resolved but its WHAT is sealed at its own
-milestone-planning session per
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts," which permits a named child carrying its
-WHAT without final sealing until that session runs.
+child contracts." The child set is locked at two milestones,
+and **both rows are now Locked**: m1's at the epic-promotion
+PR, m2's at its own milestone-planning session (PR
+[#58](https://github.com/kcrobinson-1/workstream-tracker/pull/58)).
 
 | Milestone | Short description | End result and what it preserves (WHAT) | Sibling interface |
 |---|---|---|---|
