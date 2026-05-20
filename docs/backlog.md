@@ -346,9 +346,31 @@ follows. One option among several: reconcile the "Goal" /
 three say milestone-terminal for a milestone's tasks/phases and
 task-terminal only for standalone task plans.
 
+### post-m2-ux-correction
+
+**Status:** Graduated — post-m2-ux-correction
+
+**Plan:** [`docs/plans/post-m2-ux-correction/README.md`](plans/post-m2-ux-correction/README.md)
+
+Correct UX gaps that shipped during m2 because the milestone
+lacked a per-leaf product-validation gate.
+
+v0.3 shipped UX defects and unfinished feature surfaces —
+dark-mode-unreadable page chrome, raw-markdown body shown by
+default, misplaced collapse arrows, an information-free
+progress-cell row, half-clickable session list, and a forest
+actor identifier that disagrees with the roster's — because m2
+had no validation gate to catch them. This task takes the
+corrective work as a single bug-fix-shaped standalone graduated
+task; the broader per-leaf validation discipline already landed
+in `spec/planning/milestone.md` "Product acceptance and per-leaf
+validation."
+
 ### humanize-forest-actor
 
-**Status:** Open
+**Status:** Graduated — post-m2-ux-correction
+
+**Plan:** [`docs/plans/post-m2-ux-correction/README.md`](plans/post-m2-ux-correction/README.md)
 
 Humanize the forest's per-node actor display.
 
@@ -363,6 +385,37 @@ and this entry is where the resulting forest-shows-uuid /
 roster-shows-name gap is addressed. One option among several:
 render the reported name in the forest UX (and/or revisit the
 `wst-<uuid>` actor generator). Scope-framed, not prescribed.
+
+### progress-cell-active-state-and-actor
+
+**Status:** Open
+
+The active-cell actor icon and per-cell PR-state coloring for
+the progress-cell row.
+
+`post-m2-ux-correction` lands the Status-driven coarse cell
+model (default D/P/I/V; Landed ⇒ filled, In draft ⇒ D +
+placeholders). It deliberately does not put the actor icon on a
+*specific cell* and does not color cells by PR state (in-review
+vs. complete), because both need data the current model does not
+carry: work-instance sub-stage attribution (the work-instance
+registers against a slug only — `internal/api/api.go`
+`RegisterRequest`) and a PR-state source
+(`design/vision.md` §3/§9 names the GitHub API as a future
+input; the render path renders `RelatedPRs` as a flat list and
+never fetches PR state — `internal/site/forest.go`). Re-trigger
+pain axis: until shipped, the forest tells you a session is
+*somewhere in* a node but not which stage, and in-progress nodes
+show no per-stage progression. Migration cost: linear, not cliff
+— `post-m2-ux-correction` designs the cell DOM so a per-cell
+actor marker attaches additively, and PR-state coloring overlays
+additional state on existing cells. Mitigation:
+`post-m2-ux-correction`'s cell-render contract names "the cell
+is the per-stage anchor a future actor marker / state overlay
+attaches to" so this entry is cheap to graduate later. One
+option among several: schematize a small `current_stage` field
+on the work-instance register payload and source PR state from
+the GitHub API.
 
 ### destructive-metadata-updates
 
