@@ -18,8 +18,8 @@ the Files-to-touch, the per-phase Validation Gate
 walkthrough lives at p3), Out of Scope, and the Risk Register.
 Five open decisions were surfaced for the OD walk preceding the
 `` `In draft` → `Proposed` `` promotion gate. OD-walk
-resolutions are folded inline below as they land; OD2, OD3, and
-OD4 remain open at this revision.
+resolutions are folded inline below as they land; OD2 and OD4
+remain open at this revision.
 
 ### Open decisions
 
@@ -150,33 +150,52 @@ README precedent).
   `Name` and `Slug` on `ActiveWorkInstance`; OD1.a + OD2.b needs
   only `Name`.
 
-- **OD3 — Unbound work-instance handling.** A work-instance
-  registered against a slug not present in the walked tree is
-  *unbound*. Today the forest drops it at `buildTree`'s join
-  site ([`tree.go:104`](../../../internal/site/tree.go);
+- **OD3 — Unbound work-instance handling. Resolved = OD3.a**
+  (no change; unbound stays roster-only). *Rationale
+  (vision-grounded).*
+  [`vision.md` §4](../../../design/vision.md) explicitly names
+  the roster as the surface for unbound sessions: "set aside
+  from the plan-tree forest is a roster of the sessions the
+  tool knows about ... a session that is unbound ... still
+  appears, in the roster, rather than vanishing."
+  [§3](../../../design/vision.md) puts unattached work in a
+  triage zone, not in the forest. The forest/roster split is a
+  vision-level commitment, not a t4 implementation choice. The
+  pre-existing `buildTree` exact-slug join
+  ([`tree.go:104`](../../../internal/site/tree.go);
   `active[d.Slug]` reads only when the slug matches a parsed
-  doc), and the roster lists it
-  ([`buildRoster` in
-  site.go](../../../internal/site/site.go) classifies unbound
-  entries with `Bound: false`). Confirm:
-  - **OD3.a — No change; unbound work-instances stay
-    roster-only.** The forest renders only attached
-  work-instances; the drop predates p2 and falls naturally out
-    of the exact-slug join. The parent task plan's contract
-    surface (C6) places the F4 humanization on the forest's
-    *existing* per-node `actor-marker` attachments, not on a new
-    surface for unbound sessions. Recorded in `## Out of Scope`.
-  - **OD3.b — Render unbound work-instances somewhere in the
-    forest.** Out of scope per the parent task plan's split
-    between roster (which surfaces unbound) and forest (which
-    renders attached); would require new render plumbing past
-    F4.
+  doc) already implements that split correctly. Parent Contract
+  **C6** targets the forest's *per-node* `actor-marker` —
+  there is no `actor-marker` to humanize on a node that doesn't
+  exist — so OD3.a is also the scope-grounded reading. The
+  triage *action* (promote-into-tree / dismiss) is deferred
+  past 1.0 per [`vision.md` §4](../../../design/vision.md) and
+  the parent epic's resolved "Triage zone in 1.0?" open
+  question; OD3.a doesn't close that door — a future bound
+  transition flows through `buildTree`'s existing join
+  automatically. Recorded in `## Out of Scope` and observed in
+  the Validation Gate's "Observe" step (seeded session 3, an
+  unbound entry that appears in the roster but not in the
+  forest).
 
-  Tradeoff lens: OD3.a is the natural reading of parent C6 and
-  the t4 / forest split — surfacing unbound in the forest would
-  expand p2's scope past F4 with no contract support. Confirm
-  OD3.a and record the drop site in `## Out of Scope` so
-  reviewers don't read the pre-existing drop as a p2 regression.
+  - **OD3 (original framing, retained as scoping record).** A
+    work-instance registered against a slug not present in the
+    walked tree is *unbound*. Today the forest drops it at
+    `buildTree`'s join site
+    ([`tree.go:104`](../../../internal/site/tree.go);
+    `active[d.Slug]` reads only when the slug matches a parsed
+    doc), and the roster lists it
+    ([`buildRoster` in
+    site.go](../../../internal/site/site.go) classifies unbound
+    entries with `Bound: false`). Two shapes were decomposed:
+    - **OD3.a — No change; unbound stays roster-only.** The
+      drop predates p2 and falls naturally out of the
+      exact-slug join.
+    - **OD3.b — Render unbound work-instances somewhere in the
+      forest.** Out of scope per the parent task plan's split
+      between roster (which surfaces unbound) and forest (which
+      renders attached); would require new render plumbing
+      past F4 and contradicts the vision-level split.
 
 - **OD4 — Test-coverage posture for the F4 contract.** The
   forest-region test surface
