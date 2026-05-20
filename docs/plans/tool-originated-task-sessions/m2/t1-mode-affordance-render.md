@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m2-t1
-Status: Proposed
+Status: Landed
 short_description: Mode-affordance render on plan-tree nodes
 ---
 

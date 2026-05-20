@@ -207,6 +207,53 @@ func buildTree(docs []parsedDoc, active map[string][]*ActiveWorkInstance) []*Pla
 	return roots
 }
 
+// ModeAffordance is the per-node mode the rendered forest offers
+// the contributor — the value t1 emits as the form's hidden
+// `mode` input AND as the visible submit-button label. Per m2 t1
+// C2, one value drives both sites so a future edit cannot drift
+// one without the other; per m2 D3, the string values are the
+// exact downstream-checked tokens t2's /spawn handler will
+// dispatch on. ModeAffordanceNone is the sentinel (empty string)
+// — a node returning it renders no form at all per C3.
+type ModeAffordance string
+
+const (
+	ModeAffordanceNone           ModeAffordance = ""
+	ModeAffordancePlanning       ModeAffordance = "Begin planning"
+	ModeAffordanceImplementation ModeAffordance = "Begin implementation"
+)
+
+// Affordance returns the per-node mode-affordance per the m2
+// Cross-Task Decision D3 static map. Inputs are exactly three
+// already-populated PlanNode fields D3 keys on: NodeType, Status
+// (canonical-prefix-stripped via canonicalStatus, so
+// "Deferred — <reason>" reads as Deferred per m2 t1 C4), and the
+// presence-or-absence of items in Children. Returns
+// ModeAffordanceNone for any combinator the map does not enable,
+// including any unknown Status value (C6) — matching the
+// graceful-fallback shape statusClass already takes for
+// unrecognized lifecycle tokens.
+func (n *PlanNode) Affordance() ModeAffordance {
+	switch n.NodeType {
+	case string(slugs.NodeTypeTask), string(slugs.NodeTypePhase):
+	default:
+		// root / epic / milestone are always parent-shape per D3.
+		return ModeAffordanceNone
+	}
+	if len(n.Children) > 0 {
+		// A task carrying its phase children is parent-shape per
+		// D3 — its work is its phases.
+		return ModeAffordanceNone
+	}
+	switch canonicalStatus(n.Status) {
+	case "In draft", "":
+		return ModeAffordancePlanning
+	case "Proposed":
+		return ModeAffordanceImplementation
+	}
+	return ModeAffordanceNone
+}
+
 // markActiveInSubtree sets n.ActiveInSubtree post-order and
 // returns it, so a parent's value reflects already-computed
 // children.
