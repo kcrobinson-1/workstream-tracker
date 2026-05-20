@@ -1,10 +1,17 @@
 package site
 
 import (
+	"bytes"
 	"html/template"
 	"io"
 	"net/url"
 	"strings"
+	"time"
+
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/ast"
+	"github.com/yuin/goldmark/renderer"
+	"github.com/yuin/goldmark/util"
 )
 
 // indexTmpl is the page shell: chrome, the two-region .layout
@@ -15,9 +22,12 @@ import (
 // so no later task edits this shell to grow a region. Bare-bones
 // by design (see design/v0.1-design.md Section 7).
 var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
-	"statusClass":      statusClass,
-	"isURL":            isAbsoluteURL,
-	"truncateLongDesc": truncateLongDesc,
+	"statusClass":        statusClass,
+	"isURL":              isAbsoluteURL,
+	"truncateLongDesc":   truncateLongDesc,
+	"progressCellClass":  progressCellClass,
+	"renderLongDescBody": renderLongDescBody,
+	"formatEventTime":    formatEventTime,
 }).Parse(`<!doctype html>
 <html lang="en">
 <head>
@@ -130,4 +140,134 @@ func statusClass(status string) string {
 		return "deferred"
 	}
 	return "unknown"
+}
+
+// progressCellClass returns the per-cell CSS class suffix the
+// default D / P / I / V progress row uses for a node with the
+// given Status at the given cell position ("d" / "p" / "i" /
+// "v"). Three shape buckets per p3 F3a:
+//   - Landed: all four cells "landed" (filled green; matches
+//     .status-landed badge palette).
+//   - In draft: D = "in-draft" (filled amber); P/I/V = "empty"
+//     (dashed border, no fill — the placeholder treatment that
+//     reads "stage not yet started" while preserving the
+//     per-cell DOM C-INV-1 anchor for F3b's future attachment).
+//   - Everything else (In progress, Proposed, Validating,
+//     Deferred, any unrecognized Status the statusClass helper
+//     falls back to "unknown" for): all four "neutral" (filled
+//     grey; matches .status-unknown badge palette).
+//
+// position is "d" only-distinguished from the others (the
+// In-draft branch flips D to filled and the rest to empty);
+// passing positions other than those four returns the same
+// non-"d" treatment per bucket.
+func progressCellClass(status, position string) string {
+	canonical := status
+	if i := strings.Index(canonical, " — "); i >= 0 {
+		canonical = canonical[:i]
+	}
+	switch canonical {
+	case "Landed":
+		return "landed"
+	case "In draft":
+		if position == "d" {
+			return "in-draft"
+		}
+		return "empty"
+	}
+	return "neutral"
+}
+
+// bodyMarkdown is the goldmark instance that renders the F7
+// disclosed long-description body. The custom stripLinksRenderer
+// runs at priority 100 (lower than the default html.NewRenderer
+// at 1000), which under goldmark's "higher-priority registers
+// first, lower-priority registers last and overwrites" pattern
+// (renderer.Render's init loop, html.go line 130+) overrides
+// the default Link / AutoLink renderers so anchor tags are
+// suppressed structurally — never reach the rendered HTML.
+// OD3 = I2b: render markdown with <a> tags stripped (the link
+// text still renders via the Walk-into-children pass on Link
+// nodes; AutoLink nodes emit their label as plain escaped text).
+var bodyMarkdown = goldmark.New(
+	goldmark.WithRendererOptions(
+		renderer.WithNodeRenderers(
+			util.Prioritized(&stripLinksRenderer{}, 100),
+		),
+	),
+)
+
+// stripLinksRenderer overrides KindLink + KindAutoLink so the
+// rendered HTML carries no <a> tags. Link text still appears as
+// plain text (Walk continues into children for KindLink; the
+// AutoLink's label is emitted as escaped plain text). All other
+// markdown constructs (paragraphs, emphasis, code spans,
+// headers, lists, etc.) render through the default html
+// renderer unchanged.
+type stripLinksRenderer struct{}
+
+func (r *stripLinksRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
+	reg.Register(ast.KindLink, renderLinkStripped)
+	reg.Register(ast.KindAutoLink, renderAutoLinkStripped)
+}
+
+// renderLinkStripped emits nothing for the link wrapper; the
+// Walk continues into the link's text children, which the
+// default Text/String renderers handle, so the link's display
+// text appears as plain text in the rendered output.
+func renderLinkStripped(_ util.BufWriter, _ []byte, _ ast.Node, _ bool) (ast.WalkStatus, error) {
+	return ast.WalkContinue, nil
+}
+
+// renderAutoLinkStripped emits the autolink's label (the URL
+// itself for a bare <http://...>) as escaped plain text on the
+// entering pass, then walks children (typically none for an
+// AutoLink). Without the strip, the default renderer would emit
+// <a href="...">label</a>; here the label survives as plain
+// escaped text.
+func renderAutoLinkStripped(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
+	if !entering {
+		return ast.WalkContinue, nil
+	}
+	al, ok := n.(*ast.AutoLink)
+	if !ok {
+		return ast.WalkContinue, nil
+	}
+	_, _ = w.Write(util.EscapeHTML(al.Label(source)))
+	return ast.WalkContinue, nil
+}
+
+// renderLongDescBody renders the per-node long description as
+// markdown HTML with <a> tags stripped per F7 OD3 = I2b. The
+// truncateLongDesc cap runs first (truncate, then render) so a
+// very long body still terminates with the existing truncation
+// marker even when disclosed — the cap is the defense-in-depth
+// tail per parent C2. The empty case short-circuits to an empty
+// HTML value so the template can use a non-empty check
+// unchanged. Render failures fall back to escaped plain text
+// rather than failing the page render.
+func renderLongDescBody(s string) template.HTML {
+	if s == "" {
+		return ""
+	}
+	truncated := truncateLongDesc(s)
+	var buf bytes.Buffer
+	if err := bodyMarkdown.Convert([]byte(truncated), &buf); err != nil {
+		return template.HTML(template.HTMLEscapeString(truncated))
+	}
+	return template.HTML(buf.String())
+}
+
+// formatEventTime formats a Unix-epoch nanosecond timestamp for
+// the F9 K3 known-facts header — the storage shape every event
+// write in internal/api/handlers.go writes (now.UnixNano()),
+// matching events.received_at's column. Zero (no event observed)
+// renders as the em-dash placeholder. Otherwise UTC,
+// RFC3339-shaped without the T separator so it reads cleanly to
+// a human at a glance: "2026-05-20 14:33:21 UTC".
+func formatEventTime(t int64) string {
+	if t == 0 {
+		return "—"
+	}
+	return time.Unix(0, t).UTC().Format("2006-01-02 15:04:05 UTC")
 }

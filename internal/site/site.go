@@ -123,14 +123,28 @@ func loadActiveWorkInstances(ctx context.Context, db *sql.DB) (map[string][]*Act
 }
 
 // sessionMeta is one active work-instance's resolved reported
-// metadata: the conventionally-read display Name (empty when the
-// session reported no JSON-object `name`) and the
-// deliberately-unstructured raw-JSON Detail (empty when the
-// session reported no metadata at all — that entry renders as a
-// plain row with no disclosure, not an empty <details>).
+// metadata (Name + Detail) plus loader-known event timestamps
+// (RegisteredAt + LastEventAt) the F9 K3 known-facts header
+// surfaces alongside the deliberately-unstructured Detail blob.
+// Name is the conventionally-read display Name (empty when the
+// session reported no JSON-object `name`). Detail is the
+// deliberately-unstructured raw-JSON view of the session's
+// resolved reported metadata (empty when the session reported
+// nothing — under p3 the K3 header still renders, with a
+// no-metadata sentinel in place of the raw-JSON block). The two
+// timestamp fields carry Unix-epoch nanoseconds matching
+// events.received_at's storage shape (every event write in
+// internal/api/handlers.go writes now.UnixNano()); zero means
+// "no register event seen" / "no later event seen" respectively.
+// K3's
+// "registered-at" reads RegisteredAt; "last event" reads
+// LastEventAt (falling back to RegisteredAt when no later event
+// has been seen).
 type sessionMeta struct {
-	Name   string
-	Detail string
+	Name         string
+	Detail       string
+	RegisteredAt int64
+	LastEventAt  int64
 }
 
 // loadSessionMetadata resolves, per active work-instance, the
@@ -162,11 +176,20 @@ func loadSessionMetadata(ctx context.Context, db *sql.DB, active map[string][]*A
 		args = append(args, id)
 	}
 
+	// p3 F9 OD6: the metadata IS NOT NULL filter was dropped so a
+	// register event with no metadata still surfaces its
+	// received_at as the K3 "registered-at" facts-block field,
+	// and a later heartbeat with no metadata still surfaces its
+	// received_at as the K3 "last event" field — observable
+	// conditions (b) and (d) need both. The fold-into-Detail
+	// logic in resolveSessionMeta already handles null metadata
+	// (empty json.RawMessage → asObject returns nil → contributes
+	// no keys), so dropping the filter changes timestamp coverage
+	// without changing Detail rendering.
 	rows, err := db.QueryContext(ctx,
 		`SELECT work_instance_id, type, metadata, received_at
 		 FROM events
-		 WHERE work_instance_id IN (`+placeholders+`)
-		   AND metadata IS NOT NULL`,
+		 WHERE work_instance_id IN (`+placeholders+`)`,
 		args...,
 	)
 	if err != nil {
@@ -176,7 +199,27 @@ func loadSessionMetadata(ctx context.Context, db *sql.DB, active map[string][]*A
 
 	baseline := map[string]json.RawMessage{}
 	latest := map[string]json.RawMessage{}
-	latestAt := map[string]int64{}
+	// p3 F9 OD6 (post-#62 review): tracking the K3 "last event"
+	// timestamp is DECOUPLED from selecting the latest metadata-
+	// bearing later event for the Detail fold. Two maps:
+	//   - lastEventAt[wid] is the absolute latest later event's
+	//     received_at across ALL events (the K3 facts-block
+	//     "Last event" field; a no-metadata heartbeat still
+	//     counts here).
+	//   - latestMetadataAt[wid] is the latest received_at among
+	//     events that CARRY metadata — gates writes to
+	//     latest[wid] (the Detail-fold source) so the t4 task
+	//     plan's "Metadata read policy" + the
+	//     `destructive-metadata-updates` backlog entry's
+	//     deferred semantics are preserved: a no-metadata
+	//     heartbeat contributes nothing to Detail and does not
+	//     mask a previous metadata-bearing later event.
+	// registeredAt is the K3 "registered-at" facts-block field;
+	// the register-event branch always writes it regardless of
+	// whether the register event carried metadata.
+	lastEventAt := map[string]int64{}
+	latestMetadataAt := map[string]int64{}
+	registeredAt := map[string]int64{}
 	for rows.Next() {
 		var wid, etype string
 		var meta []byte
@@ -186,21 +229,36 @@ func loadSessionMetadata(ctx context.Context, db *sql.DB, active map[string][]*A
 		}
 		if etype == string(models.EventRegister) {
 			baseline[wid] = json.RawMessage(meta)
+			registeredAt[wid] = receivedAt
 			continue
 		}
-		if receivedAt >= latestAt[wid] {
+		if receivedAt > lastEventAt[wid] {
+			lastEventAt[wid] = receivedAt
+		}
+		if len(meta) > 0 && receivedAt >= latestMetadataAt[wid] {
 			latest[wid] = json.RawMessage(meta)
-			latestAt[wid] = receivedAt
+			latestMetadataAt[wid] = receivedAt
 		}
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
+	// Every active work-instance gets a sessionMeta entry now —
+	// even one with no reported metadata at all — so the F9 K3
+	// disclosure has the always-known facts (registered-at,
+	// last-event) to render. resolveSessionMeta's ok=false case
+	// still produces empty Name + Detail; the timestamps and the
+	// per-entry classification (bound / unbound + slug + actor id)
+	// fill the K3 header.
 	out := make(map[string]sessionMeta, len(ids))
 	for _, id := range ids {
-		if name, detail, ok := resolveSessionMeta(baseline[id], latest[id]); ok {
-			out[id] = sessionMeta{Name: name, Detail: detail}
+		name, detail, _ := resolveSessionMeta(baseline[id], latest[id])
+		out[id] = sessionMeta{
+			Name:         name,
+			Detail:       detail,
+			RegisteredAt: registeredAt[id],
+			LastEventAt:  lastEventAt[id],
 		}
 	}
 	return out, nil
@@ -292,15 +350,25 @@ func asObject(raw json.RawMessage) map[string]json.RawMessage {
 // actor; the task-level name-then-slug rule). Detail is the
 // deliberately-unstructured raw-JSON view of the session's
 // resolved reported metadata — empty when the session reported
-// nothing, in which case the entry renders as a plain row with
-// no disclosure (enrichment is additive; absence is not a drop).
+// nothing. p3 F9 K3: every entry opens to the same outer
+// disclosure structure regardless of Detail, so RosterEntry
+// also carries the always-known event timestamps the K3
+// known-facts header renders — RegisteredAt (the register
+// event's received_at) and LastEventAt (the latest later
+// event's received_at; zero when no later event has been seen,
+// in which case the K3 header falls back to RegisteredAt for
+// the "last event" facts-block field). Both timestamp fields
+// carry Unix-epoch nanoseconds matching events.received_at's
+// storage shape.
 type RosterEntry struct {
-	ID     string
-	Slug   string
-	Actor  string
-	Bound  bool
-	Name   string
-	Detail string
+	ID           string
+	Slug         string
+	Actor        string
+	Bound        bool
+	Name         string
+	Detail       string
+	RegisteredAt int64
+	LastEventAt  int64
 }
 
 // buildRoster classifies every active work-instance as bound
@@ -331,12 +399,14 @@ func buildRoster(docs []parsedDoc, active map[string][]*ActiveWorkInstance, meta
 		for _, wi := range wis {
 			m := meta[wi.ID]
 			entries = append(entries, RosterEntry{
-				ID:     wi.ID,
-				Slug:   slug,
-				Actor:  wi.Actor,
-				Bound:  bound[slug],
-				Name:   m.Name,
-				Detail: m.Detail,
+				ID:           wi.ID,
+				Slug:         slug,
+				Actor:        wi.Actor,
+				Bound:        bound[slug],
+				Name:         m.Name,
+				Detail:       m.Detail,
+				RegisteredAt: m.RegisteredAt,
+				LastEventAt:  m.LastEventAt,
 			})
 		}
 	}
