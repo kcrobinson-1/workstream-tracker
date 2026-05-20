@@ -281,22 +281,37 @@ walkthrough lives on the t4 leaf and is not duplicated here.
 1. **Enumerated-map test (the primary falsifier).** A new
    table-driven test in
    [`forest_test.go`](../../../../internal/site/forest_test.go)
-   carries one row per case D3 distinguishes — at minimum one
-   row for each of: epic node, milestone node, root node, task
-   with children, phase with children, task-without-children at
-   each canonical Status the D3 table enumerates plus one
-   unknown-Status and one `Deferred — <reason>`, and the
-   symmetric phase-without-children rows. Each row renders a
-   one-doc fixture through `renderTree` and asserts the rendered
-   HTML either contains exactly the expected affordance form
-   shape (the `<form>` element with the hidden inputs and the
-   button labeled per the mode) **or** contains no `<form>`
-   element at all, matching D3's row outcome. The assertion
-   distinguishes positive-affordance from negative-affordance
-   cases on the same render output (the `<form>` element's
-   presence is the unambiguous discriminator), so the
-   falsifier-check rule's "multiple causes produce the same
-   observation" failure mode does not apply.
+   carries one row per production-reachable (NodeType × Status ×
+   has-children) triple D3 distinguishes — covering each
+   NodeType the renderer can produce (`root`, `milestone`,
+   `task`, `phase`) at the Status values D3 enumerates for that
+   NodeType, plus at least one unknown-Status row and at least
+   one `Deferred — <reason>` row to pin canonical-prefix
+   behavior, plus the task-with-children case (no affordance).
+   Per-row fixture shape is implementation choice: cases whose
+   test node is a structural root need only their own
+   `parsedDoc`; deeper cases need the parsedDoc chain of
+   intermediate parents because
+   [`tree.go`](../../../../internal/site/tree.go) `buildTree`
+   silently drops a node whose parent slug is absent from the
+   slice; the with-children case additionally needs at least one
+   child phase doc so `buildTree`'s wire-children pass populates
+   the test node's `Children`. The phase-with-children case is
+   **not** in the enumeration — per
+   [`slugs.go`](../../../../internal/slugs/slugs.go) `pN` is the
+   terminal segment in the slug grammar, so a well-formed
+   parsedDoc set cannot construct a phase with children and that
+   branch of D3 is structurally unreachable in production. Each
+   row renders via `renderTree` and asserts the rendered HTML
+   either contains exactly the expected affordance form shape
+   (the `<form>` element with the hidden inputs and the button
+   labeled per the mode) **or** contains no `<form>` element at
+   all, matching D3's row outcome. The assertion distinguishes
+   positive-affordance from negative-affordance cases on the
+   same render output (the `<form>` element's presence is the
+   unambiguous discriminator), so the falsifier-check rule's
+   "multiple causes produce the same observation" failure mode
+   does not apply.
 2. **`go test ./internal/site/...` clean.** The standing suite
    (every preserved-surface test enumerated in C7) keeps passing
    alongside the new enumerated-map test.

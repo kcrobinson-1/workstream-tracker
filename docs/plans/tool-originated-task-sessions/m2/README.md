@@ -106,7 +106,7 @@ child contracts → Parent-promotion stub seeding."
 
 | Task | Slug | Skeleton | Status |
 |---|---|---|---|
-| t1 | `tool-originated-task-sessions-m2-t1` | [`t1-mode-affordance-render.md`](./t1-mode-affordance-render.md) | In draft (skeleton — awaiting t1 drafting) |
+| t1 | `tool-originated-task-sessions-m2-t1` | [`t1-mode-affordance-render.md`](./t1-mode-affordance-render.md) | Proposed |
 | t2 | `tool-originated-task-sessions-m2-t2` | [`t2-spawn-endpoint.md`](./t2-spawn-endpoint.md) | In draft (skeleton — awaiting t2 drafting) |
 | t3 | `tool-originated-task-sessions-m2-t3` | [`t3-session-start-hook.md`](./t3-session-start-hook.md) | In draft (skeleton — awaiting t3 drafting) |
 | t4 | `tool-originated-task-sessions-m2-t4` | [`t4-end-to-end-validation.md`](./t4-end-to-end-validation.md) | In draft (skeleton — awaiting t4 drafting) |

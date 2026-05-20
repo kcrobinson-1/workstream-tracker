@@ -364,22 +364,46 @@ Register.
   the rendered output reflects both the method's return and the
   template's faithful emission.
 
-**Chosen: (a).** A single table-driven test, one row per D3
-case, renders via `renderTree` (the existing helper used across
-forest_test.go) and asserts on rendered HTML — same shape as the
-existing
+**Chosen: (a).** A single table-driven test, one row per
+production-reachable (NodeType × Status × has-children) triple
+D3 distinguishes, rendering via `renderTree` (the existing
+helper used across forest_test.go) and asserting on rendered
+HTML — same shape as the existing
 [`TestRenderProgressRowDeclaredStages`](../../../../../internal/site/forest_test.go)
 and
 [`TestRenderProgressRowFieldlessOnlyDrafting`](../../../../../internal/site/forest_test.go)
-table tests. Coverage: every NodeType × Status × has-children
-triple D3 distinguishes, plus at least one unknown-Status row
-and at least one Deferred — `<reason>` row to pin canonical-prefix
-behavior. *Verified by:*
+table tests. Per-row fixture shape is implementation choice: a
+case whose test node is a structural root needs only its own
+parsedDoc; a deeper case needs the chain of intermediate
+parents (the milestone's root, the task's milestone-and-root,
+etc.) because
+[`internal/site/tree.go`](../../../../../internal/site/tree.go)
+`buildTree`'s "If the parent isn't present (gap in the tree),
+the node is silently dropped from the visualization" branch
+otherwise drops the test node before render; a with-children
+case additionally needs at least one child phase doc so
+`buildTree`'s "Wire children to parents" pass appends it to the
+test node's `Children`. Coverage: each NodeType the renderer
+can produce (`root`, `milestone`, `task`, `phase`) at the
+applicable Status values per D3, plus at least one unknown-Status
+row and at least one `Deferred — <reason>` row to pin canonical-
+prefix behavior. The `phase`-with-children case is not in the
+enumeration — per
+[`internal/slugs/slugs.go`](../../../../../internal/slugs/slugs.go)
+`pN` is the terminal segment, so `buildTree` cannot construct a
+phase with children from well-formed slugs and that branch of
+D3 is structurally unreachable in production. *Verified by:*
 [`internal/site/forest_test.go`](../../../../../internal/site/forest_test.go)
 `renderTree` invocation pattern (the existing precedent for
-table-driven render assertions); m2's Risk Register entry
-"Mode-affordance map drift" naming the enumerated-map test as
-the falsifier.
+table-driven render assertions);
+[`internal/site/tree.go`](../../../../../internal/site/tree.go)
+`buildTree` (the parent-chain and child-wiring requirements the
+fixture shape depends on);
+[`internal/slugs/slugs.go`](../../../../../internal/slugs/slugs.go)
+`IsWellFormed` and the `pN`-is-terminal grammar (the constraint
+that rules out the phase-with-children case); m2's Risk Register
+entry "Mode-affordance map drift" naming the enumerated-map
+test as the falsifier.
 
 ### SD9 — Click bubbling inside `<summary>`: accept the navigation-supersedes posture, no contract added
 
@@ -429,10 +453,12 @@ plan's Risk Register entry).
 
 ## Plan structure handoff
 
-The paired plan doc carries:
-
-- **Status: In draft**, replacing the seeded skeleton in place at
-  [`../t1-mode-affordance-render.md`](../t1-mode-affordance-render.md).
+The paired plan doc was drafted and promoted to **Status:
+Proposed** (the seeded skeleton in place at
+[`../t1-mode-affordance-render.md`](../t1-mode-affordance-render.md)
+was replaced in the drafting commit and flipped to `Proposed` at
+the promotion-gate commit on this branch). Section structure as
+shipped:
 - A Context preamble naming what the plan covers, why it is
   being done now, and what surfaces it touches at the conceptual
   level (per
