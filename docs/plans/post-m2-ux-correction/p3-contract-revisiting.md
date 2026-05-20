@@ -1,6 +1,6 @@
 ---
 slug: post-m2-ux-correction-p3
-Status: Validating
+Status: Landed
 short_description: Contract-revisiting + task-terminal — default D/P/I/V cells (F3a) + nested-details body disclosure (F7) + every-entry-opens roster (F9); carries the full product-acceptance walkthrough
 ---
 
@@ -8,26 +8,41 @@ short_description: Contract-revisiting + task-terminal — default D/P/I/V cells
 
 ## Status
 
-`Validating`. The implementing PR shipped F3a + F7 + F9 with the
-gate-walk-locked OD resolutions (goldmark-native Renderer
-customization for OD3; additive `RegisteredAt int64` +
-`LastEventAt int64` on `sessionMeta` and `RosterEntry` per OD6,
-populated inside `loadSessionMetadata`'s existing baseline /
-latest distinction loop; render-altitude deferrals on OD1 / OD2
-/ OD4 / OD5 picked at this PR per the conservative starting
-points named at the gate). The full six-finding task-terminal
-walkthrough was observed against a `go run` rendering on the
-implementing branch — F1 / F8 carried forward from p1 (Landed
-PR #57), F4 carried forward from p2 (Landed PR #60), F3a / F7 /
-F9 shipped here. Per
-[`shared.md`](../../../spec/planning/shared.md) "Plan-doc
-Status," the mandatory-`Validating` rule binds the product-
-facing leaf, so the implementing PR merges at this state; the
-post-merge doc-only commit that records product approval flips
-both this phase plan and the parent task plan
+`Landed`. p3 (the task-terminal phase of the
+[`post-m2-ux-correction`](README.md) task) is complete. Product
+acceptance was demonstrated against the full six-finding
+walkthrough below; this close-out commit records approval and
+flips both this phase plan and the parent task plan
 `Validating → Landed` in a single commit per
 [`task-plan.md`](../../../spec/planning/task-plan.md) "Task
-plan terminal state when N ≥ 2."
+plan terminal state when N ≥ 2," and deletes the paired scoping
+doc per [`task-plan.md`](../../../spec/planning/task-plan.md)
+"Goal: scoping doc + plan doc" (scoping is transient and
+deletes at the plan's terminal PR).
+
+### Product acceptance recorded
+
+- **Approved by:** kcrobinson-1.
+- **Walkthrough revision approved:** [`37c565c`](https://github.com/kcrobinson-1/workstream-tracker/commit/37c565c)
+  — the merge commit of the implementing PR
+  [#62](https://github.com/kcrobinson-1/workstream-tracker/pull/62)
+  on `origin/main`. The `## Validation Gate` section below
+  reached its final landed form at the implementing branch's
+  initial commit (`da0f9da`) and was not modified by the two
+  post-PR bot-review fix commits (`15e323a` formatEventTime
+  nanosecond fix; `5c038cd` Detail-fold decoupling), which
+  touched the loader / tests / implementation-history record
+  but not the Validation Gate text.
+- **Date of approval:** 2026-05-20.
+- **Walkthrough run by:** the implementing-agent session,
+  observed against a `go run ./cmd/workstream-tracker`
+  rendering of the worktree's `docs/plans/` tree, with four
+  work-instances registered to cover the four observable
+  conditions (a name-bearing bound, b no-name bound, c
+  name-bearing unbound, d no-name unbound). Per-finding
+  structural acceptance verified for F1 / F3a / F4 / F7 / F8 /
+  F9 against the rendered HTML; see PR #62's `UX Review`
+  section for the detailed observation record.
 
 p3 is the **task-terminal** phase of the
 [`post-m2-ux-correction`](README.md) task: it ships the three
@@ -1857,7 +1872,7 @@ forest / roster semantic tests:
   and the OD-walk-outcomes record locking OD2 / OD3 / OD5 /
   OD6 at the WHAT-altitude inputs this phase plan reads
   against.
-- [`scoping/post-m2-ux-correction.md`](scoping/post-m2-ux-correction.md)
+- `scoping/post-m2-ux-correction.md`
   — paired scoping doc; **SD2** (F7), **SD4** (F9), **SD5**
   (F3a) record the scoping-time deliberation this phase
   realizes — the locked WHAT this phase carries, the rejected

@@ -829,7 +829,7 @@ between `loadSessionMetadata` and `buildTree`:
   (with the OD1-driven `tree.go` / `site.go` deviation path
   pre-flagged), and the task-terminal Validation Gate this
   phase's per-phase gate feeds into at p3.
-- [`scoping/post-m2-ux-correction.md`](scoping/post-m2-ux-correction.md)
+- `scoping/post-m2-ux-correction.md`
   — paired scoping doc; **SD6** records the scoping-time
   deliberation for F4 (decomposed shape: render reported name
   with slug fallback; rejected: actor-generator change at SD6

@@ -1,6 +1,6 @@
 ---
 slug: post-m2-ux-correction
-Status: Proposed
+Status: Landed
 short_description: Corrective UX work for the six product-facing gaps m2 shipped without a per-leaf product-validation gate
 ---
 
@@ -8,7 +8,46 @@ short_description: Corrective UX work for the six product-facing gaps m2 shipped
 
 ## Status
 
-`Proposed`. The recently-shipped milestone
+`Landed`. The task-terminal close-out commit (this commit)
+records product approval for the
+[`p3-contract-revisiting.md`](p3-contract-revisiting.md)
+task-terminal walkthrough and flips both p3 and this parent
+task plan `Validating → Landed` in a single commit per
+[`task-plan.md`](../../../spec/planning/task-plan.md) "Task
+plan terminal state when N ≥ 2." The paired scoping doc
+`scoping/post-m2-ux-correction.md`
+deletes in this same commit per
+[`task-plan.md`](../../../spec/planning/task-plan.md) "Goal:
+scoping doc + plan doc" (scoping is transient; deletes at the
+plan's terminal PR). All three phase plans —
+[`p1-cosmetic-defects.md`](p1-cosmetic-defects.md) (Landed
+PR [#57](https://github.com/kcrobinson-1/workstream-tracker/pull/57)),
+[`p2-humanize-forest-actor.md`](p2-humanize-forest-actor.md)
+(Landed PR [#60](https://github.com/kcrobinson-1/workstream-tracker/pull/60)),
+[`p3-contract-revisiting.md`](p3-contract-revisiting.md) (Landed
+PR [#62](https://github.com/kcrobinson-1/workstream-tracker/pull/62)
+plus this close-out) — are at `Landed`. Product approval was
+recorded against walkthrough revision
+[`37c565c`](https://github.com/kcrobinson-1/workstream-tracker/commit/37c565c)
+(the PR #62 merge commit) by kcrobinson-1 on 2026-05-20.
+
+The two `Graduated — post-m2-ux-correction` backlog entries
+([`post-m2-ux-correction`](../../backlog.md#post-m2-ux-correction),
+[`humanize-forest-actor`](../../backlog.md#humanize-forest-actor))
+**stay at `Graduated`** as permanent historical records per
+[`spec/backlog.md`](../../../spec/backlog.md) "Entry lifecycle"
+— the lifecycle is `Open → Graduated → delete (only when no
+plan-tree node was ever created)`; both entries have a
+plan-tree node (this plan), so neither deletes. The
+[`progress-cell-active-state-and-actor`](../../backlog.md#progress-cell-active-state-and-actor)
+entry stays Open: the F3b deferred work (active-cell actor
+icon + per-cell PR-state coloring) was never in p3's scope,
+and the C-INV-1 (cell-anchor) invariant this plan realized
+keeps the future migration cost linear-not-cliff.
+
+### Historical context
+
+The recently-shipped milestone
 [`workstream-tracker-1-0-m2`](../workstream-tracker-1-0/m2/README.md)
 (Landed) delivered the two-region shell, the expanded nested-box
 forest, the doc-declared progress-cell row, and the session
@@ -42,7 +81,7 @@ entry carrying the F3b carve-out.
 ### OD-walk outcomes (resolved at this drafting session)
 
 The paired scoping doc
-[`scoping/post-m2-ux-correction.md`](scoping/post-m2-ux-correction.md)
+`scoping/post-m2-ux-correction.md`
 decomposed six open decisions (OD1–OD6) against merged code. The
 contributor walked them in this drafting session; outcomes are
 folded into the durable record below. The scoping doc carries the
@@ -1027,7 +1066,7 @@ this drafting change), the entry's intent is *realized* at p2.
 
 ## Related Docs
 
-- [`scoping/post-m2-ux-correction.md`](scoping/post-m2-ux-correction.md)
+- `scoping/post-m2-ux-correction.md`
   — the paired scoping doc (decomposed HOW with rejected
   alternatives; open decisions OD1–OD6 for the gate-walk;
   reality-check inputs; F3b deferral analysis).
