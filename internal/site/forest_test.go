@@ -739,7 +739,8 @@ func TestRenderBodyDisclosureIndependentOfParentCollapse(t *testing.T) {
 // "Mode-affordance map drift" m2 Cross-Task Risk. Each row pins
 // one production-reachable (NodeType × Status × has-children)
 // triple D3 distinguishes: the rendered HTML either carries the
-// exact D4 form shape for the target node OR carries no <form>
+// exact D4 form shape for the target node (button in <summary>
+// + form in .box-body, associated by id) OR carries no <form>
 // element at all (the <form> presence is the unambiguous
 // discriminator between positive and negative D3 rows). Renders
 // via the standard renderTree helper so the assertion exercises
@@ -869,31 +870,55 @@ func TestRenderModeAffordanceMap(t *testing.T) {
 			}
 
 			// Positive case: the exact D4-conformant form for the
-			// target node must appear in the render. Pinning the
-			// full form shape exercises C2 (one value drives both
-			// the hidden mode input and the button label) and C3
-			// (the D4 form is emitted exactly).
+			// target node must appear in the render, factored into
+			// the button-in-summary + form-in-body split that
+			// keeps HTML5 phrasing/flow content-model rules
+			// satisfied (the form is flow content; <summary> is
+			// phrasing-only). C2 (one value drives both): the
+			// same affordance constant is the button's visible
+			// text AND the form's hidden mode input value. C3:
+			// the form carries method=POST, action=/spawn, the
+			// hidden slug + mode inputs, exactly.
+			wantButton := fmt.Sprintf(
+				`<button class="affordance-button" type="submit" form="spawn-%s">%s</button>`,
+				tc.target, tc.wantMode)
 			wantForm := fmt.Sprintf(
-				`<form class="affordance-form" method="POST" action="/spawn"><input type="hidden" name="slug" value="%s"><input type="hidden" name="mode" value="%s"><button class="affordance-button" type="submit">%s</button></form>`,
-				tc.target, tc.wantMode, tc.wantMode)
+				`<form class="affordance-form" id="spawn-%s" method="POST" action="/spawn"><input type="hidden" name="slug" value="%s"><input type="hidden" name="mode" value="%s"></form>`,
+				tc.target, tc.target, tc.wantMode)
+			if !strings.Contains(html, wantButton) {
+				t.Errorf("missing expected affordance button\n  want: %s\n  got:\n%s", wantButton, html)
+			}
 			if !strings.Contains(html, wantForm) {
 				t.Errorf("missing expected affordance form\n  want: %s\n  got:\n%s", wantForm, html)
 			}
 
-			// C5: the form sits inside the node's <summary> region
-			// (the always-visible region) and not inside the
-			// .box-body div (which native <details> hides on a
-			// closed box). Scoped to the form's own location: the
-			// next </summary> after the form must precede the next
-			// <div class="box-body"> after the form — otherwise
-			// the form lives in the body, not the summary.
-			formIdx := strings.Index(html, wantForm)
-			rest := html[formIdx+len(wantForm):]
+			// C5: the visible affordance — the button — sits in
+			// the always-visible <summary> region (not in
+			// .box-body, which native <details> hides on a closed
+			// box). Scoped to the button's own location: the next
+			// </summary> after the button must precede the next
+			// <div class="box-body"> after the button.
+			buttonIdx := strings.Index(html, wantButton)
+			rest := html[buttonIdx+len(wantButton):]
 			endSummary := strings.Index(rest, `</summary>`)
 			nextBody := strings.Index(rest, `<div class="box-body">`)
 			if endSummary < 0 || (nextBody >= 0 && nextBody < endSummary) {
-				t.Errorf("affordance form must render inside <summary>, before .box-body: next </summary>=%d next box-body=%d (offsets from form end)",
+				t.Errorf("affordance button must render inside <summary>, before .box-body: next </summary>=%d next box-body=%d (offsets from button end)",
 					endSummary, nextBody)
+			}
+
+			// Companion to C5: the associated <form> sits inside
+			// .box-body (a flow-content container), not in
+			// <summary>. The button-form association by id
+			// resolves via the DOM regardless of the box's
+			// open/closed CSS state.
+			formIdx := strings.Index(html, wantForm)
+			beforeForm := html[:formIdx]
+			lastBoxBody := strings.LastIndex(beforeForm, `<div class="box-body">`)
+			lastEndSummary := strings.LastIndex(beforeForm, `</summary>`)
+			if lastBoxBody < 0 || lastBoxBody < lastEndSummary {
+				t.Errorf("affordance form must render inside .box-body, after the matching </summary>: last box-body=%d last </summary>=%d (offsets before form)",
+					lastBoxBody, lastEndSummary)
 			}
 		})
 	}
