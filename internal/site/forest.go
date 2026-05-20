@@ -66,7 +66,7 @@ const forestTemplates = `
 
 {{define "node"}}
 <details class="box box-{{.NodeType}}{{if not .Children}} box-leaf{{end}}"{{if .ActiveInSubtree}} open{{end}}>
-<summary><span class="box-header">{{template "node-header" .}}</span></summary>
+<summary><span class="box-header"><span class="triangle" aria-hidden="true">&#9656;</span>{{template "node-header" .}}</span></summary>
 <div class="box-body">
 {{- template "node-detail" .}}
 {{range .Children}}{{template "node" .}}
@@ -80,11 +80,19 @@ const forestTemplates = `
     .box-milestone { background: #fcfcfd; }
     .box-phase { border-style: dashed; }
     .box-body { padding: 0 0.75rem 0.5rem 1rem; }
-    summary { cursor: pointer; }
+    /* m2 post-ux-correction p1 F8: suppress the UA-default
+       <details> marker and render an inline triangle inside the
+       header flex row, baseline-aligned with the label and rotated
+       open via details[open]. list-style: none is the modern
+       spec; ::-webkit-details-marker covers older WebKit. */
+    summary { cursor: pointer; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
     summary .box-header { display: flex; }
-    .box-header { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; padding: 0.4rem 0.75rem; }
+    .box-header { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; padding: 0.4rem 0.75rem; }
+    .triangle { display: inline-block; flex: 0 0 auto; font-size: 0.75em; color: #6b7280; transition: transform 0.1s ease; }
+    details[open] > summary .triangle { transform: rotate(90deg); }
     .label-group { display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; min-width: 0; }
-    .status-group { flex: 0 0 auto; }
+    .status-group { flex: 0 0 auto; margin-left: auto; }
     .badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 0.25rem; font-size: 0.85em; font-weight: 500; }
     .status-in-draft    { background: #fef3c7; color: #78350f; }
     .status-proposed    { background: #dbeafe; color: #1e3a8a; }
