@@ -232,7 +232,7 @@ The option sets the implementing PR will choose between
 `list-style: none` + inline triangle in the header flex, or
 `summary::marker` content styling) are already decomposed in
 the parent's scoping doc
-([`scoping/post-m2-ux-correction.md`](scoping/post-m2-ux-correction.md)
+(`scoping/post-m2-ux-correction.md`
 SD1 / SD3 and the OD-walk record for OD4) and are not
 re-decomposed here. p1's contracts stay at WHAT altitude per
 [`shared.md`](../../../spec/planning/shared.md) "Plans
@@ -547,7 +547,7 @@ diff, no schema, pipeline, or operational doc touched).
   this phase preserves; Phase Contracts table's p1 row this
   plan realizes; the task-terminal Validation Gate this
   phase's smaller gate is a subset of.
-- [`scoping/post-m2-ux-correction.md`](scoping/post-m2-ux-correction.md)
+- `scoping/post-m2-ux-correction.md`
   — paired scoping doc for the parent task plan; SD1 (F1)
   and SD3 (F8) record the scoping-time deliberation this
   phase realizes; the OD-walk record for OD4 (F8 marker
