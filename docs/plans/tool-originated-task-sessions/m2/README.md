@@ -16,11 +16,16 @@ Parent epic:
 The **WHAT** below is locked by the epic and is binding input —
 not loosened here. This session re-derives the milestone's task
 breakdown, cross-task contracts, cross-task decisions, and risks
-against merged code. The remaining scope-locking question — the
-**spawn mechanism shape** by which a contributor's click on a
-node produces a real local interactive Claude Code session — is
-explicitly named in Open Questions below rather than silently
-resolved.
+against merged code. The previously-open **spawn-mechanism
+shape** is now locked in **D4** below against Claude Code's
+actual launcher surface: the workstream-tracker server adds a
+single fire-and-forget POST endpoint that execs `claude --bg
+--worktree …`, Claude Code's supervisor process owns the agent's
+process lifetime, and the contributor's takeable session is
+`claude attach <id>` in their own terminal. The remaining
+non-load-bearing edges of D3 (mode-offer map) and the 3-vs-4
+task split are surfaced as Open Questions for the user to
+resolve before the milestone walks its promotion gate.
 
 ## Goal
 
@@ -97,12 +102,7 @@ Three tasks. Skeletons are seeded **at this milestone's
 `In draft` → `Proposed` promotion gate**, per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
 child contracts → Parent-promotion stub seeding"; they do not
-exist yet while this doc is `In draft`. The locked Cross-Task
-Decision **D4 (spawn mechanism shape)** must resolve before the
-promotion gate runs, because t2's WHAT contract names what t1
-clicks into; an open D4 leaves t2's sibling-interface clause
-under-specified for skeleton seeding. (See Open Questions
-below — the user resolves D4 before promotion.)
+exist yet while this doc is `In draft`.
 
 | Task | Slug | Status |
 |---|---|---|
@@ -131,13 +131,17 @@ flowchart LR
 surfaces** that can draft and ship in parallel under
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 parallel-drafting citation rules: t1 touches only the page-side
-render ([`internal/site/forest.go`](../../../../internal/site/forest.go) +
+forest render ([`internal/site/forest.go`](../../../../internal/site/forest.go) +
 [`internal/site/tree.go`](../../../../internal/site/tree.go)
 template surface) and the locked mode-offer table; t2 touches
-only the launcher-side integration (a new launcher surface, the
-Claude Code `SessionStart` hook configuration, the prompt-handover
-shape). Their coupling is the locked **slug-carry contract** the
-milestone names below (D1) — once that's locked, neither task
+only the spawn-integration surface (the new `POST /spawn`
+chi-router handler, the `os/exec` of `claude --bg --worktree …`,
+the committed `.claude/settings.json` SessionStart-hook
+configuration, and the version-controlled mode-prompt files).
+Their coupling is the locked **slug-carry contract (D1)** and
+the **form submission contract (D4)** — t1's form `action`,
+`method`, and field names are the contract t2's endpoint reads.
+Once D1 + D4 are locked here at milestone level, neither task
 needs the other's source to draft or land. The Mermaid graph
 reflects intended ship order, not strict dependency.
 
@@ -169,8 +173,8 @@ contracts" and [`milestone.md`](../../../../spec/planning/milestone.md)
 
 | Task | Short description | End result and what it preserves (WHAT) | Sibling interface | Product acceptance |
 |---|---|---|---|---|
-| `tool-originated-task-sessions-m2-t1` | Mode-affordance render on plan-tree nodes | The plan-tree forest renders a **mode-affordance** on each node — either **Begin planning**, **Begin implementation**, or neither — driven by the locked static map over the node's already-rendered facts (node-type + Status + has-children). A node that offers no mode renders no affordance. **Preserves**: every node still renders its existing label, Status badge, work-instance markers, progress-cell row, long description, and related-PR list — none of those are modified. The forest's expand/collapse default, the no-JavaScript posture (the page is still pure server-rendered HTML+CSS with native `<details>`/`<summary>`), and the walk-on-every-request invariant are unchanged. No new endpoint, no new DB read, no new walk. | Produces the **mode-affordance render surface** t2's spawn integration wires to. The render side and the launch side are coupled only by D1's locked slug-carry contract — t1 emits the slug in the affordance's launch surface, t2 consumes it from the launched session's environment; the exact handover form is t2's WHAT to lock at D4's resolution. | A product reviewer opens the page and observes that every leaf-shape task and phase node renders the correct affordance per the locked mode map (Begin planning on `In draft` / no-doc; Begin implementation on `Proposed`; neither on `In progress`/`Validating`/`Landed`/`Deferred`); parent-shape nodes (epic/milestone, and tasks with phase children) render no affordance; the affordance is visible without expanding the node. |
-| `tool-originated-task-sessions-m2-t2` | Spawn integration: click → real local interactive Claude Code session with deterministic registration | Acting on a mode-affordance launches a **real local interactive Claude Code session** in the contributor's local environment, with the clicked node's canonical slug carried out-of-band (via the existing `WST_SLUG` environment variable, per D1) and the mode-appropriate prompt handed in at session start. A **Claude Code `SessionStart` hook**, configured per D2, runs the deterministic `workstream-tracker register --slug $WST_SLUG` subcommand before the model reasons, attaching a work-instance to the clicked node by construction; the model then opens on the prompt. The agent self-provisions its worktree as ordinary in-prompt behavior (D5); the resulting worktree name returns through the **existing best-effort enrichment leg** (PR [#38](https://github.com/kcrobinson-1/workstream-tracker/pull/38)'s `--name`/`WST_NAME` metadata blob) — never load-bearing for attachment. **Preserves**: the deterministic register CLI is **unmodified** (the existing `--slug` argument and `WST_SLUG` env var are honored verbatim); the interactive best-effort handshake for natural-language sessions is **unmodified**; observe-only is preserved for every session the tool did not originate; no new endpoint, no new schema, no new request/response field is introduced into the registration surface. The fencing properties (human-initiated, one-shot at birth, identity-not-correction, running session stays observe-only) hold at every site t2 touches. | Consumes t1's mode-affordance render surface as the launch trigger; produces the **real construction-time slug producer** that drives m1's slug-carried registration path end-to-end. The seam between t2 and a hypothetical future agent adapter must be additive (a new adapter is added beside the Claude Code launcher, not by rewriting t2's structure). | Closes on technical gate; the milestone's product validation lives on t3. (Interior node — not a Mermaid-graph leaf.) |
+| `tool-originated-task-sessions-m2-t1` | Mode-affordance render on plan-tree nodes | The plan-tree forest renders a **mode-affordance** on each node — either **Begin planning**, **Begin implementation**, or neither — driven by the locked static map (D3) over the node's already-rendered facts (node-type + Status + has-children). The affordance is a **plain HTML `<form method="POST" action="/spawn">`** carrying the node's slug and the chosen mode in hidden inputs and a submit button labeled per the mode; clicking it POSTs to t2's spawn endpoint (D4). A node that offers no mode renders no form. **Preserves**: every node still renders its existing label, Status badge, work-instance markers, progress-cell row, long description, and related-PR list — none of those are modified. The forest's expand/collapse default, the **no-JavaScript** posture (the page stays pure server-rendered HTML+CSS with native `<details>`/`<summary>`; a `<form>` submit needs no script), and the **walk-on-every-request** invariant for the GET render are unchanged. No new DB read, no new walk. | Produces the **affordance form surface** t2's `/spawn` endpoint consumes. The render side and the launch side are coupled by D1 (slug-via-`WST_SLUG`) and D4 (the form's `action`, method, and field names); both are locked here at milestone level. | A product reviewer opens the page and observes that every leaf-shape task and phase node renders the correct affordance per the locked mode map (Begin planning on `In draft` / no-doc; Begin implementation on `Proposed`; neither on `In progress`/`Validating`/`Landed`/`Deferred`); parent-shape nodes (epic/milestone, and tasks with phase children) render no affordance; the affordance is visible without expanding the node. |
+| `tool-originated-task-sessions-m2-t2` | Spawn integration: `/spawn` endpoint + `claude --bg` exec + SessionStart hook | A new `POST /spawn` endpoint on the workstream-tracker local server accepts the slug + mode submitted by t1's affordance form and **fire-and-forget execs the Claude Code launcher in background-session mode** with the slug carried out-of-band via `WST_SLUG` (D1) and a mode-appropriate prompt body handed in via `--append-system-prompt-file`. The launcher invocation uses Claude Code's `--bg` (background session — supervisor process owns the agent's process lifetime; the workstream-tracker does **not** become a process manager) and `--worktree <name>` (Claude Code provisions a fresh worktree at `<repo>/.claude/worktrees/<name>` automatically — D5). The endpoint captures the printed session id from stdout and acknowledges it back to the page; the contributor's takeable session is `claude attach <id>` in their own terminal. A **Claude Code `SessionStart` hook** committed to `.claude/settings.json` (matcher `startup`, `type: "command"`) runs the deterministic `workstream-tracker register --slug $WST_SLUG` subcommand before the model reasons (D2) — attaching a work-instance to the clicked node by construction; the model then opens on the prompt. The worktree name (and the human session name) return through the **existing best-effort enrichment leg** (PR [#38](https://github.com/kcrobinson-1/workstream-tracker/pull/38)'s `--name`/`WST_NAME` metadata blob) — never load-bearing for attachment. **Preserves**: the deterministic register CLI is **unmodified** (the existing `--slug` argument and `WST_SLUG` env var are honored verbatim); the interactive best-effort handshake for natural-language sessions is **unmodified** (a contributor opening Claude Code in this repo without `WST_SLUG` set keeps the existing handshake — the hook is a no-op when `WST_SLUG` is empty per `runRegister`'s short-circuit); observe-only is preserved for every session the tool did not originate; no new endpoint is added to the **registration** surface (the new `/spawn` endpoint is the *launcher* surface — orthogonal to registration; the registration path is the unchanged exact-slug create-or-attach flow). The fencing properties (human-initiated, one-shot at birth, identity-not-correction, running session stays observe-only) hold at every site t2 touches: the form submit is the human-initiated trigger; the spawn is one-shot at session birth; the slug carried is identity-not-correction; the *running* session stays file-driven and observe-only — `/spawn` is a one-shot launch surface, not an in-session steering channel. The seam stays additive: a hypothetical second-agent launcher is a new exec shape inside the endpoint, not a rewrite. | Consumes t1's mode-affordance form submission as the launch trigger; produces the **real construction-time slug producer** that drives m1's slug-carried registration path end-to-end. | Closes on technical gate; the milestone's product validation lives on t3. (Interior node — not a Mermaid-graph leaf.) |
 | `tool-originated-task-sessions-m2-t3` | End-to-end product validation + milestone-terminal close-out | A product reviewer performs the **full end-to-end walkthrough** against the local server with a real Claude Code launcher available: open the page, locate a `Proposed` task/phase node, click **Begin implementation**, observe a real Claude Code session start, observe the **real register receipt** echo with the clicked node's canonical slug (per the deterministic-path handshake rule), observe the work-instance appear on the clicked node in the rendered tree, observe the session run its initial prompt; symmetrically for **Begin planning** against an `In draft`/no-doc node; symmetrically observe that nodes offering no mode (epic/milestone parents, in-flight task/phase nodes) show no affordance. The walkthrough records approval in this plan; product-validation findings are routed per [`milestone.md`](../../../../spec/planning/milestone.md) "Product-validation findings: fix now or defer." The terminal PR then performs the **milestone-terminal close-out**: batch-deletes the m2 `scoping/` subfolder (every transient scoping doc t1's and t2's planning sessions produced), de-links any inbound references to those scoping docs in any durable plan doc that survives the batch (the non-link inline-code form), flips this milestone doc's `Status` `Proposed` → `Landed`, advances the parent epic's m2 milestone row to `Landed` with its terminal PR link. **Preserves**: nothing about the production code path is touched at this stage; t3 is a validation + close-out node, not a code-producing task. The milestone retrospective (per `milestone.md` "Milestone retrospective") runs at the same boundary and routes any accumulated findings forward through the backlog — it does **not** gate t3's `Landed` flip. | Sole Mermaid-graph leaf — converges t1 and t2 and is the milestone-terminal node. | The full walkthrough above runs to completion against a live local server + Claude Code launcher, with the real register receipt observed for both modes and parent-shape nodes verified to offer no affordance; approval is recorded in this plan before its `Landed` flip. |
 
 ## Cross-Task Invariants
@@ -272,8 +276,10 @@ brushes against them.
 - **D2 — The session-start integration is a Claude Code
   `SessionStart` hook (matcher `startup`) running the
   deterministic register subcommand.** *Resolved this session.*
-  The hook is configured in `.claude/settings.json` (or its
-  user-scoped/local-scoped peer) with `type: "command"`,
+  The hook is committed to the project-scoped
+  `.claude/settings.json` (so every contributor working in
+  this repo gets the deterministic-path registration
+  automatically) with `type: "command"`,
   matcher `startup`, and a command that invokes
   `workstream-tracker register --slug $WST_SLUG` (via the
   agent rule's full module-path form,
@@ -344,41 +350,95 @@ brushes against them.
   Which node levels offer 'Begin planning' vs 'Begin
   implementation'"](../README.md) (the epic's resolved
   shallow-static-map framing the table implements).
-- **D4 — Spawn-mechanism shape: OPEN.** *Surfaced as Open
-  Question 1 below.* This is the dominant
-  technical-direction call the milestone owes; it determines
-  the exact form by which a contributor's click on a node's
-  mode-affordance results in a real local interactive Claude
-  Code session running with the slug in its environment and a
-  mode-appropriate initial prompt. Three shapes are
-  decomposed in Open Questions; user input required before
-  the milestone's promotion gate, because t1's affordance
-  render surface and t2's launcher surface must both speak
-  the same handover form, and t2's WHAT clause naming that
-  handover cannot lock until the shape is named. **The
-  preserved cross-task invariants (no new registration
-  surface, fencing properties, single-local-environment
-  origination, additive agent-adapter seam, no
-  walk-on-every-request regression) bind the shape choice;
-  any shape that violates one of them is rejected by
-  invariant, not deliberation.**
-- **D5 — Worktree provisioning is prompt-instructed; the
-  worktree name returns through the existing best-effort
-  enrichment leg.** *Resolved this session.* The tool has no
-  workspace role — per the epic's resolved "Where does a
-  tool-originated session's workspace come from?", the opening
-  prompt instructs the session to start its work in a fresh
-  worktree off the latest `origin/main`; the agent does so as
-  ordinary agent behavior. The resulting worktree name returns
-  to the tool through the existing `--name`/`WST_NAME`
-  enrichment leg added in PR
-  [#38](https://github.com/kcrobinson-1/workstream-tracker/pull/38),
+- **D4 — Spawn-mechanism shape: server-side fire-and-forget
+  exec of `claude --bg --worktree …` from a new `POST /spawn`
+  endpoint.** *Resolved this session against Claude Code's
+  actual launcher surface.* The page-side affordance (t1) is a
+  plain HTML `<form method="POST" action="/spawn">` carrying
+  the slug and mode as hidden inputs; the chi router gains a
+  new `POST /spawn` handler that validates the request,
+  reads the per-mode prompt body from a version-controlled
+  file, and execs `claude --bg --worktree <name>
+  --append-system-prompt-file <prompt-file>
+  "<initial-task>"` with `WST_SLUG=<slug>` in the child's
+  environment. The exec is **fire-and-forget**: Claude Code's
+  background-session supervisor (`claude daemon status`) owns
+  the agent's process lifetime, so the workstream-tracker
+  server does **not** become a process manager. The endpoint
+  captures the session id printed to stdout and acknowledges
+  it to the contributor (so they can `claude attach <id>` in
+  their own terminal — the takeable session the epic vision
+  resolves to). The previously-feared cost of S3 (terminal
+  windows, CSRF token machinery, server-side process
+  management, first JavaScript on the page) all drop away
+  against Claude Code's surface: a plain HTML form needs no
+  JavaScript; `--bg` removes the lifetime-management surface;
+  `claude attach` removes the new-terminal-window surface;
+  the same-origin localhost-only trust boundary is the
+  pre-existing single-contributor / single-local-environment
+  invariant the 1.0 epic locked. **The four fencing
+  properties survive on a careful read**: the form submit is
+  *human-initiated* (the click is the contributor's explicit
+  action); the spawn is *one-shot at session birth* (the
+  `/spawn` handler fires once per click and returns); the
+  slug carries *identity, not correction* (no tool→agent
+  state push beyond the slug); the *running* session stays
+  file-driven and observe-only (the `/spawn` endpoint is a
+  launch surface, not a steering channel — once the supervisor
+  owns the agent process, the workstream-tracker is back to
+  observe-only for that session). *Verified by:*
+  [Claude Code CLI reference, `--bg`
+  flag](https://code.claude.com/docs/en/cli-reference.md)
+  ("Start the session as a background agent and return
+  immediately. Prints the session ID and management
+  commands");
+  [Claude Code CLI reference, `claude attach
+  <id>`](https://code.claude.com/docs/en/cli-reference.md)
+  ("Attach to a background session in this terminal");
+  [Claude Code CLI reference, `--worktree`
+  flag](https://code.claude.com/docs/en/cli-reference.md)
+  ("Start Claude in an isolated git worktree at
+  `<repo>/.claude/worktrees/<name>`");
+  [Claude Code CLI reference, `claude daemon
+  status`](https://code.claude.com/docs/en/cli-reference.md)
+  (the supervisor that owns background-session lifetime is a
+  Claude Code construct, not a workstream-tracker one);
+  [Claude Code CLI reference,
+  `--append-system-prompt-file`](https://code.claude.com/docs/en/cli-reference.md)
+  (the mode-prompt carrier);
+  [`internal/site/site.go`](../../../../internal/site/site.go)
+  `Router()` returning a chi.Router (the host the new POST
+  handler mounts onto, beside the existing GET `/`);
+  [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go)
+  `runServer` (the single-port localhost-only server posture
+  the trust-boundary inherits).
+- **D5 — Worktree provisioning is the Claude Code `--worktree`
+  flag the launcher passes; the worktree name returns through
+  the existing best-effort enrichment leg.** *Resolved this
+  session against Claude Code's actual launcher surface.* The
+  tool has no workspace role — the launcher passes
+  `--worktree <name>` to `claude` at spawn time, and Claude
+  Code provisions a fresh isolated worktree at
+  `<repo>/.claude/worktrees/<name>` automatically. The epic's
+  resolved "fresh worktree off the latest `origin/main`"
+  framing is satisfied by Claude Code's own worktree
+  provisioning, not by a prompt-instructed dance. The
+  resulting worktree name is therefore **known at spawn time
+  by the launcher**, not discovered by the agent: t2's
+  `/spawn` handler can pass that same name through the
+  existing `--name`/`WST_NAME` enrichment leg (PR
+  [#38](https://github.com/kcrobinson-1/workstream-tracker/pull/38)),
   which the deterministic-path handshake's "Invoke" /
   "Echo real output" steps already wrap (the optional `name`
-  request-metadata key). The enrichment is best-effort; a
+  request-metadata key). The enrichment stays best-effort; a
   missed enrichment degrades richness, not correctness — the
   node still shows the agent is there. No new metadata field,
   no schema change. *Verified by:*
+  [Claude Code CLI reference, `--worktree` /
+  `-w`](https://code.claude.com/docs/en/cli-reference.md)
+  ("Start Claude in an isolated git worktree at
+  `<repo>/.claude/worktrees/<name>`. If no name is given, one
+  is auto-generated");
   [epic "Open Questions Resolved By This Epic → Where does
   the workspace come from?"](../README.md);
   [`cmd/workstream-tracker/register.go`](../../../../cmd/workstream-tracker/register.go)
@@ -390,20 +450,29 @@ brushes against them.
 
 ## Cross-Task Risks
 
-- **The spawn-mechanism choice (D4) is the largest technical-
-  direction call in the project's history.** The epic resolved
-  posture-level questions but not the launch mechanism; a
-  wrong choice on D4 could either (a) make the tool a heavier
-  surface than the carve-out justifies (a server endpoint that
-  runs arbitrary local processes), (b) bake in a
-  Claude-Code-only assumption the agent-adapter seam was
-  meant to keep open, or (c) under-deliver the vision's
-  "click the node, watch the right session start"
-  experience. Mitigation: D4 is named explicitly Open and
-  decomposed into named shapes in Open Questions; the
-  preserved cross-task invariants act as the rejection filter
-  for each shape; the resolution lands before the milestone's
-  promotion gate, not later.
+- **New `/spawn` endpoint expands the tool's write surface
+  for the first time.** D4's resolved shape adds the
+  workstream-tracker's first non-GET route — a POST that
+  execs the local Claude Code launcher with caller-supplied
+  slug and mode. The trust boundary inherits the 1.0-epic
+  single-contributor / single-local-environment invariant
+  (anyone on the loopback interface is already the
+  contributor), so the endpoint adds no new authentication
+  posture, but it is the first surface where a request causes
+  a local subprocess to run. Mitigation: the endpoint's
+  inputs (slug, mode) are **defense-in-depth-validated**
+  against the slug grammar and the D3 mode-offer map even
+  though t1's render is the gating site (a hand-crafted POST
+  cannot fire a mode the map forbids); the exec is bounded to
+  the verbatim `claude --bg …` argument shape (no shell
+  interpolation of caller data into a shell command line —
+  use `os/exec.Command` with a fixed `argv`); the
+  fire-and-forget posture means the supervisor (`claude
+  daemon status`) — not the workstream-tracker — owns the
+  agent's process lifetime, so the new surface does not
+  accumulate persistent state. The agent-adapter-seam
+  invariant binds the shape *inside* the handler: an
+  additional adapter is a new exec shape, not a rewrite.
 - **Mode-affordance map drift.** The static map (D3) is
   shallow, but a missed combinator (an unknown Status, a
   task-with-phases case the renderer mis-classifies, a
@@ -475,12 +544,17 @@ required "Documentation Currency"):
   product surface, not a contract under
   [`spec/**`](../../../../spec/) or
   [`docs/agents/local/**`](../../../../docs/agents/local/)).
-- **t2 edits:** the launcher integration surface (location
-  follows the D4 resolution — a `.claude/settings.json` hook
-  configuration plus the launcher entrypoint at the resolved
-  shape's home) and, if D4 lands on a shape that adds new
-  surface to the existing site or CLI, those files. The
-  agent rule
+- **t2 edits:** the spawn endpoint and its tests under
+  [`internal/site/`](../../../../internal/site/) (the new
+  `POST /spawn` chi handler beside the existing GET `/`); the
+  Claude Code `SessionStart` hook entry committed to a new
+  `.claude/settings.json` at the repo root (project-scoped,
+  shareable per [Claude Code hook
+  documentation](https://code.claude.com/docs/en/hooks.md));
+  the per-mode prompt files (the version-controlled bodies
+  `--append-system-prompt-file` reads — file paths are HOW
+  for t2's planning, but the existence and shape of those
+  files lives in this milestone). The agent rule
   [`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md)
   is currency-check no-edit-expected — m1's t1 already
   expressed the deterministic path additively, and m2
@@ -573,12 +647,16 @@ produces no doc artifact.
   completion half stays the agent-process responsibility per
   the lifecycle rule's session-end section — m2 does not
   introduce a tool-driven completion mechanism.
-- **Persistent contributor configuration on first run.** Any
-  one-time-setup choreography for the
-  `.claude/settings.json` hook (whether the repo ships a
-  committed snippet, a per-contributor `.local.json` overlay,
-  or a documented install step) is HOW for t2's planning
-  session, not a milestone-level contract.
+- **Per-contributor `.claude/settings.local.json`
+  overlays.** The SessionStart hook entry is committed to the
+  project-scoped `.claude/settings.json` (D2) so every
+  contributor working in this repo gets it automatically; the
+  pre-existing gitignored `.claude/settings.local.json` is a
+  contributor's own overlay and m2 does not edit or interact
+  with it. A contributor's `.local.json` keys that override
+  the committed hook are out of scope (Claude Code's settings
+  precedence handles the merge per the
+  [hook documentation](https://code.claude.com/docs/en/hooks.md)).
 
 ## Open Questions
 
@@ -589,99 +667,7 @@ Decision and/or Task Contract clauses; promotion is gated on
 each item being either resolved or explicitly accepted as
 deferred.
 
-### OQ1 — Spawn-mechanism shape (locks D4)
-
-What is the form by which a contributor's click on a
-mode-affordance results in a real local interactive Claude
-Code session running with `WST_SLUG` set and a mode-appropriate
-initial prompt handed in? Three shapes are named below;
-decomposition follows the [`shared.md`](../../../../spec/planning/shared.md)
-"Decompose options into shapes before analyzing" rule. **The
-cross-task invariants act as the rejection filter** — a shape
-that violates one (no new registration surface, fencing
-properties, single-local origination, additive agent-adapter
-seam, no walk-on-every-request / no-JS regression for t1) is
-rejected by invariant.
-
-- **Shape S1 — Click-to-paste (display-only launch surface).**
-  The mode-affordance click reveals an inline launch surface
-  on the node (a `<details>`-revealable block, or a
-  copy-to-clipboard control beside the affordance) carrying a
-  copy-pasteable shell command line that exports `WST_SLUG`
-  for the clicked slug and invokes the `claude` launcher with
-  a prompt-file argument for the mode's prompt material. The
-  contributor's paste-and-run **is** the spawn. **Faithful
-  to:** minimal-tool framing (no new endpoint, no JavaScript,
-  no subprocess from the server); the existing no-JS posture
-  ([`render.go`](../../../../internal/site/render.go),
-  [`forest.go`](../../../../internal/site/forest.go)) and
-  walk-on-every-request invariant. **Cost:** falls short of
-  the vision's "click the node, watch the right session
-  start" UX — a paste step sits between click and start.
-  **Open sub-question:** does this still satisfy the locked
-  WHAT's "an explicit contributor action on a node spawns a
-  real local interactive session" verb, or does the paste-as-
-  contributor-action read as too-many-actions?
-
-- **Shape S2 — Custom URL-handler hand-off.** The mode-
-  affordance is an anchor with `href` set to a
-  Claude-Code-launcher URL scheme (e.g.,
-  `claude-code://launch?slug=<slug>&prompt=…`). The
-  contributor's browser hands the URL to the OS, which routes
-  it to a Claude-Code-aware handler that opens a real local
-  interactive session with the slug in its environment.
-  **Faithful to:** the vision's one-click UX; no
-  JavaScript needed (it's a plain anchor); no new tool surface
-  beyond the rendered link. **Cost / unresolved factual
-  premise:** requires verifying whether Claude Code installs
-  (or makes installable) such a URL handler in the
-  contributor's local environment — the vendor docs
-  surveyed in D2 do not assert it. **This is a sole
-  factual-grounding question** the spec can only resolve by
-  reading Claude Code's launcher / installation surface;
-  surface here rather than silently presuming. **Sub-risk:**
-  even if the handler exists, baking the exact URL
-  scheme into the render surface couples t1 to Claude Code
-  more tightly than the agent-adapter-seam invariant
-  prefers — a second-agent adapter would need a different
-  scheme.
-
-- **Shape S3 — Local fetch + server-side spawn.** The mode-
-  affordance is rendered as a small client-side trigger that
-  POSTs (CSRF-token-protected, same-origin) to a new `/spawn`
-  endpoint on the workstream-tracker local server; the
-  server runs `WST_SLUG=<slug> claude <prompt args>` as a
-  subprocess in the contributor's local environment.
-  **Faithful to:** the vision's one-click UX. **Cost / load-
-  bearing question:** introduces (a) JavaScript on the page
-  for the first time (POST + CSRF), (b) a new endpoint on the
-  workstream-tracker server that runs arbitrary local
-  subprocesses, (c) a CSRF / same-origin posture the server
-  has not previously needed. **This is the largest expansion
-  of tool surface** the post-1.0 carve-out has contemplated.
-  Whether the carve-out's value survives this much new
-  surface — particularly the "no walk-on-every-request
-  regression" and "fencing properties" invariants — is the
-  load-bearing question; the four fencing properties survive
-  it on a careful read (still human-initiated by the click;
-  still one-shot at birth; still identity-not-correction;
-  the *running* session stays observe-only since the
-  POST→subprocess is a one-shot at spawn), but the cost in
-  new tool surface is real.
-
-**Recommended path for user input:** the user weighs the
-vision's UX framing ("click the node, watch the right
-session start") against the minimal-tool framing memory
-("default is nothing — prompt + observe/display"). The two
-read in different directions on this question; this
-milestone-planning session cannot legitimately default
-either way without the user's call. A choice of **S1** is
-the safest minimal-tool path and the smallest m2 in
-implementation; **S2** is the cleanest UX *if* the URL-handler
-premise holds; **S3** is the most-UX-faithful path at the
-cost of the largest new tool surface.
-
-### OQ2 — Edge cases in the mode-offer static map (refines D3)
+### OQ1 — Edge cases in the mode-offer static map (refines D3)
 
 D3 names the table, but two edges are worth a deliberate
 yes/no rather than a silent answer:
@@ -707,7 +693,7 @@ yes/no rather than a silent answer:
   a re-launch into a state the spec doesn't recognize) but
   worth confirming.
 
-### OQ3 — Task breakdown (3 vs. 4-task split)
+### OQ2 — Task breakdown (3 vs. 4-task split)
 
 This session proposes **three tasks** (t1 affordance render,
 t2 spawn integration, t3 validation + close-out). An
@@ -747,11 +733,10 @@ hook's surface warrants its own seat.
   validation rule, the milestone-retrospective seam.
 - [`../../../../spec/planning/shared.md`](../../../../spec/planning/shared.md) —
   cross-level planning rules; "Deterministic assertion when
-  the slug is construction-known" (the contract m2 wires
-  to); "Decompose options into shapes before analyzing" (the
-  rule OQ1 is structured by); "Slug generation" (the
-  exact-slug create-or-attach path m2's slug-producer
-  drives).
+  the slug is construction-known" (the contract m2 wires to);
+  "Slug generation" (the exact-slug create-or-attach path m2's
+  slug-producer drives); "Plan-doc Status" (the canonical
+  lifecycle D3's mode-offer map is keyed on).
 - [`../../../../docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md) —
   the lifecycle rule; "The deterministic path
   (construction-known slug)" is the runtime contract
@@ -760,6 +745,11 @@ hook's surface warrants its own seat.
   documentation](https://code.claude.com/docs/en/hooks.md) —
   D2's vendor-doc grounding (matcher `startup`, env-var
   inheritance, configuration in `.claude/settings.json`).
+- [Claude Code CLI
+  reference](https://code.claude.com/docs/en/cli-reference.md) —
+  D4 and D5's vendor-doc grounding (`--bg`,
+  `claude attach <id>`, `--worktree`,
+  `--append-system-prompt-file`, `claude daemon status`).
 - [`../../../../internal/site/tree.go`](../../../../internal/site/tree.go),
   [`../../../../internal/site/forest.go`](../../../../internal/site/forest.go),
   [`../../../../internal/site/render.go`](../../../../internal/site/render.go) —
