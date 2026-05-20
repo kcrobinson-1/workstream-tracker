@@ -740,17 +740,15 @@ with the cosmetic defects + the actor-name change — three
 distinct review-coherence shapes in one PR. L2's split gives
 each PR a single review-coherence shape (CSS defects; backlog
 graduation; contract-revisiting) without re-introducing the
-file-per-future-owner work
-([`feedback_file_per_future_owner.md`](../../../../../../../.claude/projects/-Users-kyle-workspace-workstream-tracker/memory/feedback_file_per_future_owner.md)) that the gate-walk's stub-seeding step
-covers by seeding one phase-skeleton file per phase.
+file-per-future-owner work that the gate-walk's stub-seeding
+step covers by seeding one phase-skeleton file per phase.
 
 Per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-
-promotion stub seeding," the gate-walk PR that flips this task
-plan `In draft → Proposed` seeds three phase-skeleton files
-(`post-m2-ux-correction-p1.md`, `-p2.md`, `-p3.md`) — not now;
-this scoping doc is paired with an `In draft` plan and seeds
-nothing.
+promotion stub seeding," the gate-walk commit that flipped this
+task plan `In draft → Proposed` seeded three phase-skeleton
+files alongside the flip: `post-m2-ux-correction-p1.md`,
+`-p2.md`, `-p3.md`.
 
 ### OD6 (original framing, retained as the scoping record) — Phase split: branch test outcome
 
@@ -791,16 +789,28 @@ test"](../../../../spec/planning/task-plan.md);
 [`shared.md` "Parent-promotion stub
 seeding"](../../../../spec/planning/shared.md).
 
-## Plan-structure handoff (for the promotion-gate walk)
+## Plan-structure handoff (historical — record of inputs the gate-walk consumed)
+
+> **Historical record, retained post-gate-walk.** This section
+> was written at OD-walk completion as the handoff to the
+> `` `In draft` → `Proposed` `` promotion gate. The gate has
+> since run (the gate-flip commit) and the plan doc is now the
+> durable authoritative record per the
+> [`task-plan.md`](../../../../spec/planning/task-plan.md)
+> "Scoping owns / plan owns" split. The bullets below describe
+> the planned inputs the gate-walk consumed; for the
+> post-gate-walk durable view of any item, follow its pointer
+> into the plan doc rather than treating this section's prose
+> as current.
 
 The plan doc is durable and carries the contracts the
-gate-walk re-confirms. With OD1–OD6 resolved at the OD walk
+gate-walk re-confirmed. With OD1–OD6 resolved at the OD walk
 (see "Decisions resolved at OD walk" above), the gate-walker's
-remaining work is the standard promotion-gate self-review per
+work was the standard promotion-gate self-review per
 [`task-plan.md`](../../../../spec/planning/task-plan.md)
 `` `In draft` → `Proposed` `` promotion gate; this handoff
-names the surfaces that walk applies to and the gate-specific
-seeding step the flip carries.
+names the surfaces that walk applied to and the gate-specific
+seeding step the flip carried.
 
 - This is a **standalone graduated task plan**. The plan's only
   tracking surfaces are this plan tree, the graduating
@@ -913,15 +923,15 @@ seeding step the flip carries.
 ## Related Docs
 
 - [`../README.md`](../README.md) — the durable plan doc this
-  scoping doc pairs with (Status: `In draft` until the gate-walk).
+  scoping doc pairs with.
 - [`../../workstream-tracker-1-0/m2/README.md`](../../workstream-tracker-1-0/m2/README.md)
   — the Landed milestone whose product gaps this task corrects.
 - [`../../workstream-tracker-1-0/m2/t3-doc-declared-stages.md`](../../workstream-tracker-1-0/m2/t3-doc-declared-stages.md),
   [`../../workstream-tracker-1-0/m2/t4-session-roster.md`](../../workstream-tracker-1-0/m2/t4-session-roster.md),
   [`../../stub-children-on-parent-promotion/README.md`](../../stub-children-on-parent-promotion/README.md)
-  — the three Landed contracts this task's Decisions section
-  supersedes (D1, D3, D2 respectively); Landed docs are not
-  retro-edited.
+  — the three Landed contracts this task plan's `## Status` →
+  `### Supersessions of sibling contracts` sub-block supersedes
+  (D1, D3, D2 respectively); Landed docs are not retro-edited.
 - [`../../../backlog.md`](../../../backlog.md) — the
   `humanize-forest-actor` entry this task graduates and the new
   `progress-cell-active-state-and-actor` entry it adds.

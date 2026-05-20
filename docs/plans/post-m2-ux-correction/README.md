@@ -149,11 +149,21 @@ the t3 / t4 / stub-children precedent and avoid a [task-plan.md](../../../spec/p
   conditional disclosure — the surface this task removes the
   no-metadata branch from). Realized at p3.
 
-The supersessions are authorized by
-[`task-plan.md`](../../../spec/planning/task-plan.md) Decisions
-in a task plan and apply only to the named clauses; the
+The supersessions apply only to the named clauses; the
 unsuperseded portions of the three Landed contracts continue to
-hold.
+hold. Landed docs are not retro-edited — the supersession is
+declared in this plan's `## Status` →
+`### Supersessions of sibling contracts` sub-block rather than
+by amending m2 t3 / m2 t4 / stub-children in place. The
+structural route (a new plan corrects deferred / not-caught
+findings on Landed work) follows
+[`milestone.md`](../../../spec/planning/milestone.md)
+"Product-validation findings: fix now or defer," whose
+forward-only graduation seam is the closest spec authority; the
+"supersession lives in the new plan" half of the move is an
+unwritten convention this plan establishes (no spec rule
+explicitly authorizes or bans it; a follow-on backlog entry
+should capture the spec-gap).
 
 ### `In draft` → `Proposed` promotion gate walked
 
@@ -427,7 +437,7 @@ the node's `Status`:
   **neutral shade** (no per-stage progression inferred; F3b
   carve-out below). The Drafting cell is not labeled "Drafting"
   in this default row — the label is "D" per the
-  [`design/vision.md` §3](../../../../design/vision.md) D / P /
+  [`design/vision.md` §3](../../../design/vision.md) D / P /
   I / V vocabulary the default-cells row adopts. The doc-visible
   `Drafting` token banned by m2 t3 D3 remains banned. `Verified
   by:` [`statusClass` in
@@ -435,7 +445,7 @@ the node's `Status`:
   Status value + the `unknown` fallback the default-cells
   Status→shape mapping reads); [`design/vision.md` §3
   "Sub-stages within a node" + §7 "Smaller open
-  questions"](../../../../design/vision.md) (the D / P / I / V
+  questions"](../../../design/vision.md) (the D / P / I / V
   vocabulary + the placeholder-vs-strict open question, which
   this contract picks placeholder for the default-cells case);
   [m2 README "Cross-Task Decisions" → "Doc-declared-stages
@@ -488,15 +498,17 @@ Per-phase **WHAT** (end result, sibling-interface handoff,
 preserved behavior); per-phase **HOW** is scoped just-in-time in
 each phase plan against then-merged code per
 [`task-plan.md`](../../../spec/planning/task-plan.md) "Cross-PR
-coordination." Seeded as skeleton docs by the PR that flips this
-task plan `In draft → Proposed`, per
+coordination." Seeded as skeleton docs in the same commit that
+flipped this task plan `In draft → Proposed`, per
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc child
-contracts" / "Parent-promotion stub seeding" — **not now**; this
-plan is `In draft` and seeds nothing. The split locked at the
-OD-walk (OD6 = L2) is recorded here as the locked WHAT contract;
-the per-phase HOW (file inventory, function shapes, validation-
-gate specifics, risks) is each phase plan's own scoping when the
-phase drafts.
+contracts" / "Parent-promotion stub seeding":
+[`p1-cosmetic-defects.md`](p1-cosmetic-defects.md),
+[`p2-humanize-forest-actor.md`](p2-humanize-forest-actor.md),
+[`p3-contract-revisiting.md`](p3-contract-revisiting.md). The
+split locked at the OD-walk (OD6 = L2) is recorded here as the
+locked WHAT contract; the per-phase HOW (file inventory, function
+shapes, validation-gate specifics, risks) is each phase plan's
+own scoping when the phase drafts.
 
 Sequence: **p1 → p2 → p3** (phases are sequence-steps toward
 the task's one outcome, not parallel, per
@@ -915,10 +927,15 @@ diff surfaces are frontend render + frontend tests:
 - **Spec / API / schema / dependency change.** None expected;
   the contracts above are all render-altitude.
 - **Retro-editing the m2 / t3 / t4 / stub-children Landed plan
-  docs.** Per
-  [`task-plan.md`](../../../spec/planning/task-plan.md)
-  Decisions, the supersession lives in this plan's Decisions
-  section; Landed docs are not retro-edited.
+  docs.** The supersession lives in this plan's `## Status` →
+  `### Supersessions of sibling contracts` sub-block, not in the
+  superseded Landed docs themselves; Landed docs are not
+  retro-edited per the
+  [`milestone.md`](../../../spec/planning/milestone.md)
+  "already-`Landed` milestone docs are immutable history ...
+  and are not retrofitted" framing (which the spec scopes to
+  milestone docs, with the principle generalized here to
+  Landed task plans).
 
 ## Risk Register
 
@@ -932,7 +949,7 @@ diff surfaces are frontend render + frontend tests:
   declared-stages affordance remains the path for a doc that
   wants per-stage truth, and the cell labels D / P / I / V are
   the
-  [`design/vision.md` §3](../../../../design/vision.md)
+  [`design/vision.md` §3](../../../design/vision.md)
   vocabulary the contributor population reads as "stage
   positions," not "stage outcomes." The Validation Gate
   walkthrough observes both the `Landed` and the `In draft`
