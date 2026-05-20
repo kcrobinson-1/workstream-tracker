@@ -1,6 +1,6 @@
 ---
 slug: post-m2-ux-correction-p3
-Status: In draft
+Status: Proposed
 short_description: Contract-revisiting + task-terminal — default D/P/I/V cells (F3a) + nested-details body disclosure (F7) + every-entry-opens roster (F9); carries the full product-acceptance walkthrough
 ---
 
@@ -8,7 +8,7 @@ short_description: Contract-revisiting + task-terminal — default D/P/I/V cells
 
 ## Status
 
-`In draft`. p3 is the **task-terminal** phase of the
+`Proposed`. p3 is the **task-terminal** phase of the
 [`post-m2-ux-correction`](README.md) task: it ships the three
 contract-revisiting findings (F7 nested-`<details>` body
 disclosure; F3a default D / P / I / V Status-driven cell row;
@@ -25,17 +25,27 @@ in a single post-merge doc-only commit per
 terminal state when N ≥ 2."
 
 The parent task plan's
-[`## Phase Contracts`](README.md#phase-contracts) p3 row locks
-the WHAT this phase realizes; the open decisions below are the
-HOW questions for the contributor's gate walk. The parent
-already resolved the inputs that bind this phase at WHAT
-altitude: OD2 = H1 (nested `<details>` for the body disclosure),
-OD3 = I2b (render markdown with `<a>` tags stripped), OD5 = K3
-(known-facts header + raw-JSON disclosure for every roster
-entry), and OD6 = L2 (the N = 3 phase shape this phase
-realizes). Those resolutions are not re-litigated here; this
-phase plan's open decisions are the render-altitude and
-data-flow questions the WHAT does not specify.
+[`## Phase Contracts`](README.md#phase-contracts) p3 row locked
+the WHAT this phase realizes; the open decisions below — walked
+at the `` `In draft` → `Proposed` `` promotion gate this commit
+flips — were the HOW questions. The parent already resolved the
+inputs that bind this phase at WHAT altitude: OD2 = H1 (nested
+`<details>` for the body disclosure), OD3 = I2b (render
+markdown with `<a>` tags stripped), OD5 = K3 (known-facts
+header + raw-JSON disclosure for every roster entry), and
+OD6 = L2 (the N = 3 phase shape this phase realizes). Those
+resolutions are not re-litigated here. The OD walk at this
+commit took a sweep posture — the contributor reviewed the
+open decisions and expressed no preferences on any, which the
+walk folded as "lock the WHAT-altitude shape (OD3 / OD6) at the
+conservative-and-verified choice; lock every render-altitude
+decision (OD1 / OD2 / OD4 / OD5) as deferred to the implementing
+PR per [`task-plan.md`](../../../spec/planning/task-plan.md)
+'Bans on surface require rendering the consequence'; absorb the
+test-coverage OD (OD8) as planned coverage; affirm the
+locked-by-structure entries (OD7 / OD9)." Resolutions fold into
+each OD entry below, into the Contracts section, and into the
+Files-to-touch certain set.
 
 p1 (cosmetic defects F1 + F8) and p2 (humanize forest actor F4)
 both Landed before this drafting session; p3 is the last phase
@@ -52,262 +62,439 @@ product approval against this plan's Validation Gate revision
 and flips both p3 and the parent task plan to `Landed` in a
 single commit.
 
+### `In draft` → `Proposed` promotion gate walked
+
+`Proposed` was reached at this drafting commit; the
+[`task-plan.md`](../../../spec/planning/task-plan.md)
+`` `In draft` → `Proposed` `` promotion gate was walked before
+the flip.
+
+- **Sibling-divergent-lifecycle check (gate-walk step 1).** p3
+  is the task-terminal product-leaf; the
+  mandatory-`Validating` rule
+  ([`shared.md`](../../../spec/planning/shared.md) "Plan-doc
+  Status") binds the leaf and p3 *is* the leaf, so the
+  lifecycle is `In draft → Proposed → Validating → Landed` —
+  **divergent from** sibling
+  [`p1-cosmetic-defects.md`](p1-cosmetic-defects.md) "Status"
+  and
+  [`p2-humanize-forest-actor.md`](p2-humanize-forest-actor.md)
+  "Status," both of which used the interior-phase `In draft →
+  Proposed → Landed` shape that skips `Validating`. This is
+  the **correct** divergence: p1 and p2 are interior phases
+  and the leaf-keyed rule routes them past `Validating`; p3
+  is the leaf and binds it. The wording in the Status block
+  above + the Validation Gate section's "Approval recording"
+  sub-section + parent task plan's
+  [`## Phase Contracts`](README.md#phase-contracts) p3 row all
+  reflect this divergence consistently. (This step is
+  pre-empted up front because the analogous sibling-comparison
+  gap surfaced at p2's PR review per
+  [`feedback_wait_before_push_or_reply.md`](../../../) —
+  catching it at step 1 rather than at review.)
+- **End-to-end coherence.** Plan re-read in order; no
+  contradiction between Status, Open decisions (OD1–OD9 with
+  resolutions folded), Context, Goal, Contracts C1 / C2 / C3,
+  Cross-Cutting Invariants (inherited C-INV-1 through
+  C-INV-5; C-INV-1 explicitly realized at this phase),
+  Files-to-touch (with the parent's pre-flagged `site.go`
+  deviation path now closed at "certain" per OD6
+  verification), the task-terminal Validation Gate (the full
+  six-finding walkthrough; the divergent `Validating`
+  lifecycle), Self-Review Audits, Out of Scope, Risk Register,
+  and Related Docs.
+- **Decision-completeness on Contracts.** Every C-clause
+  locked at WHAT altitude:
+  - **C1 (F7).** Header-only first view + nested `<details>`
+    body disclosure + markdown-render-with-anchors-stripped
+    are all parent-locked at OD2 = H1 and OD3 = I2b; OD3's
+    technique choice was locked at this gate (goldmark-native
+    Renderer customization — the build-vs-adopt fit since
+    [`walker.go`](../../../internal/site/walker.go) lines
+    12–15 already import the dep). The exact summary text
+    (OD2) and exact goldmark renderer interface (OD3) are
+    render-altitude / implementation-altitude deferrals
+    explicitly authorized by
+    [`task-plan.md`](../../../spec/planning/task-plan.md)
+    "Bans on surface require rendering the consequence" +
+    [`shared.md`](../../../spec/planning/shared.md) "Plans
+    describe contracts, not implementation."
+  - **C2 (F3a).** Default D / P / I / V row shape locked at
+    parent C5 (three buckets across the seven `statusClass`
+    values); OD1's palette + dashed-placeholder treatment are
+    render-altitude deferrals explicitly authorized by the
+    same Bans-on-surface + Plans-describe-contracts rules.
+    The cell DOM shape is **not** a render-altitude deferral
+    — it is load-bearing under C-INV-1 (cell-anchor) and is
+    locked at this contract.
+  - **C3 (F9).** K3 every-entry-opens shape locked at parent
+    C4 + OD5; OD6's data-flow extension locked at this gate
+    (additive `RegisteredAt int64` + `LastEventAt int64` on
+    `sessionMeta` and `RosterEntry`, populated inside
+    `loadSessionMetadata`'s existing baseline / latest
+    distinction loop, threaded through `buildRoster`'s
+    existing per-entry read; `LastEventType` **not** added —
+    the type sits on the per-event payload, not the merged
+    blob, and the minimal-additive C-INV-5 posture defers it
+    until a concrete need arises). OD4's K3 field order +
+    labels and OD5's no-metadata sentinel exact wording are
+    render-altitude deferrals.
+
+  No "decided at plan-drafting," "shape later," or "spelling
+  at plan time" phrasing in any C-clause; all deferrals are
+  explicitly named with the rule that authorizes them.
+- **Universal `Verified by:` walk.** Every load-bearing claim
+  in Contracts, Open decisions, Cross-Cutting Invariants,
+  Files-to-touch, and the Risk Register carries a citation;
+  symbolic anchors (`node-progress`, `node-detail`,
+  `node-header`, `actor-marker`, `roster` template,
+  `RosterEntry`, `sessionMeta`, `loadSessionMetadata`,
+  `buildRoster`, `statusClass`, `truncateLongDesc`,
+  `maxLongDescLines`, `markdownBody`, `goldmark` imports,
+  `IsWellFormed`) dominate per the anchor-preference rule.
+  The navigational pass (read the cited file/symbol and
+  confirm the target exists) was run during drafting and
+  re-confirmed at this gate.
+- **Reality-check inputs re-confirmed.** Every cited surface
+  spot-checked against current branch code (base
+  `origin/main` `2142789`, the p2-Landed commit):
+  [`forest.go`](../../../internal/site/forest.go)
+  `node-progress` (line 53, the field-presence-gated row this
+  phase generalizes) and `node-detail` (line 55, the
+  long-description + related-PR render this phase collapses
+  behind a nested disclosure) and the per-node `<details>`
+  shape inside `node` (lines 67–75, including p1's
+  inline-triangle marker at line 69 the F7 nested-`<summary>`
+  may reuse);
+  [`roster.go`](../../../internal/site/roster.go) `roster`
+  template (lines 25–35, the `.Detail`-gated disclosure this
+  phase generalizes; line 43 `.roster-label` carrying the
+  name-then-slug fallback that the K3 known-facts header's
+  `actor id` field must not silently re-introduce uuids
+  through);
+  [`site.go`](../../../internal/site/site.go) `sessionMeta`
+  (line 131, the struct OD6 extends with `RegisteredAt` +
+  `LastEventAt`), `loadSessionMetadata` (line 148, the
+  baseline-vs-latest loop already in scope; `latestAt[wid]`
+  tracked but unexposed at line 191; baseline `received_at`
+  in scope at the register-event scan at line 187),
+  `RosterEntry` (line 297, the consumer struct extended via
+  `buildRoster` line 323), `Server.index` (line 47, the
+  per-request orchestration matching p2's data-path
+  precedent);
+  [`render.go`](../../../internal/site/render.go)
+  `statusClass` (line 112, seven recognized Status values +
+  unknown fallback; the OD1 mapping's grounding) and
+  `truncateLongDesc` (line 99, the cap the F7 truncate-first
+  pipeline preserves) and `maxLongDescLines` (line 93);
+  [`walker.go`](../../../internal/site/walker.go) goldmark
+  import set (lines 12–15, the dep OD3 builds on without a
+  new addition) and `markdownBody` (line 166, the
+  plain-text-returning source the F7 markdown-render pipeline
+  reads). No drift; all citations stable.
+- **Always-on rules.** Required sections present (Status,
+  Context, Goal, Contracts, Files to touch, Validation Gate);
+  optional sections present where applicable (Cross-Cutting
+  Invariants inherited from parent; Self-Review Audits; Out
+  of Scope; Risk Register; Related Docs). No descent to
+  implementation prescription — the OD6 additive struct
+  fields are contract-altitude per the milestone's t4-amended
+  data-path carve-out
+  ([`m2/README.md` Cross-Task
+  Invariants](../workstream-tracker-1-0/m2/README.md)) and the
+  p2 OD1.a precedent; the goldmark renderer choice is
+  named at technique level (goldmark-native) not interface
+  level (the exact extension point is implementation-altitude);
+  no fenced code; no executable predicates; no inline
+  template-syntax expressions in prose (the lesson from p2's
+  PR review on the now-Landed plan). No soft-commitment
+  language. The `### Open decisions` sub-block stays under
+  `## Status` per the parent README and p2 precedent — not a
+  [`task-plan.md`](../../../spec/planning/task-plan.md)
+  "Required and optional sections" variance.
+- **Phase-skeleton seeding (N ≥ 2 only).** Does not apply.
+  p3 is a phase plan with no further phase children; the
+  parent task plan is N = 3 (p1 / p2 / p3) and seeded its
+  three phase skeletons when *it* was promoted.
+
 ### Open decisions
 
-Decomposed against merged code; resolutions fold into Contracts,
-Files to touch, the Validation Gate, and the implementing PR
-when the gate-walk resolves them. Each carries a `Verified by:`
-citation so the contributor can re-check the grounding before
-the OD walk. Per the parent README OD-walk-outcomes precedent
-and the
+Decomposed against merged code; resolutions folded at the OD
+walk into Contracts, Files to touch, the Validation Gate, and
+the implementing PR. Each entry leads with **Resolved =** and
+carries a `Verified by:` citation. Per the parent README
+OD-walk-outcomes precedent and the
 [`task-plan.md`](../../../spec/planning/task-plan.md) "Required
 and optional sections" rule, this `### Open decisions`
 sub-block stays under `## Status` and is not a separate
 top-level section.
 
+The walk took a sweep posture (the contributor expressed no
+preferences on any OD; the walk folded WHAT-altitude items at
+the conservative-and-verified choice and render-altitude items
+as deferrals to the implementing PR per
+[`task-plan.md`](../../../spec/planning/task-plan.md) "Bans on
+surface require rendering the consequence" +
+[`shared.md`](../../../spec/planning/shared.md) "Plans describe
+contracts, not implementation"). The original framing of each
+OD (the decomposed shapes the gate-walk read against) is
+retained as a scoping record nested under each resolved entry,
+matching the
+[`p2-humanize-forest-actor.md` Open decisions](p2-humanize-forest-actor.md)
+precedent.
+
 - **OD1 — F3a default-cells per-Status shape and color
-  treatment.** Parent Contract **C5** locks the three shape
-  buckets: `Landed` ⇒ all four cells filled (conventionally
-  green to match the existing `status-landed` palette); `In
-  draft` ⇒ D filled and P / I / V rendered as dashed empty
-  placeholders; every other Status (`In progress`, `Proposed`,
-  `Validating`, `Deferred`, and the `unknown` fallback) ⇒ one
-  neutral shade across all four cells. The mapping covers
-  every value `statusClass` returns
-  ([`render.go`](../../../internal/site/render.go)
-  `statusClass`: `in-draft`, `proposed`, `in-progress`,
-  `validating`, `landed`, `deferred`, `unknown`) — seven cases
-  into three buckets. Open at this phase: the exact filled
-  color, the exact neutral shade, and the dashed-placeholder
-  CSS treatment (a border-style change, a fill-with-stripe
-  pattern, or a low-opacity empty cell) — all render-altitude
-  per
+  treatment. Resolved = render-altitude deferral (palette
+  values + dashed-placeholder CSS technique).** The three
+  shape buckets are parent-C5-locked: `Landed` ⇒ all four
+  cells filled (conventionally green to match the existing
+  `status-landed` palette); `In draft` ⇒ D filled and P / I /
+  V rendered as dashed empty placeholders; every other Status
+  (`In progress`, `Proposed`, `Validating`, `Deferred`, and
+  the `unknown` fallback) ⇒ one neutral shade across all four
+  cells — covering every value `statusClass` returns into
+  three buckets. The exact filled color, the exact neutral
+  shade, and the dashed-placeholder CSS treatment (a
+  border-style change, a fill-with-stripe pattern, or a
+  low-opacity empty cell) are settled at the implementing PR
+  against the F3a acceptance bullet, per
   [`task-plan.md`](../../../spec/planning/task-plan.md) "Bans
-  on surface require rendering the consequence" + parent
-  [Contract **C5**](README.md#c5--default-d--p--i--v-cell-row-status-driven-when-no-progress_stages-declared-f3a).
-  Candidates available: (1) reuse `.status-landed` /
-  `.status-unknown` palette values from
-  [`forest.go`](../../../internal/site/forest.go) so the cell
-  fill matches the existing status badge for the same Status,
-  versus (2) introduce a sibling palette specific to the
-  cell row. The contributor's gate walk picks (1) or (2) or
-  surfaces a third; this phase plan does not lock either. The
-  cell DOM shape itself is **load-bearing under C-INV-1
-  (cell-anchor)** and is not render-altitude: every cell stays
-  its own DOM element regardless of which row drew it. *Verified
-  by:* [`render.go`](../../../internal/site/render.go)
+  on surface require rendering the consequence" +
+  [`shared.md`](../../../spec/planning/shared.md) "Plans
+  describe contracts, not implementation." The conservative
+  starting point named at this gate is **reuse the
+  `.status-landed` and `.status-unknown` palette values from
+  [`forest.go`](../../../internal/site/forest.go)** so the
+  cell fill matches the existing status badge for the same
+  Status (a sibling-palette alternative remains available if
+  the implementing PR finds a visual reason to diverge). The
+  cell DOM shape itself is **not** render-altitude — it is
+  load-bearing under C-INV-1 (cell-anchor) and stays as
+  every-cell-is-its-own-element across both row branches.
+  *Verified by:* [`render.go`](../../../internal/site/render.go)
   `statusClass` (the seven recognized Status values + the
   `unknown` fallback this OD's mapping reads against);
   [`forest.go`](../../../internal/site/forest.go) `.progress-row`
   / `.progress-cell` / `.progress-cell-drafting` /
   `.status-landed` / `.status-unknown` styles (the existing
-  palette the candidates reference);
+  palette the conservative starting point references);
   [`design/vision.md` §3 / §7](../../../design/vision.md) (the
   D / P / I / V vocabulary and the placeholder-vs-strict open
   question this contract picks placeholder for).
 
-- **OD2 — F7 body-disclosure summary text.** Parent OD2 = H1
-  is locked: the body disclosure is a nested `<details>` /
-  `<summary>` inside the parent per-node `<details>` box. The
-  summary's rendered text (e.g., "Show description," "Show
-  details," "Show more," "Body," a chevron-only glyph paired
-  with a screen-reader label) is render-altitude. Render-altitude
-  in this context means the implementing PR picks the exact
-  wording observed against the F7 acceptance bullet (header-only
-  first view; the body discloses to a markdown-rendered body
-  on gesture) and the gate-walk picks against the demo
-  walkthrough output, not against this plan-doc. *Verified by:*
+- **OD2 — F7 body-disclosure summary text. Resolved =
+  render-altitude deferral.** Parent OD2 = H1 is locked (the
+  body disclosure is a nested `<details>` / `<summary>` inside
+  the parent per-node `<details>` box); the summary's
+  rendered text (e.g., "Show description," "Show details,"
+  "Show more," "Body," or a chevron-only glyph paired with a
+  screen-reader label) is settled at the implementing PR
+  against the F7 acceptance bullet, per the same
+  Bans-on-surface + Plans-describe-contracts rules. *Verified
+  by:*
   [`task-plan.md`](../../../spec/planning/task-plan.md) "Bans
   on surface require rendering the consequence";
   [parent Contract **C2**](README.md#c2--header-only-default-view-body-content-behind-a-separate-disclosure-f7)
   (the locked WHAT the wording must serve).
 
-- **OD3 — F7 markdown-render and anchor-stripping technique.**
-  Parent OD3 = I2b is locked: when the body disclosure is
-  open, the long description is rendered as markdown via the
-  existing `goldmark` dependency, with `<a>` (anchor) tags
-  stripped so link text reads as plain text (avoiding the
-  forest-page-URL footgun parent C2 names). Three candidate
-  techniques: (a) a custom `goldmark.Renderer` that emits no
-  `<a>` openers (the goldmark-native shape — anchor stripping
-  is a renderer-level concern, not a post-processing one;
-  build-vs-adopt favors this since
+- **OD3 — F7 markdown-render and anchor-stripping technique.
+  Resolved = goldmark-native Renderer customization (the
+  build-vs-adopt fit; no new dependency).** Parent OD3 = I2b
+  locks the WHAT (render markdown, strip `<a>` tags); the
+  technique decomposition at the gate-walk surfaced three
+  candidates: (a) custom `goldmark.Renderer` that emits no
+  `<a>` openers (anchor stripping at the renderer layer); (b)
+  HTML tree walk over the rendered fragment to strip `<a>`
+  tags (adds a transitive HTML-parser dep); (c) regex over
+  the rendered HTML string (fragile against nested or
+  attribute-bearing anchor tags). The walk picked **(a)**
+  because
   [`walker.go`](../../../internal/site/walker.go) lines 12–15
-  already import `goldmark`, `goldmark-meta`, `goldmark/parser`,
-  `goldmark/text`, so no new dependency); (b) HTML tree walk
-  (e.g., `golang.org/x/net/html`) over the rendered fragment
-  to strip `<a>` open / close tags while preserving inner
-  text — adds a transitive HTML-parser dep; (c) regex over the
-  rendered HTML string — fragile against markdown that
-  produces nested or attribute-bearing anchor tags. The
-  goldmark-native (a) is the build-vs-adopt fit; the
-  implementing PR picks against the contextual-escape boundary
-  the parent's Risk Register names (a markdown body with
-  inline markup must not produce unsafe HTML). The exact
-  goldmark renderer interface (e.g., extension via
-  `parser.WithASTTransformers` versus renderer-side suppression
-  via `goldmark.WithRendererOptions`) is implementation-altitude
-  and is the implementing PR's call. *Verified by:*
+  already import `goldmark`, `goldmark-meta`,
+  `goldmark/parser`, and `goldmark/text` — the dep is in scope
+  for the renderer-level customization, no new package added,
+  and the strip step runs at the rendering layer rather than
+  as a post-process — closing the contextual-escape boundary
+  risk cleanly (the rendered HTML reaching the template never
+  carries an `<a>` tag in the first place). The exact
+  goldmark renderer interface — whether the customization
+  lives in the renderer's HTML registration
+  (`renderer.NewRenderer` / `html.WithExtension`) or in an
+  AST transformer (`parser.WithASTTransformers`) — is
+  **implementation-altitude** and is the implementing PR's
+  call. *Verified by:*
   [`walker.go`](../../../internal/site/walker.go) lines 12–15
-  (the existing goldmark import set);
-  [`walker.go`](../../../internal/site/walker.go) `markdownBody`
-  (the function returning the plain-text body the disclosure
-  renders — today not parsed as markdown for display, only for
-  the walker's frontmatter / AST pass);
+  (the existing goldmark import set the customization
+  extends);
+  [`walker.go`](../../../internal/site/walker.go)
+  `markdownBody` (the plain-text source the F7 pipeline
+  renders);
   [parent Contract **C2**](README.md#c2--header-only-default-view-body-content-behind-a-separate-disclosure-f7)
-  (the locked WHAT: rendered markdown + anchors stripped);
-  parent
-  [Risk Register](README.md#risk-register) "rendered-vs-raw
-  contextual-escape boundary" (the falsifier the technique
-  choice closes).
+  (the locked WHAT);
+  [parent Risk Register](README.md#risk-register)
+  "rendered-vs-raw contextual-escape boundary" (the falsifier
+  the renderer-layer choice closes structurally).
 
-- **OD4 — F9 K3 known-facts header field ordering and labels.**
-  Parent Contract **C4** locks the five fields: slug, actor id,
-  bound / unbound, registered-at, last event. The rendered
-  order and the human-readable labels (e.g., `Slug:` vs.
-  unlabelled; `Actor:` vs. `Actor id:` vs. parenthetical;
-  bound / unbound as a badge versus a free word; `Registered:`
-  versus `Registered at:`; the timestamp format — full
-  ISO 8601, "relative" / "30 minutes ago", or both) are
-  render-altitude. Sub-question: whether the order matches the
-  existing roster row's `.roster-label` + `.roster-tag` order
-  ([`roster.go`](../../../internal/site/roster.go) lines 40–47)
-  for visual continuity, or whether the disclosure body is
-  free to introduce its own ordering. *Verified by:*
+- **OD4 — F9 K3 known-facts header field ordering and labels.
+  Resolved = render-altitude deferral.** Parent C4 locks the
+  five fields (slug, actor id, bound / unbound, registered-at,
+  last event); the rendered order, the human-readable labels
+  (e.g., `Slug:` vs. unlabelled; `Actor:` vs. `Actor id:`;
+  bound / unbound as a badge versus a free word;
+  `Registered:` versus `Registered at:`; the timestamp format
+  — full ISO 8601, "relative" / "30 minutes ago", or both),
+  and whether the order matches the existing roster row's
+  `.roster-label` + `.roster-tag` order or introduces its own
+  are all settled at the implementing PR against the F9
+  acceptance bullet, per the same Bans-on-surface +
+  Plans-describe-contracts rules. *Verified by:*
   [parent Contract **C4**](README.md#c4--roster-entry-opens-for-every-entry-f9)
   (the five-field set);
   [`roster.go`](../../../internal/site/roster.go) `roster`
-  template (the existing roster row composition the
+  template (the existing roster row composition the K3
   disclosure body sits beneath).
 
-- **OD5 — F9 no-metadata case display string.** Parent
-  Contract **C4** names "(no reported metadata)" in the prose;
-  the exact rendered string (capitalization; en-dash versus
-  em-dash; whether to include a one-line explanation pointing
-  at the always-known fields above) is render-altitude. The
-  load-bearing observation the C4 wording locks is that
+- **OD5 — F9 no-metadata case display string. Resolved =
+  render-altitude deferral.** Parent C4 names "(no reported
+  metadata)" in the prose; the exact rendered string
+  (capitalization; en-dash versus em-dash; whether to include
+  a one-line explanation pointing at the always-known fields
+  above) is settled at the implementing PR. The load-bearing
+  observation C4 locks — and OD5 does **not** defer — is that
   no-metadata and metadata-bearing entries render the **same
-  outer disclosure structure** — the disclosed body is not
-  absent for a no-metadata entry, it carries the known-facts
-  header plus an explicit "no reported metadata" sentinel
-  where the raw-JSON block would otherwise sit. *Verified by:*
+  outer disclosure structure**: the disclosed body is not
+  absent for a no-metadata entry; it carries the known-facts
+  header plus an explicit sentinel where the raw-JSON block
+  would otherwise sit. *Verified by:*
   [parent Contract **C4**](README.md#c4--roster-entry-opens-for-every-entry-f9);
   parent
   [Self-Review Audits](README.md#self-review-audits)
-  "error-surfacing-user-mutations" (the audit lens that catches
-  an empty-`<details>`-reads-as-broken regression).
+  "error-surfacing-user-mutations" (the audit lens that
+  catches an empty-`<details>`-reads-as-broken regression).
 
 - **OD6 — F9 RosterEntry additive fields (registered-at +
-  last-event).** Verified concretely against current code: the
-  K3 known-facts header needs `registered-at` and `last event`
-  but `sessionMeta` ([`site.go`](../../../internal/site/site.go)
-  `sessionMeta`) carries only `Name` and `Detail` today. The
-  underlying data **is** in scope inside
-  [`loadSessionMetadata`](../../../internal/site/site.go) —
-  the loop already distinguishes the `register` event
-  (baseline) from later events by `events.type`
-  ([`models.EventRegister`](../../../internal/models)
-  comparison at the type-switch step) and already tracks
-  `latestAt[wid]` to identify the latest later event by
-  `events.received_at` — but those two timestamps (the
-  register event's `received_at` and the latest later event's
-  `received_at`) are **discarded** today: only the merged
-  metadata blob escapes. K3's header consumes the discarded
-  facts. Resolved shape candidate: extend `sessionMeta` with
-  `RegisteredAt int64` and `LastEventAt int64`
-  (Unix-epoch seconds, the same shape
+  last-event). Resolved = OD6.a (additive `RegisteredAt int64`
+  + `LastEventAt int64` on `sessionMeta` and `RosterEntry`,
+  populated inside `loadSessionMetadata`'s existing baseline /
+  latest distinction; `LastEventType` NOT added).** Verified
+  concretely against current code at the drafting and
+  re-confirmed at this gate: the K3 known-facts header needs
+  registered-at and last-event timestamps;
+  [`sessionMeta` in
+  site.go](../../../internal/site/site.go) carries only
+  `Name` and `Detail` today; but inside
+  [`loadSessionMetadata`](../../../internal/site/site.go) the
+  loop already distinguishes the `register` event (baseline)
+  from later events by `events.type` and already tracks the
+  latest-later-event timestamp internally to identify the
+  latest reading by `events.received_at`. Both timestamps
+  (the register event's `received_at` available at the
+  register-event scan step; the latest-later-event's
+  `received_at` already tracked) are discarded today; the K3
+  header consumes them. The extension shape: extend
+  `sessionMeta` with `RegisteredAt int64` and
+  `LastEventAt int64` (Unix-epoch seconds, the same storage
+  shape
   [`schema.go`](../../../internal/db/schema.go)
-  `events.received_at` stores), populate from the existing
-  baseline / latest distinction inside
-  `loadSessionMetadata`, propagate to `RosterEntry` through
-  the `buildRoster` `m := meta[wi.ID]` read site, and read
-  from the roster template. **This is a certain extension,
-  not an Estimate Deviation** — the data-flow shape is
-  identical in structure to p2's OD1.a (additive value-fields
-  on the per-request resolved-metadata struct, populated
-  inside the existing loader pass, threaded to consumers
-  through the already-existing reader site). Pre-flag here
-  rather than deferring to the implementing PR because the
-  parent task plan's `## Files to touch` p3 row
-  ([`README.md` Files to touch](README.md#files-to-touch))
-  named the `site.go` extension as "possibly" — verifying it
-  to "certain" closes that uncertainty at plan-drafting time
-  per the
-  [`feedback_deferral_decision_must_analyze_growth_and_migration_cost.md`](../../../) growth-and-migration-cost
-  posture (the deferral here is cheaper named than left
-  open). Sub-question for the gate walk: whether the
-  known-facts header also surfaces the **last-event type**
-  (heartbeat / state-transition / register) alongside its
-  timestamp. The reported-metadata blob the existing roster
-  shows under K3 is type-erased (it's the merged blob, not
-  the per-event payload); whether type belongs in the
-  always-known facts is an OD-walk call. *Verified by:*
+  `events.received_at` carries), populate inside the existing
+  loader loop from values already in scope, propagate to
+  `RosterEntry` through `buildRoster`'s already-existing
+  per-entry metadata read, and read from the roster template.
+  Data-flow shape is identical in structure to p2's OD1.a
+  (additive value-fields on the per-request resolved-metadata
+  struct, populated inside the existing loader pass,
+  threaded to consumers through the already-existing reader
+  site). **This is a certain extension, not an Estimate
+  Deviation** — closes the parent's pre-flagged "possibly"
+  estimate to "certain" at this gate per the
+  [`feedback_deferral_decision_must_analyze_growth_and_migration_cost.md`](../../../)
+  growth-and-migration-cost posture (the deferral is cheaper
+  named than left open). The **sub-question on
+  `LastEventType`** (whether the known-facts header also
+  surfaces the latest event's type — heartbeat /
+  state-transition / register — alongside its timestamp)
+  resolves to **not added** at this gate: the type sits on
+  the per-event payload, not the merged metadata blob (the
+  raw-JSON block already shows the merged content under K3),
+  and the C-INV-5 additive-minimal posture defers any further
+  field until a concrete need arises. The implementing PR may
+  re-open this if the F9 acceptance walkthrough exposes a
+  need; otherwise the two timestamp fields are the certain
+  scope. *Verified by:*
   [`site.go`](../../../internal/site/site.go)
   `loadSessionMetadata` (the baseline vs. latest distinction
-  already made; `latestAt[wid]` already tracked but
-  unexposed; baseline `received_at` available at the
-  `register`-event scan step but currently unwritten);
+  already made; the latest-event timestamp already tracked
+  internally; the baseline `received_at` available at the
+  register-event scan step but currently unwritten);
   [`site.go`](../../../internal/site/site.go) `sessionMeta`
   (the struct K3 extends with the two timestamp fields);
   [`site.go`](../../../internal/site/site.go) `RosterEntry`
   (the consumer struct K3 propagates the timestamps onto via
-  `buildRoster`'s `meta[wi.ID]` read);
+  `buildRoster`'s per-entry metadata read);
   [`schema.go`](../../../internal/db/schema.go)
-  `events.received_at` (the source column's storage shape).
+  `events.received_at` (the source column's storage shape);
+  [`p2-humanize-forest-actor.md` "Open
+  decisions" OD1.a](p2-humanize-forest-actor.md) (the
+  precedent shape this extension mirrors symmetrically).
 
 - **OD7 — Per-phase Validation Gate shape and `Validating`
-  lifecycle confirmation.** p3 is the task-terminal phase;
-  the mandatory-`Validating` rule
+  lifecycle confirmation. Resolved = task-terminal lifecycle
+  + walkthrough as documented; approval-recording = prose in
+  the post-merge commit message (no sub-template).** p3 is the
+  task-terminal product-leaf; the mandatory-`Validating` rule
   ([`shared.md`](../../../spec/planning/shared.md) "Plan-doc
-  Status") binds the product-facing leaf, and p3 is the leaf.
-  The Validation Gate below carries the **full
-  product-acceptance walkthrough across all six findings**,
-  not a phase-scoped subset, per parent
-  [Validation Gate](README.md#validation-gate). The lifecycle
-  is `In draft → Proposed → Validating → Landed` — divergent
-  from p1 and p2's `In draft → Proposed → Landed` interior
-  shape; this divergence is correct because p3 is the leaf
-  and p1 / p2 are not. The implementing PR merges at Status
-  `Validating`; a post-merge doc-only commit records product
-  approval (who approved, the walkthrough revision approved
-  by commit SHA, the date of approval) and flips both this
-  phase plan and the parent task plan `Validating → Landed`
-  in a single commit per
+  Status") binds the leaf and p3 *is* the leaf, so the
+  lifecycle is `In draft → Proposed → Validating → Landed`
+  — divergent from p1 and p2's `In draft → Proposed →
+  Landed` interior shape; the divergence is correct because
+  p3 is the leaf and the siblings are not. The Validation
+  Gate carries the **full product-acceptance walkthrough
+  across all six findings**, not a phase-scoped subset, per
+  the parent
+  [Validation Gate](README.md#validation-gate); the four
+  observable conditions ((a) name-bearing bound, (b) no-name
+  bound, (c) name-bearing unbound, (d) no-name unbound) match
+  the parent's locked set. The implementing PR merges at
+  Status `Validating`; a post-merge doc-only commit records
+  product approval (who approved, the walkthrough revision
+  approved by commit SHA, the date of approval) and flips
+  both this phase plan and the parent task plan
+  `Validating → Landed` in a single commit per
   [`task-plan.md`](../../../spec/planning/task-plan.md) "Task
-  plan terminal state when N ≥ 2." The four observable
-  conditions the walkthrough exercises ((a) name-bearing bound,
-  (b) no-name bound, (c) name-bearing unbound, (d) no-name
-  unbound) match the parent's locked set and are not
-  re-derived here. Open at this phase: whether to add a
-  reviewer-facing approval-recording sub-template (e.g., a
-  short "approval block" prose snippet the post-merge commit
-  copy-fills) or to leave the recording to the commit
-  message's prose. The parent gate's "Approval recording"
-  sub-section already names the three required fields; the
-  open call is purely a formatting affordance. *Verified by:*
+  plan terminal state when N ≥ 2." Approval-recording shape
+  resolves to **prose in the post-merge commit message**,
+  matching the parent README's existing "Approval recording"
+  sub-section format — the three required fields are short
+  enough to live as commit-message prose; a sub-template
+  would add ceremony without closing a real falsifier.
+  *Verified by:*
   [`shared.md`](../../../spec/planning/shared.md) "Plan-doc
   Status" (the mandatory-`Validating` leaf-keyed rule);
   [`task-plan.md`](../../../spec/planning/task-plan.md) "Task
   plan terminal state when N ≥ 2" (the joint-flip rule);
   [`milestone.md`](../../../spec/planning/milestone.md)
-  "Product acceptance and per-leaf validation" (the approval
-  recording shape);
+  "Product acceptance and per-leaf validation" (the
+  approval-recording shape);
   [parent Validation Gate](README.md#validation-gate) (the
   six-finding walkthrough this phase's gate carries verbatim
   + the four observable conditions);
-  [`p1-cosmetic-defects.md`](p1-cosmetic-defects.md) "Validation
-  Gate" and
+  [`p1-cosmetic-defects.md`](p1-cosmetic-defects.md)
+  "Validation Gate" and
   [`p2-humanize-forest-actor.md`](p2-humanize-forest-actor.md)
-  "Validation Gate" (the interior-phase shape p3 deliberately
-  diverges from).
+  "Validation Gate" (the interior-phase shape p3
+  deliberately diverges from).
 
-- **OD8 — Test-coverage posture for F3a / F7 / F9.** The
-  semantic-not-byte-exact posture m2 t3 established
+- **OD8 — Test-coverage posture for F3a / F7 / F9. Resolved =
+  all three sub-blocks below are the planned coverage (the
+  candidate assertions ARE the test scope, not a choice
+  among options).** The semantic-not-byte-exact posture m2 t3
+  established
   ([`t3-doc-declared-stages.md`
   Contracts](../workstream-tracker-1-0/m2/t3-doc-declared-stages.md)
-  C7) is preserved; this OD names candidate assertions per
-  contract. p2's OD4.a presence-and-absence posture is the
-  precedent for catching silent-regression modes.
+  C7) is preserved; p2's OD4.a presence-and-absence posture
+  is the precedent for catching silent-regression modes via
+  the absence side. The implementing PR's test fixtures
+  realize each block below.
 
   - **F3a coverage candidates.** A `Landed` node renders all
     four cells filled; an `In draft` node renders the D cell
@@ -362,8 +549,12 @@ top-level section.
   decisions" OD4.a](p2-humanize-forest-actor.md) (the
   presence-and-absence sibling precedent).
 
-- **OD9 — Backlog mutations and slug-grammar non-scope.** The
-  parent task plan's
+- **OD9 — Backlog mutations and slug-grammar non-scope.
+  Resolved = no backlog-file mutations at this phase's
+  implementing PR; the `post-m2-ux-correction` entry's close
+  rides the post-merge `Validating → Landed` commit; the
+  slug-grammar bug stays out of scope per PR #59's gate
+  redesign decline.** The parent task plan's
   [`## Backlog Impact`](README.md#backlog-impact) recorded
   three mutations executed in the parent drafting change:
   the `humanize-forest-actor` graduation, the
