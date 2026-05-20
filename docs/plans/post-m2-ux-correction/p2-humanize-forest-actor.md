@@ -18,8 +18,14 @@ the Files-to-touch, the per-phase Validation Gate
 walkthrough lives at p3), Out of Scope, and the Risk Register.
 Five open decisions were surfaced for the OD walk preceding the
 `` `In draft` → `Proposed` `` promotion gate. OD-walk
-resolutions are folded inline below as they land; OD2 remains
-open at this revision.
+resolutions are now folded inline below: **OD1 = OD1.a**,
+**OD2 = OD2.a**, **OD3 = OD3.a**, **OD4 = OD4.a**, **OD5
+dissolved** (subsumed by OD1.a). Every OD is resolved; the
+phase plan is decision-complete in WHAT terms and ready for
+the `` `In draft` → `Proposed` `` promotion-gate walk (the
+gate-walk itself is the user's next step per the standing
+spawned-drafting rule — this drafting session does not run
+it).
 
 ### Open decisions
 
@@ -119,36 +125,54 @@ README precedent).
     forest/roster identity disagreement m2 shipped. All three
     shapes preserve C-INV-4 single-resolution.
 
-- **OD2 — Slug fallback's source on the rendered value.** Parent
-  Contract **C6** locks the rule as **name-then-slug**, the same
-  rule t4 locked for the roster
-  ([`t4-session-roster.md` "Session identity and naming"](../workstream-tracker-1-0/m2/t4-session-roster.md));
-  the `wst-<uuid>` actor is the loader-internal identity key and
-  is never a label (banned by parent C6 + C-INV-3). Confirm the
-  *source* of the slug to fall back to:
-  - **OD2.a — The work-instance's registered slug.** The slug
-    the session registered against — the same value the roster
-    falls back to in `RosterEntry.Slug` today. Requires a `Slug`
-    field on `ActiveWorkInstance` (additive — only OD1.a's
-    shape; OD1.b/c carry the slug through the threaded map).
-  - **OD2.b — The enclosing node's slug** (`.Slug` on the
-    parent `PlanNode`, available via outer-template scope —
-    `$.Slug` or a pre-`range` template variable inside
-    `node-header`). No additive field needed.
+- **OD2 — Slug fallback's source on the rendered value.
+  Resolved = OD2.a** (the work-instance's registered slug; add
+  a `Slug string` field to `ActiveWorkInstance` alongside the
+  `Name` field OD1.a lands, populated in the same
+  `Server.index` pass from the `active`-map key in scope).
+  *Rationale.* Under OD1.a the forest's per-node template
+  reads display fields off the work-instance value; OD2.a
+  continues that convention for the slug fallback rather than
+  splitting it across two scopes (`Name` on the value, `Slug`
+  via outer-template `$node.Slug`). The rendered output is
+  identical to OD2.b for every attached work-instance —
+  `buildTree`'s exact-slug join
+  ([`tree.go:148`](../../../internal/site/tree.go)
+  `active[d.Slug]`) guarantees the work-instance's registered
+  slug equals the enclosing node's slug — so OD2 is not
+  load-bearing for behavior. The choice is posture-only, and
+  OD2.a's posture matches `RosterEntry.Name` / `RosterEntry.Slug`
+  ([site.go:286](../../../internal/site/site.go)): both
+  surfaces read identity off the work-instance / roster-entry
+  value, both fall back name-then-slug, both populate from the
+  same per-request resolution. The future-feature pattern
+  ahead (F3b `current_stage`, work-instance state vocab, actor
+  kind, actor lineage) will all land on `ActiveWorkInstance`,
+  not via outer-template scope, so OD2.a establishes the
+  forest-template convention every future field follows
+  without further negotiation. Name-then-actor-id was **not**
+  a candidate — banned by parent **C6** + **C-INV-3**.
 
-  Tradeoff lens: For every *attached* work-instance, OD2.a and
-  OD2.b produce **identical** rendered output — `buildTree`
-  attaches via exact slug match
-  ([`tree.go:148`](../../../internal/site/tree.go) `active[d.Slug]`),
-  so an attached work-instance's registered slug equals the
-  enclosing node's slug. The difference is semantic: OD2.a keeps
-  the rule keyed to the same identity the roster reads (the
-  registered slug — the durable fact about the session); OD2.b
-  ties the forest's fallback semantically to the node identity.
-  Name-then-actor-id is **not** a candidate — banned by parent
-  C6 + C-INV-3. OD2 interacts with OD1: OD1.a + OD2.a needs both
-  `Name` and `Slug` on `ActiveWorkInstance`; OD1.a + OD2.b needs
-  only `Name`.
+  - **OD2 (original framing, retained as scoping record).**
+    Parent Contract **C6** locks the rule as **name-then-slug**,
+    the same rule t4 locked for the roster
+    ([`t4-session-roster.md` "Session identity and
+    naming"](../workstream-tracker-1-0/m2/t4-session-roster.md)).
+    Two shapes were decomposed for the *source* of the slug:
+    - **OD2.a — The work-instance's registered slug.**
+      Requires a `Slug` field on `ActiveWorkInstance`
+      (additive — only OD1.a's shape; OD1.b/c carry the slug
+      through the threaded map).
+    - **OD2.b — The enclosing node's slug** (`.Slug` on the
+      parent `PlanNode`, available via outer-template scope).
+      No additive field needed; introduces a template-scope
+      reference the forest's `node-header` doesn't use today.
+
+    Tradeoff lens at decision time: identical rendered output
+    for every attached work-instance (`buildTree`'s exact-slug
+    join equates the two sources). OD2 is posture-only — the
+    same axis as OD1's value-shape symmetry, applied to the
+    fallback half.
 
 - **OD3 — Unbound work-instance handling. Resolved = OD3.a**
   (no change; unbound stays roster-only). *Rationale
@@ -336,13 +360,15 @@ idempotency key keyed on `(slug, actor)`), never a label. The
 `actor-marker` span itself, its placement inside `label-group`,
 and the per-node `range .WorkInstances` attachment remain
 unchanged — this contract changes only the text rendered inside
-the span. The data-flow shape locks at **OD1.a** (additive
-`Name` field on `ActiveWorkInstance`, populated in
-`Server.index` between `loadSessionMetadata` and `buildTree`;
-see Status → Open decisions); the slug fallback's source on
-the rendered value (OD2) remains open at this drafting session.
-Remaining render-altitude details are resolved at the gate-walk
-and the implementing PR per
+the span. The data-flow shape locks at **OD1.a** (additive `Name` field
+on `ActiveWorkInstance`, populated in `Server.index` between
+`loadSessionMetadata` and `buildTree`); the slug fallback's
+source on the rendered value locks at **OD2.a** (additive
+`Slug` field on `ActiveWorkInstance` alongside `Name`,
+populated in the same pass from the `active`-map key); see
+Status → Open decisions. The implementing PR's narrow
+render-altitude calls (exact span text, dark/light mode
+observation) are settled per
 [`shared.md`](../../../spec/planning/shared.md) "Plans describe
 contracts, not implementation." The per-request resolution of
 the reported `name` continues to live in the already-existing
@@ -424,23 +450,21 @@ asks whether the phase plan pre-flags it explicitly).*
     rendered text (**C1**). The `range .WorkInstances` and the
     span attachment stay; only the text inside the span changes.
   - [`internal/site/tree.go`](../../../internal/site/tree.go) —
-    additive `Name string` field on `ActiveWorkInstance`. If
-    OD2 lands on OD2.a, a `Slug string` field is added in the
-    same edit; OD2.b leaves the struct with only the `Name`
-    addition and reads the slug fallback from outer-template
-    scope. The struct's existing `ID` field — added in t4-p2
-    for the roster's event-log join even though the forest
-    doesn't render `ID` — is the additive-field precedent OD1.a
-    extends.
+    additive `Name string` and `Slug string` fields on
+    `ActiveWorkInstance` (per OD1.a + OD2.a). The struct's
+    existing `ID` field — added in t4-p2 for the roster's
+    event-log join even though the forest doesn't render `ID`
+    — is the additive-field-for-cross-region-needs precedent
+    these extend.
   - [`internal/site/site.go`](../../../internal/site/site.go) —
-    `Server.index` populates the new field(s) on each
-    `ActiveWorkInstance` from the already-loaded `meta` map
-    between `loadSessionMetadata` and `buildTree` (a single
-    short pass over `active`'s values, keyed by `wi.ID`). No
+    `Server.index` populates the two new fields on each
+    `ActiveWorkInstance` between `loadSessionMetadata` and
+    `buildTree` in a single pass over `active`'s entries:
+    `Name` from `meta[wi.ID].Name`, `Slug` from the
+    `active`-map's slug key (in scope from
+    `for slug, wis := range active`). No
     `loadActiveWorkInstances` change; no `buildTree` signature
-    change; no second resolution path. If OD2.a, the
-    population pass also assigns `wi.Slug` from the
-    `active`-map's slug key (in scope at that point).
+    change; no second resolution path.
 
 - **Modify (tests):**
   - [`internal/site/forest_test.go`](../../../internal/site/forest_test.go)
