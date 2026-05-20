@@ -127,6 +127,47 @@ func TestRenderNestedBoxesReplaceBulletList(t *testing.T) {
 	}
 }
 
+// TestRenderSummaryCarriesExplicitMarkerTreatment asserts the m2
+// post-m2-ux-correction p1 F8 contract: every node's <summary>
+// carries an explicit marker treatment so the disclosure marker is
+// baseline-aligned and does not overlap the box border (the UA-
+// default marker is suppressed and an in-flow triangle element is
+// rendered inside the header flex row). Semantic-not-byte-exact
+// per the m2 t3 C7 precedent: the rule set carries the declarations,
+// and a triangle element is present inside the summary; the visual
+// result is observed via the manual walkthrough, not asserted here.
+func TestRenderSummaryCarriesExplicitMarkerTreatment(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "Proposed"},
+		{Slug: "alpha-m1", Status: "Landed"},
+	}, nil)
+	html := renderTree(t, roots)
+
+	// The rule set suppresses the UA-default marker.
+	if !strings.Contains(html, "list-style: none") {
+		t.Errorf("summary rule set must suppress the UA-default marker via list-style: none; html:\n%s", html)
+	}
+	// An inline triangle element renders inside the summary's
+	// header flex row, baseline-aligned with the label.
+	if !strings.Contains(html, `<span class="triangle"`) {
+		t.Errorf("summary missing the inline triangle marker element; html:\n%s", html)
+	}
+	// The triangle sits inside the box-header so the existing
+	// baseline-aligned flex row aligns it with the label.
+	iHeader := strings.Index(html, `<span class="box-header">`)
+	iTriangle := strings.Index(html, `<span class="triangle"`)
+	iLabel := strings.Index(html, `<span class="label-group">`)
+	if !(iHeader >= 0 && iHeader < iTriangle && iTriangle < iLabel) {
+		t.Errorf("triangle must sit inside box-header, before the label-group: header=%d triangle=%d label=%d; html:\n%s",
+			iHeader, iTriangle, iLabel, html)
+	}
+	// The open-state rotation rule exists so the marker reads as
+	// "open" vs. "closed" in both <details> states.
+	if !strings.Contains(html, "details[open] > summary .triangle") {
+		t.Errorf("missing details[open] rule that rotates the triangle for the open state; html:\n%s", html)
+	}
+}
+
 // TestRenderFieldlessNodeEmitsNoDetailMarkup is the preserved
 // additive guard (C5): a node carrying neither a long description
 // nor related PRs emits no detail markup. The semantic

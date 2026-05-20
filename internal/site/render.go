@@ -24,7 +24,7 @@ var indexTmpl = template.Must(template.New("index").Funcs(template.FuncMap{
   <meta charset="utf-8">
   <title>workstream-tracker</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; padding: 1rem; max-width: 80rem; margin: 0 auto; color: #111827; }
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 1rem; max-width: 80rem; margin: 0 auto; color: #111827; background-color: #fff; color-scheme: light; }
     h1 { margin-top: 0; }
     /* Two-region shell (m2 t1): forest ~2/3 left, roster ~1/3
        right, top-aligned so the roster shows without scrolling on

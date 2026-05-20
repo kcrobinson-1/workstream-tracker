@@ -1,6 +1,6 @@
 ---
 slug: post-m2-ux-correction-p1
-Status: Proposed
+Status: Landed
 short_description: Cosmetic defects — dark-mode chrome legibility (F1) + baseline-aligned collapse marker (F8)
 ---
 
@@ -8,7 +8,7 @@ short_description: Cosmetic defects — dark-mode chrome legibility (F1) + basel
 
 ## Status
 
-`Proposed`. p1 ships pure-CSS fixes for two m2-shipped cosmetic
+`Landed`. p1 ships pure-CSS fixes for two m2-shipped cosmetic
 defects under the [`post-m2-ux-correction`](README.md) task plan:
 dark-mode page chrome (F1) and the misplaced native `<details>`
 disclosure marker (F8). p1 ships first in the p1 → p2 → p3
@@ -71,6 +71,48 @@ the flip:
   predicates, no specific CSS spelling locked); no
   soft-commitment language.
 - **Phase skeletons** — N = 1; none to seed.
+
+### Implementation history
+
+What shipped at the implementing PR, recorded here so the
+durable plan doc describes the picked render-altitude shapes
+(both deferrals on Contracts C1 / C2 are now closed).
+
+- **F1 — picked CSS shape: both `color-scheme: light` and an
+  explicit `background-color: #fff` on the page-shell body
+  rule.** `background-color: #fff` is the load-bearing
+  declaration: per the CSS body-background-canvas propagation
+  rule, body's background paints the user-agent canvas when
+  the `html` element has no background, which makes the
+  canvas white in OS dark mode regardless of UA color-scheme
+  policy. `color-scheme: light` is the belt-and-suspenders
+  partner: it tells the UA the page is designed for the light
+  scheme, so any UA-rendered widgets (scrollbars, form
+  controls) follow suit. The "color-scheme only" shape
+  (option A in the parent's scoping doc) was rejected at
+  the implementing PR because `color-scheme: light` applied
+  to `body` does not by itself paint the html canvas light —
+  the canvas inherits from `:root`. The "both" shape closes
+  this falsifier directly and is what shipped.
+- **F8 — picked marker technique: J1 (inline triangle
+  inside the `.box-header` flex row + `list-style: none` on
+  summary + `::-webkit-details-marker { display: none }`
+  fallback).** J1 was picked over J2 (`summary::marker`
+  content styling) because `summary::marker` is positioned
+  by the UA and cannot be baseline-aligned with the
+  summary's flex children, which is the contract's load-
+  bearing visual. The minimal structural element added
+  inside `<summary>` is a `<span class="triangle"
+  aria-hidden="true">` placed as the first child of
+  `.box-header` (not inside `node-header` — preserving the
+  C-INV-2 carve-out's narrow scope). The triangle rotates
+  90° in the open state via
+  `details[open] > summary .triangle { transform:
+  rotate(90deg); }`. The pre-existing `justify-content:
+  space-between` on `.box-header` was removed in favor of
+  `margin-left: auto` on `.status-group` so the three-item
+  flex row (triangle, label-group, status-group) lays out
+  with the status badge still pinned to the right edge.
 
 ## Context
 
