@@ -250,19 +250,34 @@ is one-line confirmations rather than rationale records.
   int64` and `LastEventAt int64` to `sessionMeta` and
   `RosterEntry` in
   [`site.go`](../../../internal/site/site.go); populated inside
-  the existing `loadSessionMetadata` baseline / latest
-  distinction loop from values already in scope. The
-  `WHERE metadata IS NOT NULL` filter was dropped from the
-  loader query so register events with no metadata still
-  surface their `received_at` as the K3 "registered-at" field
-  (observable conditions (b) and (d) need this); the
-  fold-into-Detail logic in `resolveSessionMeta` already
-  handles null metadata so the change is timestamp-coverage-
-  only, not Detail-rendering-affecting. The "every active
+  the existing `loadSessionMetadata` loop from values already
+  in scope. The `WHERE metadata IS NOT NULL` filter was dropped
+  from the loader query so register events with no metadata
+  still surface their `received_at` as the K3 "registered-at"
+  field (observable conditions (b) and (d) need this), and
+  later events with no metadata still contribute their
+  `received_at` to the K3 "Last event" field. The loop tracks
+  three maps: `registeredAt[wid]` (register event), `lastEventAt[wid]`
+  (absolute latest later event across ALL events — the K3
+  "Last event" surface), and `latestMetadataAt[wid]` (gates
+  the write to `latest[wid]`, the Detail-fold source). The
+  third map's existence — added at the post-PR-#62 review fix
+  — **preserves** the t4 task plan's "Metadata read policy"
+  contract and the
+  [`destructive-metadata-updates`](../../backlog.md#destructive-metadata-updates)
+  backlog entry's deferred semantics: a no-metadata heartbeat
+  contributes nothing to Detail and does not mask a previously
+  surfaced metadata-bearing event. The "every active
   work-instance gets a sessionMeta entry now even when none
   was reported" semantic change is the K3 enabler: the
   loader's `out` map writes for every id, not just the
-  metadata-bearing ones.
+  metadata-bearing ones. Loader-level regression coverage in
+  [`roster_test.go`](../../../internal/site/roster_test.go)
+  `TestLoadSessionMetadataNoMetadataLaterDoesNotMaskMetadataBearing`
+  pins the contract with the specific
+  (register-with-metadata, heartbeat-with-metadata,
+  heartbeat-with-NO-metadata) sequence the post-#62 bot review
+  named.
 - **F3a default-cells row (C2).** Generalized
   [`forest.go`](../../../internal/site/forest.go)
   `node-progress` template to the field-presence branch:

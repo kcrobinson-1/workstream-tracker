@@ -2,9 +2,16 @@ package site
 
 import (
 	"bytes"
+	"context"
+	"database/sql"
 	"encoding/json"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/kcrobinson-1/workstream-tracker/internal/db"
+	"github.com/kcrobinson-1/workstream-tracker/internal/models"
 )
 
 // Roster-region tests. p1 covered the bare bound/unbound roster
@@ -500,5 +507,125 @@ func TestResolveSessionMeta(t *testing.T) {
 	// No metadata at all → not ok (entry renders as a plain row).
 	if _, _, ok := resolveSessionMeta(nil, nil); ok {
 		t.Fatalf("no metadata must yield ok=false (plain row)")
+	}
+}
+
+// TestLoadSessionMetadataNoMetadataLaterDoesNotMaskMetadataBearing
+// pins the post-#62-review fix: when a session sequence is
+// (register-with-metadata, heartbeat-with-metadata,
+// heartbeat-with-NO-metadata), the latest-later-metadata
+// selection that drives Detail rendering must pick the
+// metadata-bearing heartbeat — not the absolute latest event.
+//
+// The original t4 "Metadata read policy" + the Open
+// `destructive-metadata-updates` backlog entry establish that a
+// no-metadata heartbeat "contributes nothing" to Detail. p3
+// dropped the WHERE metadata IS NOT NULL filter on the loader
+// query to get K3 timestamp coverage for the F9 "Last event"
+// facts-block field; the post-#62-review fix decoupled the K3
+// timestamp tracking (lastEventAt, all events) from the
+// Detail-source selection (latestMetadataAt + latest[wid],
+// metadata-bearing events only) so the t4 contract is
+// preserved.
+//
+// This test exercises the loader against a real SQLite DB
+// (matching the production path) — the no-metadata heartbeat
+// is the latest event by received_at, but Detail must still
+// reflect the metadata-bearing heartbeat that came before it.
+// LastEventAt picks up the no-metadata heartbeat's timestamp
+// (the K3 "Last event" surface is supposed to track absolute
+// latest activity, separately).
+func TestLoadSessionMetadataNoMetadataLaterDoesNotMaskMetadataBearing(t *testing.T) {
+	conn := openTestDB(t)
+
+	const wid = "wi-abc-123"
+	// Register at t=1000ns with baseline metadata.
+	insertEvent(t, conn, wid, models.EventRegister,
+		`{"name":"Alpha","step":"init"}`, 1000)
+	// Heartbeat at t=2000ns with metadata that overlays "step"
+	// and adds "detail".
+	insertEvent(t, conn, wid, models.EventHeartbeat,
+		`{"step":"running","detail":"phase-2"}`, 2000)
+	// Heartbeat at t=3000ns with NO metadata. Under the locked
+	// t4 contract this contributes nothing to Detail; it does
+	// contribute to LastEventAt (the K3 "Last event" surface).
+	insertEvent(t, conn, wid, models.EventHeartbeat,
+		"", 3000)
+
+	active := map[string][]*ActiveWorkInstance{
+		"alpha": {{ID: wid, Actor: "wst-a"}},
+	}
+	meta, err := loadSessionMetadata(context.Background(), conn, active)
+	if err != nil {
+		t.Fatalf("loadSessionMetadata: %v", err)
+	}
+	got, ok := meta[wid]
+	if !ok {
+		t.Fatalf("no sessionMeta entry for %q (every active wi must get one)", wid)
+	}
+	// Name survives from baseline (the metadata-bearing
+	// heartbeat at t=2000ns did not overwrite the "name" key).
+	if got.Name != "Alpha" {
+		t.Errorf("Name must survive from register baseline; got %q want \"Alpha\"", got.Name)
+	}
+	// Detail must reflect the metadata-bearing overlay
+	// (baseline + t=2000ns heartbeat), not just the baseline.
+	// The no-metadata t=3000ns heartbeat must not mask it.
+	if !strings.Contains(got.Detail, `"detail"`) ||
+		!strings.Contains(got.Detail, `"phase-2"`) {
+		t.Errorf("Detail must retain the metadata-bearing heartbeat's keys; got Detail=%q",
+			got.Detail)
+	}
+	if !strings.Contains(got.Detail, `"running"`) {
+		t.Errorf("Detail must reflect the latest-metadata-bearing-event overlay; got Detail=%q",
+			got.Detail)
+	}
+	// LastEventAt picks up the absolute latest event's
+	// received_at — including the no-metadata heartbeat at
+	// t=3000ns (the K3 "Last event" facts-block surface).
+	if got.LastEventAt != 3000 {
+		t.Errorf("LastEventAt must track the absolute latest event (all events); got %d want 3000",
+			got.LastEventAt)
+	}
+	// RegisteredAt is the register event's received_at.
+	if got.RegisteredAt != 1000 {
+		t.Errorf("RegisteredAt must track the register event; got %d want 1000",
+			got.RegisteredAt)
+	}
+}
+
+// openTestDB opens a temp SQLite for loader-level tests and
+// runs the schema init. Cleanup is automatic via t.TempDir.
+func openTestDB(t *testing.T) *sql.DB {
+	t.Helper()
+	conn, err := db.Open(filepath.Join(t.TempDir(), "loadertest.db"))
+	if err != nil {
+		t.Fatalf("db.Open: %v", err)
+	}
+	t.Cleanup(func() { _ = conn.Close() })
+	if err := db.Init(context.Background(), conn); err != nil {
+		t.Fatalf("db.Init: %v", err)
+	}
+	return conn
+}
+
+// insertEvent writes a single events row for a loader-level
+// test fixture. An empty metadata string means "store NULL"
+// (matching the handlers.go nullableJSON behavior the
+// production path uses).
+func insertEvent(t *testing.T, conn *sql.DB, wid string, etype models.EventType, metadata string, receivedAt int64) {
+	t.Helper()
+	var meta any
+	if metadata != "" {
+		meta = metadata
+	}
+	_, err := conn.ExecContext(context.Background(),
+		`INSERT INTO events (id, work_instance_id, type, payload, metadata, received_at)
+		 VALUES (?, ?, ?, NULL, ?, ?)`,
+		wid+"-evt-"+string(etype)+"-"+strconv.FormatInt(receivedAt, 10),
+		wid, string(etype), meta, receivedAt,
+	)
+	if err != nil {
+		t.Fatalf("insert event: %v", err)
 	}
 }

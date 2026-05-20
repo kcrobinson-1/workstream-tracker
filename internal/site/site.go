@@ -199,13 +199,26 @@ func loadSessionMetadata(ctx context.Context, db *sql.DB, active map[string][]*A
 
 	baseline := map[string]json.RawMessage{}
 	latest := map[string]json.RawMessage{}
-	latestAt := map[string]int64{}
-	// registeredAt tracks the register event's received_at per
-	// work-instance — the K3 "registered-at" facts-block field
-	// (p3 F9 OD6). The DB query returns rows in arbitrary order,
-	// so a work-instance may yield its register event before or
-	// after any later events; the register-event branch always
-	// writes this value, and any later event leaves it alone.
+	// p3 F9 OD6 (post-#62 review): tracking the K3 "last event"
+	// timestamp is DECOUPLED from selecting the latest metadata-
+	// bearing later event for the Detail fold. Two maps:
+	//   - lastEventAt[wid] is the absolute latest later event's
+	//     received_at across ALL events (the K3 facts-block
+	//     "Last event" field; a no-metadata heartbeat still
+	//     counts here).
+	//   - latestMetadataAt[wid] is the latest received_at among
+	//     events that CARRY metadata — gates writes to
+	//     latest[wid] (the Detail-fold source) so the t4 task
+	//     plan's "Metadata read policy" + the
+	//     `destructive-metadata-updates` backlog entry's
+	//     deferred semantics are preserved: a no-metadata
+	//     heartbeat contributes nothing to Detail and does not
+	//     mask a previous metadata-bearing later event.
+	// registeredAt is the K3 "registered-at" facts-block field;
+	// the register-event branch always writes it regardless of
+	// whether the register event carried metadata.
+	lastEventAt := map[string]int64{}
+	latestMetadataAt := map[string]int64{}
 	registeredAt := map[string]int64{}
 	for rows.Next() {
 		var wid, etype string
@@ -219,9 +232,12 @@ func loadSessionMetadata(ctx context.Context, db *sql.DB, active map[string][]*A
 			registeredAt[wid] = receivedAt
 			continue
 		}
-		if receivedAt >= latestAt[wid] {
+		if receivedAt > lastEventAt[wid] {
+			lastEventAt[wid] = receivedAt
+		}
+		if len(meta) > 0 && receivedAt >= latestMetadataAt[wid] {
 			latest[wid] = json.RawMessage(meta)
-			latestAt[wid] = receivedAt
+			latestMetadataAt[wid] = receivedAt
 		}
 	}
 	if err := rows.Err(); err != nil {
@@ -242,7 +258,7 @@ func loadSessionMetadata(ctx context.Context, db *sql.DB, active map[string][]*A
 			Name:         name,
 			Detail:       detail,
 			RegisteredAt: registeredAt[id],
-			LastEventAt:  latestAt[id],
+			LastEventAt:  lastEventAt[id],
 		}
 	}
 	return out, nil
