@@ -85,13 +85,15 @@ does not align with the label text baseline, because the
 summary uses no explicit marker styling. Both are visible at
 every page view today; neither has a workaround.
 
-The fixes are CSS-only, in two files: the page-shell body rule
-in [render.go](../../../internal/site/render.go) for F1, and
-the summary marker styling in
-[forest.go](../../../internal/site/forest.go) for F8. No API,
-schema, route, dependency, template-structure, or render-runtime
-change. The page stays server-rendered, walk-on-every-request,
-no-JavaScript.
+The fixes are render-surface only, in two files: the page-shell
+body rule in [render.go](../../../internal/site/render.go) for
+F1, and the summary marker styling in
+[forest.go](../../../internal/site/forest.go) for F8 — plus, if
+the inline-triangle marker technique is picked for F8, a
+minimal structural element inside `<summary>` as part of the
+marker treatment. No API, schema, route, dependency, broader
+template reshape, or render-runtime change. The page stays
+server-rendered, walk-on-every-request, no-JavaScript.
 
 It is being done now as the first phase of the
 [`post-m2-ux-correction`](README.md) task because the
@@ -120,9 +122,12 @@ Open the page against `docs/plans/` per
 
 All while m2's file-enforced region invariants hold (the only
 `render.go` edit is the body rule — no shell-layout,
-region-boundary, or sibling-region body change; the only
-`forest.go` edit is the summary marker styling — no template
-or `actor-marker` change); the no-JS native
+region-boundary, or sibling-region body change; the `forest.go`
+edits are the summary marker styling for F8 and, if the
+inline-triangle marker technique is picked, a minimal structural
+element inside `<summary>` — no `actor-marker` change, no
+`node-header` / `node-detail` / `node-progress` change, no
+broader template reshape); the no-JS native
 `<details>`/`<summary>` idiom is preserved
 ([m2 README "Cross-Task Decisions" → "Collapsible
 mechanism"](../workstream-tracker-1-0/m2/README.md));
@@ -253,22 +258,35 @@ parent and child docs.
   The only `render.go` edit is the body rule (the page-shell
   CSS for F1); no shell-layout, `.layout` container, region-
   composition, or `indexData` / `renderIndex` plumbing change.
-  The only `forest.go` edit is the summary marker styling for
-  F8; no template, no `actor-marker` text, no `node-progress`
-  template change. The roster region body is not touched.
+  The `forest.go` edit is scoped to the F8 summary marker
+  styling. The `node-header` / `node-detail` / `node-progress`
+  templates are not changed; the `actor-marker` span text is
+  not changed; the `range .WorkInstances` shape is not changed;
+  the roster region is not touched. If the inline-triangle
+  marker technique (parent OD-walk's J1 shape) is picked, a
+  minimal structural element may sit inside `<summary>` as
+  part of the marker treatment — that is structural to the
+  technique, in scope, and not a forbidden template reshape.
+  Broader reshapes of the `node` / `node-header` / `node-detail`
+  / `node-progress` templates are forbidden.
 - **[C-INV-3 (actor-tag preserved)](README.md#cross-cutting-invariants).**
   p1 does not touch the `actor-marker` span or the
   `range .WorkInstances` shape; the m2 v0.1 actor-tag no-
   regress invariant holds trivially.
 - **[C-INV-4 (walk-on-every-request preserved)](README.md#cross-cutting-invariants).**
-  p1 is CSS-only — no caching, file-watch, or in-memory build-
-  up is added; every render reads the current `docs/plans/`
-  walk and the current work-instance state per HTTP request
-  unchanged.
+  p1's edits are render-surface only (CSS, plus at most a
+  minimal structural element inside `<summary>` if the inline-
+  triangle marker technique is picked) — no caching, file-watch,
+  or in-memory build-up is added; every render reads the current
+  `docs/plans/` walk and the current work-instance state per
+  HTTP request unchanged.
 - **[C-INV-5 (additive, no spec / API / schema / dependency
-  change)](README.md#cross-cutting-invariants).** p1 is CSS-
-  only; no frontmatter field, API endpoint, schema column, or
-  dependency is added. `go.mod` is not touched.
+  change)](README.md#cross-cutting-invariants).** p1's edits
+  are render-surface only (CSS, plus at most a minimal
+  structural element inside `<summary>` if the inline-triangle
+  marker technique is picked); no frontmatter field, API
+  endpoint, schema column, or dependency is added. `go.mod` is
+  not touched.
 
 (C-INV-1 cell-anchor is realized at p3, not p1; p1 is unaffected.)
 
@@ -420,8 +438,8 @@ test:
   ([`how-to-use.md`](../../agents/shared/self-review/how-to-use.md))
   layered on top.
 
-No data / CI / runbook audit surfaces apply (CSS-only diff,
-no schema, pipeline, or operational doc touched).
+No data / CI / runbook audit surfaces apply (render-surface
+diff, no schema, pipeline, or operational doc touched).
 
 ## Out of Scope
 
