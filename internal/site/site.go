@@ -68,6 +68,17 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Populate the forest's display fields on each active work-
+	// instance. Both forest and roster read these from the same
+	// per-request metadata resolution above; loadActiveWorkInstances
+	// doesn't carry display data, so the assignment happens here.
+	for slug, wis := range active {
+		for _, wi := range wis {
+			wi.Slug = slug
+			wi.Name = meta[wi.ID].Name
+		}
+	}
+
 	roots := buildTree(docs, active)
 	roster := buildRoster(docs, active, meta)
 

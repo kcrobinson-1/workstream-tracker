@@ -48,7 +48,7 @@ const forestTemplates = `
   <p class="empty">No plan-tree roots found at <code>{{.PlansPath}}</code>.</p>
   {{end}}{{end}}
 
-{{define "node-header"}}<span class="label-group"><span class="label" title="{{.Slug}}">{{.Label}}</span>{{range .WorkInstances}}<span class="actor-marker">{{.Actor}}</span>{{end}}</span><span class="status-group"><span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span></span>{{end}}
+{{define "node-header"}}<span class="label-group"><span class="label" title="{{.Slug}}">{{.Label}}</span>{{range .WorkInstances}}<span class="actor-marker">{{if .Name}}{{.Name}}{{else}}{{.Slug}}{{end}}</span>{{end}}</span><span class="status-group"><span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span></span>{{end}}
 
 {{define "node-progress"}}<div class="progress-row"><span class="progress-cell progress-cell-drafting">Drafting</span>{{range .ProgressStages}}<span class="progress-cell">{{.}}</span>{{end}}</div>{{end}}
 

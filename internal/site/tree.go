@@ -39,12 +39,29 @@ type PlanNode struct {
 type ActiveWorkInstance struct {
 	// ID is work_instances.id (the generated PRIMARY KEY) — the
 	// key events.work_instance_id references. Carried for the
-	// roster's p2 event-log join (loadActiveWorkInstances selects
-	// it; buildRoster joins reported metadata on it). The forest
-	// node-header renders only Actor, so this additive, unrendered
-	// field cannot regress the v0.1 forest actor markers.
-	ID    string
+	// roster's event-log join (loadActiveWorkInstances selects
+	// it; buildRoster joins reported metadata on it) and as the
+	// key the forest's display fields below are populated under.
+	ID string
+
+	// Actor is the loader-internal identity (the wst-<uuid>
+	// registration idempotency key). Never rendered by the
+	// forest; the roster reads it only as a deterministic
+	// secondary sort key.
 	Actor string
+
+	// Name is the resolved display name from the session's
+	// reported metadata. Populated in Server.index after
+	// loadSessionMetadata returns; empty when the session
+	// reported no name, in which case the forest falls back to
+	// Slug. Loader reads do not populate this field.
+	Name string
+
+	// Slug is the slug the session registered against —
+	// populated in Server.index from the active-map key.
+	// Used as the forest's display fallback when Name is empty
+	// (the name-then-slug rule the roster also follows).
+	Slug string
 }
 
 // buildLabel computes a node's display label per the t3 grammar:

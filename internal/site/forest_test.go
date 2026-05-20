@@ -226,14 +226,18 @@ func TestRenderLeafAndStubBox(t *testing.T) {
 
 // TestRenderActorMarkersOnBox asserts the cross-cutting invariant
 // (v0.1 actor tags on nodes must not regress): every box still
-// renders the active-work actor markers in its header.
+// renders an active-work actor-marker span in its header per
+// attached work-instance. The rendered text is the resolved
+// display name (Name with Slug fallback); the post-m2-ux-correction
+// p2 F4 contract changed the marker's text source but not its
+// presence or attachment.
 func TestRenderActorMarkersOnBox(t *testing.T) {
 	roots := buildTree([]parsedDoc{
 		{Slug: "alpha", Status: "In progress"},
 		{Slug: "alpha-m1", Status: "Proposed"},
 	}, map[string][]*ActiveWorkInstance{
-		"alpha":    {{Actor: "agent-1"}},
-		"alpha-m1": {{Actor: "agent-2"}},
+		"alpha":    {{Actor: "wst-1", Name: "agent-1", Slug: "alpha"}},
+		"alpha-m1": {{Actor: "wst-2", Name: "agent-2", Slug: "alpha-m1"}},
 	})
 	html := renderTree(t, roots)
 	if !strings.Contains(html, `<span class="actor-marker">agent-1</span>`) {
@@ -241,6 +245,44 @@ func TestRenderActorMarkersOnBox(t *testing.T) {
 	}
 	if !strings.Contains(html, `<span class="actor-marker">agent-2</span>`) {
 		t.Errorf("actor marker on child box lost; html:\n%s", html)
+	}
+}
+
+// TestRenderForestActorMarkerNameBearing asserts post-m2-ux-correction
+// p2 C1 / OD4.a for a name-bearing session: the actor-marker text
+// is the reported display name, and the raw wst-<uuid> actor never
+// surfaces alongside it.
+func TestRenderForestActorMarkerNameBearing(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "In progress"},
+	}, map[string][]*ActiveWorkInstance{
+		"alpha": {{Actor: "wst-abc-123", Name: "Demo bound", Slug: "alpha"}},
+	})
+	html := renderTree(t, roots)
+	if !strings.Contains(html, `<span class="actor-marker">Demo bound</span>`) {
+		t.Errorf("name-bearing session must render its reported name; html:\n%s", html)
+	}
+	if strings.Contains(html, "wst-") {
+		t.Errorf("forest actor-marker must not surface the wst- prefix; html:\n%s", html)
+	}
+}
+
+// TestRenderForestActorMarkerSlugFallback asserts post-m2-ux-correction
+// p2 C1 / OD4.a for a no-name session: the actor-marker falls back
+// to the work-instance's registered slug (never the wst-<uuid>
+// actor).
+func TestRenderForestActorMarkerSlugFallback(t *testing.T) {
+	roots := buildTree([]parsedDoc{
+		{Slug: "alpha", Status: "In progress"},
+	}, map[string][]*ActiveWorkInstance{
+		"alpha": {{Actor: "wst-abc-123", Slug: "alpha"}},
+	})
+	html := renderTree(t, roots)
+	if !strings.Contains(html, `<span class="actor-marker">alpha</span>`) {
+		t.Errorf("no-name session must render the slug fallback; html:\n%s", html)
+	}
+	if strings.Contains(html, "wst-") {
+		t.Errorf("forest actor-marker must not surface the wst- prefix; html:\n%s", html)
 	}
 }
 
@@ -445,7 +487,7 @@ func TestRenderProgressRowCoexistsWithPreservedSurfaces(t *testing.T) {
 			RelatedPRs:      []string{"https://github.com/o/r/pull/9"},
 			ProgressStages:  []string{"Spec", "Render"}},
 	}, map[string][]*ActiveWorkInstance{
-		"alpha": {{Actor: "agent-1"}},
+		"alpha": {{Actor: "wst-1", Name: "agent-1", Slug: "alpha"}},
 	})
 	html := renderTree(t, roots)
 
