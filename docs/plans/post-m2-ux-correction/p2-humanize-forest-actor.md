@@ -1,6 +1,6 @@
 ---
 slug: post-m2-ux-correction-p2
-Status: In draft
+Status: Proposed
 short_description: Humanize the forest actor — reported name (slug fallback) in the per-node actor-marker (F4)
 ---
 
@@ -8,24 +8,94 @@ short_description: Humanize the forest actor — reported name (slug fallback) i
 
 ## Status
 
-`In draft`. This drafting session captured the phase's Goal,
-Contract clause **C1** (the WHAT this phase realizes for parent
-Contract **C6**), the Cross-Cutting Invariants the phase
-inherits from the parent task plan
-([C-INV-2 / C-INV-3 / C-INV-4 / C-INV-5](README.md#cross-cutting-invariants)),
-the Files-to-touch, the per-phase Validation Gate
-(observation-only — the task-terminal full product-acceptance
-walkthrough lives at p3), Out of Scope, and the Risk Register.
-Five open decisions were surfaced for the OD walk preceding the
-`` `In draft` → `Proposed` `` promotion gate. OD-walk
-resolutions are now folded inline below: **OD1 = OD1.a**,
-**OD2 = OD2.a**, **OD3 = OD3.a**, **OD4 = OD4.a**, **OD5
-dissolved** (subsumed by OD1.a). Every OD is resolved; the
-phase plan is decision-complete in WHAT terms and ready for
-the `` `In draft` → `Proposed` `` promotion-gate walk (the
-gate-walk itself is the user's next step per the standing
-spawned-drafting rule — this drafting session does not run
-it).
+`Proposed`. The OD walk resolved all five open decisions
+(**OD1 = OD1.a** — additive `Name` on `ActiveWorkInstance`
+populated in `Server.index` between `loadSessionMetadata` and
+`buildTree`; **OD2 = OD2.a** — additive `Slug` on
+`ActiveWorkInstance` alongside `Name`; **OD3 = OD3.a** —
+unbound stays roster-only; **OD4 = OD4.a** — semantic
+presence-and-absence test assertions; **OD5 dissolved** —
+subsumed by OD1.a) and the
+[`task-plan.md`](../../../spec/planning/task-plan.md)
+`` `In draft` → `Proposed` `` promotion gate was walked before
+the flip. Drafting, the OD walk, and the gate walk all ran in
+a single delegated drafting session; the gate-walk extended
+the session past the standing spawned-drafting "stop at `In
+draft`" bound at the contributor's explicit direction
+(matching the t3 precedent recorded in
+[`m2/README.md` Task Status](../workstream-tracker-1-0/m2/README.md)
+— "extending past the spawn's original 'stop at `In draft`'
+bound at the contributor's explicit direction"). Status flip
+co-locates with the gate-walk record below in this commit.
+
+### Gate-walk history
+
+- **End-to-end coherence** — plan re-read in order; no
+  contradiction between Goal, Contract **C1**, the inherited
+  Cross-Cutting Invariants (C-INV-2 / C-INV-3 / C-INV-4 /
+  C-INV-5; C-INV-1 explicitly out of this phase's surface),
+  Files-to-touch, the per-phase Validation Gate, Self-Review
+  Audits, Out of Scope, the Risk Register, and the resolved
+  OD entries. C1 is the only contract clause; it locks the
+  WHAT the parent task plan's Contract **C6** specifies for
+  the forest-region surface.
+- **Decision-completeness on Contracts** — every OD resolved
+  with rationale (OD1, OD2, OD3, OD4 locked with vision- or
+  code-grounded reasoning; OD5 dissolved by OD1.a). No
+  "decided at plan-drafting," "shape later," or "spelling at
+  plan time" phrasing in C1. The implementing PR's narrow
+  render-altitude calls (exact span text, dark/light-mode
+  observation) are explicitly authorized by
+  [`shared.md`](../../../spec/planning/shared.md) "Plans
+  describe contracts, not implementation."
+- **Universal `Verified by:` walk** — every load-bearing claim
+  in C1, the resolved ODs, the Cross-Cutting Invariants,
+  Files-to-touch, and the Risk Register carries a code
+  citation or a parent-doc / Landed-sibling-doc reference.
+  Symbolic anchors (`node-header`, `actor-marker`,
+  `ActiveWorkInstance`, `Server.index`, `loadSessionMetadata`,
+  `buildTree`, `buildRoster`, `RosterEntry`) dominate per the
+  anchor-preference rule.
+- **Reality-check inputs re-confirmed** — every cited line
+  range spot-checked against current branch code:
+  [`forest.go:51`](../../../internal/site/forest.go) (the
+  `node-header` `actor-marker` span renders `{{.Actor}}`
+  today, the surface this phase edits);
+  [`tree.go:39`](../../../internal/site/tree.go)
+  (`ActiveWorkInstance` carries `ID` + `Actor`);
+  [`tree.go:104`](../../../internal/site/tree.go)
+  (`buildTree` signature `docs, active`);
+  [`tree.go:148`](../../../internal/site/tree.go)
+  (`WorkInstances: active[d.Slug]` exact-slug join — the
+  attached/unbound discriminator);
+  [`site.go`](../../../internal/site/site.go)
+  (`Server.index` orchestration; `loadActiveWorkInstances` /
+  `loadSessionMetadata` / `buildTree` / `buildRoster` ordering;
+  `RosterEntry` shape; `buildRoster`'s
+  pure-function-over-already-loaded-values precedent);
+  [`forest_test.go`](../../../internal/site/forest_test.go)
+  (file exists; semantic-test idiom matches the OD4.a
+  posture). No drift.
+- **Always-on rules** — required sections present (Status,
+  Context, Goal, Contracts, Files to touch, Validation Gate);
+  optional sections present where applicable (Cross-Cutting
+  Invariants inherited from parent; Self-Review Audits; Out
+  of Scope; Risk Register; Related Docs); no `Phase Contracts`
+  because p2 is a phase plan with no sub-children. No descent
+  to implementation prescription — OD1.a's data-flow shape
+  (additive struct field + `Server.index` threading point) is
+  contract-altitude, explicitly authorized by the milestone's
+  t4-amended data-path carve-out
+  ([`m2/README.md` Cross-Task Invariants](../workstream-tracker-1-0/m2/README.md))
+  and by parent C-INV-2. No soft-commitment language. The
+  `### Open decisions` sub-block stays in `## Status` per the
+  parent README's OD-walk-outcomes precedent and is not a
+  [`task-plan.md`](../../../spec/planning/task-plan.md)
+  "Required and optional sections" variance.
+- **Phase-skeleton seeding (N ≥ 2 only)** — does not apply.
+  p2 is a phase plan with no further phase children; the
+  parent task plan is N = 3 (p1 / p2 / p3) and seeded its
+  three phase skeletons when *it* was promoted.
 
 ### Open decisions
 
@@ -433,16 +503,18 @@ PR brushes any of these.
 
 ## Files to touch
 
-*Estimate of the expected file shape, not a binding rule.
-Implementation may revise this list when a structural call
-requires it. Any deviation is handled via the implementing PR's
-`## Estimate Deviations` callout with the plan reconciled to
-what shipped per
+*Per OD1.a + OD2.a, the file inventory is `forest.go` +
+`tree.go` + `site.go` + `forest_test.go` — all certain. The
+parent task plan's `## Files to touch` p2 row pre-flagged the
+`tree.go` / `site.go` deviation path as expected (OD5 dissolved
+by OD1.a), so the implementing PR records these as planned
+scope, not as `## Estimate Deviations` callouts. If the
+implementation discovers a genuine structural deviation past
+this set, the implementing PR handles it via `## Estimate
+Deviations` per
 [`task-plan.md`](../../../spec/planning/task-plan.md)
-"Plan-to-PR Completion Gate." The final file inventory is
-OD1's resolution at the gate-walk; the parent task plan
-pre-flagged the `tree.go` / `site.go` deviation path (OD5 above
-asks whether the phase plan pre-flags it explicitly).*
+"Plan-to-PR Completion Gate," with the plan reconciled to what
+shipped.*
 
 - **Modify (certain):**
   - [`internal/site/forest.go`](../../../internal/site/forest.go)
