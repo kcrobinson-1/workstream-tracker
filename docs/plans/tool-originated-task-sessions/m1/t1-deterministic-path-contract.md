@@ -43,7 +43,7 @@ deliverable is the contract expression itself.
 
 The HOW decisions were resolved at scoping (SD1–SD7 in the
 paired, transient scoping doc
-[`scoping/t1-deterministic-path-contract.md`](./scoping/t1-deterministic-path-contract.md));
+`scoping/t1-deterministic-path-contract.md`);
 this plan carries the durable contract those decisions produced,
 with its own code-grounded verification.
 
@@ -341,7 +341,7 @@ Status"). These edits are expected closeout, not a
 - **`AGENTS.md`** — only if C4's sole-path coherence check fires
   (then it is a carrier edit, not status currency).
 - **Not t1's to delete: the paired scoping doc.**
-  [`scoping/t1-deterministic-path-contract.md`](./scoping/t1-deterministic-path-contract.md)
+  `scoping/t1-deterministic-path-contract.md`
   is transient but is deleted in the **milestone-terminal** batch
   (m1's close, after t2) per
   [`planning-doc-location.md`](../../../../spec/planning-doc-location.md)
@@ -397,7 +397,7 @@ graduate/split/carve-outs landed in the epic promotion PR.
 
 ## Related Docs
 
-- [`./scoping/t1-deterministic-path-contract.md`](./scoping/t1-deterministic-path-contract.md)
+- `./scoping/t1-deterministic-path-contract.md`
   — the paired transient scoping doc (SD1–SD7 deliberation +
   rejected alternatives; deletes at the milestone-terminal PR).
 - [`../README.md`](../README.md) — m1 milestone doc; locks t1's
