@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m2
-Status: In draft
+Status: Proposed
 short_description: Tool-originated session UX — node affordance, slug-carry, SessionStart hook
 ---
 
@@ -99,18 +99,17 @@ agent a rewrite rather than an added adapter.
 
 ## Task Status
 
-Four tasks. Skeletons are seeded **at this milestone's
-`In draft` → `Proposed` promotion gate**, per
+Four tasks. Skeletons were seeded in the same PR that flipped
+this milestone `In draft` → `Proposed`, per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
-child contracts → Parent-promotion stub seeding"; they do not
-exist yet while this doc is `In draft`.
+child contracts → Parent-promotion stub seeding."
 
-| Task | Slug | Status |
-|---|---|---|
-| t1 | `tool-originated-task-sessions-m2-t1` | In draft (skeleton seeded at promotion) |
-| t2 | `tool-originated-task-sessions-m2-t2` | In draft (skeleton seeded at promotion) |
-| t3 | `tool-originated-task-sessions-m2-t3` | In draft (skeleton seeded at promotion) |
-| t4 | `tool-originated-task-sessions-m2-t4` | In draft (skeleton seeded at promotion) |
+| Task | Slug | Skeleton | Status |
+|---|---|---|---|
+| t1 | `tool-originated-task-sessions-m2-t1` | [`t1-mode-affordance-render.md`](./t1-mode-affordance-render.md) | In draft (skeleton — awaiting t1 drafting) |
+| t2 | `tool-originated-task-sessions-m2-t2` | [`t2-spawn-endpoint.md`](./t2-spawn-endpoint.md) | In draft (skeleton — awaiting t2 drafting) |
+| t3 | `tool-originated-task-sessions-m2-t3` | [`t3-session-start-hook.md`](./t3-session-start-hook.md) | In draft (skeleton — awaiting t3 drafting) |
+| t4 | `tool-originated-task-sessions-m2-t4` | [`t4-end-to-end-validation.md`](./t4-end-to-end-validation.md) | In draft (skeleton — awaiting t4 drafting) |
 
 Task count is this session's output and is an **estimate of
 scope shape**, not an epic-level commitment; per-task PR counts
@@ -301,7 +300,7 @@ brushes against them.
   The completion-side bracket of the lifecycle (the symmetric
   `complete`/`abandon` handshake added in PR
   [#45](https://github.com/kcrobinson-1/workstream-tracker/pull/45))
-  is **out of t2's scope** — m2 wires the start half only; the
+  is **out of m2's scope** — m2 wires the start half only; the
   completion half stays the agent-process responsibility per
   the lifecycle rule's session-end section. *Verified by:*
   [Claude Code `SessionStart` hook
