@@ -48,7 +48,7 @@ const forestTemplates = `
   <p class="empty">No plan-tree roots found at <code>{{.PlansPath}}</code>.</p>
   {{end}}{{end}}
 
-{{define "node-header"}}<span class="label-group"><span class="label" title="{{.Slug}}">{{.Label}}</span>{{range .WorkInstances}}<span class="actor-marker">{{if .Name}}{{.Name}}{{else}}{{.Slug}}{{end}}</span>{{end}}</span><span class="status-group"><span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span></span>{{end}}
+{{define "node-header"}}<span class="label-group"><span class="label" title="{{.Slug}}">{{.Label}}</span>{{range .WorkInstances}}<span class="actor-marker">{{if .Name}}{{.Name}}{{else}}{{.Slug}}{{end}}</span>{{end}}</span><span class="status-group"><span class="badge status-{{statusClass .Status}}">{{if .Status}}{{.Status}}{{else}}(no Status){{end}}</span></span>{{$aff := .Affordance}}{{if $aff}}<button class="affordance-button" type="submit" form="spawn-{{.Slug}}">{{$aff}}</button>{{end}}{{end}}
 
 {{define "node-progress"}}<div class="progress-row">{{if .ProgressStages}}<span class="progress-cell progress-cell-drafting">Drafting</span>{{range .ProgressStages}}<span class="progress-cell">{{.}}</span>{{end}}{{else}}<span class="progress-cell progress-cell-{{progressCellClass .Status "d"}}">D</span><span class="progress-cell progress-cell-{{progressCellClass .Status "p"}}">P</span><span class="progress-cell progress-cell-{{progressCellClass .Status "i"}}">I</span><span class="progress-cell progress-cell-{{progressCellClass .Status "v"}}">V</span>{{end}}</div>{{end}}
 
@@ -72,6 +72,8 @@ const forestTemplates = `
 <details class="box box-{{.NodeType}}{{if not .Children}} box-leaf{{end}}"{{if .ActiveInSubtree}} open{{end}}>
 <summary><span class="box-header"><span class="triangle" aria-hidden="true">&#9656;</span>{{template "node-header" .}}</span></summary>
 <div class="box-body">
+{{- $aff := .Affordance}}{{if $aff}}<form class="affordance-form" id="spawn-{{.Slug}}" method="POST" action="/spawn"><input type="hidden" name="slug" value="{{.Slug}}"><input type="hidden" name="mode" value="{{$aff}}"></form>
+{{end -}}
 {{- template "node-detail" .}}
 {{range .Children}}{{template "node" .}}
 {{end}}</div>
@@ -106,6 +108,21 @@ const forestTemplates = `
     .status-deferred    { background: #e5e7eb; color: #374151; }
     .status-unknown     { background: #f3f4f6; color: #6b7280; }
     .actor-marker { display: inline-block; background: #fef9c3; color: #713f12; padding: 0.05rem 0.4rem; border-radius: 0.25rem; font-size: 0.75em; }
+    /* m2 t1: the per-node mode-affordance. The visible button
+       lives in <summary>'s header row (trailing flex child after
+       .status-group, per SD7); the associated <form> lives inside
+       .box-body and is referenced by the button's form="<id>"
+       attribute. The split keeps HTML5's phrasing-vs-flow content-
+       model rule satisfied (<summary> permits phrasing content
+       only; <form> is flow content) while still rendering the
+       action in the always-visible region. HTML5 form-association
+       by ID resolves via the DOM, so submission works whether the
+       <details> is open or closed. The form's POST goes to t2's
+       /spawn endpoint; a POST before t2 lands receives a 404 as
+       the expected sibling-not-yet-shipped degrade. */
+    .affordance-form { margin: 0; padding: 0; }
+    .affordance-button { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 0.25rem; background: #4f46e5; color: #fff; border: 1px solid #4338ca; font-size: 0.8em; font-weight: 500; cursor: pointer; font-family: inherit; flex: 0 0 auto; }
+    .affordance-button:hover { background: #4338ca; }
     .label { font-weight: 500; cursor: help; }
     .empty { color: #6b7280; font-style: italic; }
     .long-desc { white-space: pre-wrap; margin: 0.25rem 0 0.25rem 0; color: #374151; font-size: 0.9em; }
@@ -153,6 +170,7 @@ const forestTemplates = `
     @media (max-width: 48rem) {
       .box-header { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
       .status-group { align-self: flex-start; margin-left: 0; }
+      .affordance-button { align-self: flex-start; }
     }{{end}}`
 
 func init() {

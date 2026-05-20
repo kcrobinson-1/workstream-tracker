@@ -735,6 +735,195 @@ func TestRenderBodyDisclosureIndependentOfParentCollapse(t *testing.T) {
 	}
 }
 
+// TestRenderModeAffordanceMap is the m2 t1 falsifier for the
+// "Mode-affordance map drift" m2 Cross-Task Risk. Each row pins
+// one production-reachable (NodeType × Status × has-children)
+// triple D3 distinguishes: the rendered HTML either carries the
+// exact D4 form shape for the target node (button in <summary>
+// + form in .box-body, associated by id) OR carries no <form>
+// element at all (the <form> presence is the unambiguous
+// discriminator between positive and negative D3 rows). Renders
+// via the standard renderTree helper so the assertion exercises
+// the real template path the GET / handler takes.
+//
+// Coverage per the m2 t1 Validation Gate: each NodeType the
+// renderer can produce — root, milestone, task, phase — at the
+// Status values D3 enumerates for that NodeType; at least one
+// unknown-Status row; at least one Deferred — <reason> row to
+// pin the canonical-prefix branch (C4); the task-with-children
+// case. The epic NodeType is structurally unreachable in
+// production (slugs.parseSegment never assigns NodeTypeEpic;
+// epic-rooted docs render as root), so the root row covers that
+// case. The phase-with-children case is structurally unreachable
+// in well-formed slugs (pN is the terminal segment per the
+// grammar) so it carries no row.
+func TestRenderModeAffordanceMap(t *testing.T) {
+	const (
+		planning = "Begin planning"
+		impl     = "Begin implementation"
+	)
+	cases := []struct {
+		name     string
+		docs     []parsedDoc
+		target   string
+		wantMode string // "" means: no <form> anywhere in the render
+	}{
+		// root: parent-shape by D3 — no affordance regardless of
+		// Status or has-children.
+		{"root In draft", []parsedDoc{
+			{Slug: "alpha", Status: "In draft"},
+		}, "alpha", ""},
+		{"root Proposed", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+		}, "alpha", ""},
+
+		// milestone: parent-shape by D3 — no affordance.
+		{"milestone Proposed", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-m1", Status: "Proposed"},
+		}, "alpha-m1", ""},
+
+		// task leaf (root-level task, no phase children): the
+		// affordance-carrying shape — every D3 Status branch.
+		{"task leaf In draft → planning", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "In draft"},
+		}, "alpha-t1", planning},
+		{"task leaf empty Status → planning (no-doc branch)", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: ""},
+		}, "alpha-t1", planning},
+		{"task leaf Proposed → implementation", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "Proposed"},
+		}, "alpha-t1", impl},
+		{"task leaf In progress → no affordance", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "In progress"},
+		}, "alpha-t1", ""},
+		{"task leaf Validating → no affordance", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "Validating"},
+		}, "alpha-t1", ""},
+		{"task leaf Landed → no affordance", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "Landed"},
+		}, "alpha-t1", ""},
+		{"task leaf Deferred → no affordance", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "Deferred"},
+		}, "alpha-t1", ""},
+		{"task leaf Deferred — reason → canonical-prefix to no affordance", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "Deferred — out of scope"},
+		}, "alpha-t1", ""},
+		{"task leaf unknown Status → no affordance (C6 graceful fall-through)", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-t1", Status: "Frobnicating"},
+		}, "alpha-t1", ""},
+
+		// task with phase children: parent-shape by D3 — the task
+		// has no affordance. The phase children carry Landed so the
+		// rendered HTML carries no <form> from any node, making the
+		// negative assertion unambiguous.
+		{"task with phase children → no affordance on the task", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-m1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1-p1", Status: "Landed"},
+			{Slug: "alpha-m1-t1-p2", Status: "Landed"},
+		}, "alpha-m1-t1", ""},
+
+		// phase leaf: same D3 branches the task-leaf row exercises,
+		// pinned at the phase NodeType to catch a switch that
+		// silently miscategorizes one but not the other.
+		{"phase In draft → planning", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-m1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1-p1", Status: "In draft"},
+		}, "alpha-m1-t1-p1", planning},
+		{"phase Proposed → implementation", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-m1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1-p1", Status: "Proposed"},
+		}, "alpha-m1-t1-p1", impl},
+		{"phase Landed → no affordance", []parsedDoc{
+			{Slug: "alpha", Status: "Proposed"},
+			{Slug: "alpha-m1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1", Status: "Proposed"},
+			{Slug: "alpha-m1-t1-p1", Status: "Landed"},
+		}, "alpha-m1-t1-p1", ""},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			roots := buildTree(tc.docs, nil)
+			html := renderTree(t, roots)
+
+			if tc.wantMode == "" {
+				if strings.Contains(html, "<form") {
+					t.Errorf("expected no <form> element in render; html:\n%s", html)
+				}
+				return
+			}
+
+			// Positive case: the exact D4-conformant form for the
+			// target node must appear in the render, factored into
+			// the button-in-summary + form-in-body split that
+			// keeps HTML5 phrasing/flow content-model rules
+			// satisfied (the form is flow content; <summary> is
+			// phrasing-only). C2 (one value drives both): the
+			// same affordance constant is the button's visible
+			// text AND the form's hidden mode input value. C3:
+			// the form carries method=POST, action=/spawn, the
+			// hidden slug + mode inputs, exactly.
+			wantButton := fmt.Sprintf(
+				`<button class="affordance-button" type="submit" form="spawn-%s">%s</button>`,
+				tc.target, tc.wantMode)
+			wantForm := fmt.Sprintf(
+				`<form class="affordance-form" id="spawn-%s" method="POST" action="/spawn"><input type="hidden" name="slug" value="%s"><input type="hidden" name="mode" value="%s"></form>`,
+				tc.target, tc.target, tc.wantMode)
+			if !strings.Contains(html, wantButton) {
+				t.Errorf("missing expected affordance button\n  want: %s\n  got:\n%s", wantButton, html)
+			}
+			if !strings.Contains(html, wantForm) {
+				t.Errorf("missing expected affordance form\n  want: %s\n  got:\n%s", wantForm, html)
+			}
+
+			// C5: the visible affordance — the button — sits in
+			// the always-visible <summary> region (not in
+			// .box-body, which native <details> hides on a closed
+			// box). Scoped to the button's own location: the next
+			// </summary> after the button must precede the next
+			// <div class="box-body"> after the button.
+			buttonIdx := strings.Index(html, wantButton)
+			rest := html[buttonIdx+len(wantButton):]
+			endSummary := strings.Index(rest, `</summary>`)
+			nextBody := strings.Index(rest, `<div class="box-body">`)
+			if endSummary < 0 || (nextBody >= 0 && nextBody < endSummary) {
+				t.Errorf("affordance button must render inside <summary>, before .box-body: next </summary>=%d next box-body=%d (offsets from button end)",
+					endSummary, nextBody)
+			}
+
+			// Companion to C5: the associated <form> sits inside
+			// .box-body (a flow-content container), not in
+			// <summary>. The button-form association by id
+			// resolves via the DOM regardless of the box's
+			// open/closed CSS state.
+			formIdx := strings.Index(html, wantForm)
+			beforeForm := html[:formIdx]
+			lastBoxBody := strings.LastIndex(beforeForm, `<div class="box-body">`)
+			lastEndSummary := strings.LastIndex(beforeForm, `</summary>`)
+			if lastBoxBody < 0 || lastBoxBody < lastEndSummary {
+				t.Errorf("affordance form must render inside .box-body, after the matching </summary>: last box-body=%d last </summary>=%d (offsets before form)",
+					lastBoxBody, lastEndSummary)
+			}
+		})
+	}
+}
+
 func TestRenderURLAndTextEscaping(t *testing.T) {
 	// An entry that is a non-URL string containing HTML-special
 	// characters must be escaped by html/template, never emitted

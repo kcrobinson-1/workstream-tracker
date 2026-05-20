@@ -115,17 +115,26 @@ func truncateLongDesc(s string) string {
 	return kept + "\n\n… (truncated — see the plan doc for the full text)"
 }
 
+// canonicalStatus returns the canonical-prefix portion of status —
+// the part before " — " for a freeform-suffixed value like
+// "Deferred — <reason>", or the whole string otherwise. m2 t1 C4:
+// the single source of truth for the Status canonical-prefix
+// strip; statusClass, progressCellClass, and PlanNode.Affordance
+// all consume it so a Deferred — <reason> node reads as Deferred
+// at every site. No second em-dash split lives in internal/site/.
+func canonicalStatus(status string) string {
+	if i := strings.Index(status, " — "); i >= 0 {
+		return status[:i]
+	}
+	return status
+}
+
 // statusClass converts a Status string to a CSS class fragment.
 // Recognized values from spec/planning/shared.md "Plan-doc
 // Status" map to specific classes; unrecognized values fall back
 // to "unknown" per the spec's graceful-fallback rule.
 func statusClass(status string) string {
-	// Strip the em-dash freeform suffix from Deferred — <reason>.
-	canonical := status
-	if i := strings.Index(canonical, " — "); i >= 0 {
-		canonical = canonical[:i]
-	}
-	switch canonical {
+	switch canonicalStatus(status) {
 	case "In draft":
 		return "in-draft"
 	case "Proposed":
@@ -162,11 +171,7 @@ func statusClass(status string) string {
 // passing positions other than those four returns the same
 // non-"d" treatment per bucket.
 func progressCellClass(status, position string) string {
-	canonical := status
-	if i := strings.Index(canonical, " — "); i >= 0 {
-		canonical = canonical[:i]
-	}
-	switch canonical {
+	switch canonicalStatus(status) {
 	case "Landed":
 		return "landed"
 	case "In draft":

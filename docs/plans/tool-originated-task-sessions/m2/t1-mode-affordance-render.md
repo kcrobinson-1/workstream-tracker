@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m2-t1
-Status: Proposed
+Status: Landed
 short_description: Mode-affordance render on plan-tree nodes
 ---
 
@@ -164,19 +164,36 @@ behavior-preserving).
 
 ### C5 — Affordance renders in the always-visible summary region
 
-The form, when emitted, sits inside the node's `<summary>` flex
-row — alongside the existing label-group and status-group flex
-children — so the affordance is visible whether the
-`<details>` box is open or closed. Nothing about the form's
-emission renders only inside `<div class="box-body">` (which
-HTML5 hides on a closed `<details>`). This realizes the m2
-product-acceptance constraint "the affordance is visible
-without expanding the node." *Verified by:*
+The visible affordance — the submit button — sits inside the
+node's `<summary>` flex row alongside the existing label-group
+and status-group flex children, so the affordance is visible
+whether the `<details>` box is open or closed. The associated
+`<form>` element is declared inside `<div class="box-body">`
+(the body region native `<details>` hides on a closed box) and
+the button references it across the DOM via the HTML5
+`form="<id>"` attribute. The split realizes both the m2
+product-acceptance constraint "the affordance is visible without
+expanding the node" AND the HTML5 phrasing-vs-flow content-model
+rule: `<summary>` permits phrasing content only, `<button>` is
+phrasing content (allowed), `<form>` is flow content (only
+allowed in flow containers like `<div>`). The form's submission
+semantics are unaffected by the closed-`<details>` `display:
+none` on its ancestor — HTML5 form-association by `form="<id>"`
+resolves via the DOM, not the render tree — so clicking the
+button submits the form's hidden inputs in both the open and
+closed `<details>` states. *Verified by:*
 [`internal/site/forest.go`](../../../../internal/site/forest.go)
 `forestTemplates` (the `define "node"` block places
 `node-header` inside `<summary>` and `node-detail` inside
 `<div class="box-body">`; the `<details>` element hides its
 body until the `open` attribute is set);
+[HTML Living Standard, "The summary
+element"](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-summary-element)
+(content model: phrasing content) and [`<form>`
+element](https://html.spec.whatwg.org/multipage/forms.html#the-form-element)
+(categorized as flow content); the `form` attribute on
+[`<button>`](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fae-form)
+(associates a form-control with a form across the DOM by `id`);
 [m2 Task Contracts row for t1](./README.md) (product acceptance:
 "the affordance is visible without expanding the node").
 
