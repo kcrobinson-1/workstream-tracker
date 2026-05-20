@@ -75,9 +75,10 @@ not by transitive citation.
   `<details>` element rendered with the header inside `<summary>`
   and the rest inside `<div class="box-body">`).
 - **The forest is rendered server-side once per GET request with
-  no JavaScript and one DB read.** The page walks the plan tree
-  + reads active work-instances + reads session metadata, then
-  renders. No JS file is referenced, the chi router exposes only
+  no JavaScript and two DB reads (the active-work-instances
+  query and the session-metadata query).** The page walks the
+  plan tree + reads active work-instances + reads session
+  metadata, then renders. No JS file is referenced, the chi router exposes only
   `GET /`. *Verified by:*
   [`internal/site/render.go`](../../../../../internal/site/render.go)
   `indexTmpl` (the `<head>` carries no `<script>`);
