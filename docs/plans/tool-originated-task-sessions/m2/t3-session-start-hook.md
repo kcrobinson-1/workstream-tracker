@@ -33,10 +33,13 @@ this repo …"); not loosened here.
 `startup`, `type: "command"`) is committed to a
 **project-scoped** `.claude/settings.json` at the repo root
 with a command that invokes the deterministic
-`workstream-tracker register --slug $WST_SLUG` subcommand via
-the agent rule's full module-path form (so the hook resolves
-regardless of the contributor's working directory). The hook
-fires at every Claude Code session start in this repo.
+`workstream-tracker register` subcommand (**no `--slug` flag**
+— env-only slug carry via the CLI's existing `WST_SLUG`
+reading; see D2 for why the no-flag form is load-bearing
+rather than stylistic) via the agent rule's full module-path
+form (so the hook resolves regardless of the contributor's
+working directory). The hook fires at every Claude Code
+session start in this repo.
 
 **When `WST_SLUG` is set in the spawned session's
 environment** (the case t2's spawn produces), the register CLI
@@ -48,7 +51,9 @@ hook, not by agent narration.
 opening Claude Code in this repo through any path other than
 t2's spawn), the register CLI **short-circuits to a no-op**
 per `runRegister`'s existing "no slug supplied … skipping
-registration, session proceeds" behavior — so existing
+registration, session proceeds" branch — reached because
+`flag.Parse` succeeds (no `--slug` flag to argument-error
+against) and the resolved slug is empty. So existing
 interactive natural-language sessions, the m1-landed
 best-effort grounded narration handshake, and any
 contributor's per-`.claude/settings.local.json` overlay all
