@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m1-t2
-Status: In progress
+Status: Landed
 short_description: Determinism proof harness
 ---
 
@@ -31,8 +31,7 @@ only the CLI end-to-end test surface under
 that lets m2 consume a *proven* path rather than an asserted one.
 
 The HOW decisions were resolved at scoping (SD1–SD6 in the
-paired, transient scoping doc
-[`scoping/t2-determinism-proof-harness.md`](./scoping/t2-determinism-proof-harness.md));
+paired, transient scoping doc `scoping/t2-determinism-proof-harness.md`);
 this plan carries the durable contract those decisions produced,
 with its own code-grounded verification.
 
@@ -233,10 +232,10 @@ unexported package-`main` helpers (`:23-38`, `:40`, `:42`,
   Currency):** this plan's own `Status` frontmatter; the
   [`../README.md`](../README.md) t2 Task Status row to its
   terminal state; the batch deletion of the transient
-  [`scoping/`](./scoping/) subfolder (**both**
-  [`scoping/t2-determinism-proof-harness.md`](./scoping/t2-determinism-proof-harness.md)
+  `scoping/` subfolder (**both**
+  `scoping/t2-determinism-proof-harness.md`
   **and**
-  [`scoping/t1-deterministic-path-contract.md`](./scoping/t1-deterministic-path-contract.md)),
+  `scoping/t1-deterministic-path-contract.md`),
   because t2's terminal PR is the m1-terminal PR (t1's plan
   Documentation Currency explicitly defers scoping deletion to
   here).
@@ -321,7 +320,7 @@ Status"). These edits are expected closeout, not a
 - **Milestone-terminal scoping deletion.** t2 is the **last task
   in m1**, so t2's terminal PR is the **milestone-terminal PR**:
   it deletes the entire transient
-  [`scoping/`](./scoping/) subfolder (both t1's and t2's scoping
+  `scoping/` subfolder (both t1's and t2's scoping
   docs) per
   [`planning-doc-location.md`](../../../../spec/planning-doc-location.md)
   "scoping/ subfolder is transient" and
@@ -385,11 +384,11 @@ proves the contract, it does not close that entry.
 
 ## Related Docs
 
-- [`./scoping/t2-determinism-proof-harness.md`](./scoping/t2-determinism-proof-harness.md)
+- `./scoping/t2-determinism-proof-harness.md`
   — the paired transient scoping doc (SD1–SD6 deliberation +
   rejected alternatives; deletes at the milestone-terminal PR,
   which is t2's).
-- [`./scoping/t1-deterministic-path-contract.md`](./scoping/t1-deterministic-path-contract.md)
+- `./scoping/t1-deterministic-path-contract.md`
   — t1's scoping doc; its "Reality-check inputs" enumerate the
   determinism facts t2's assertions mirror.
 - [`./t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md)

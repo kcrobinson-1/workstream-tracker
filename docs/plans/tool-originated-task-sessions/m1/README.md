@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m1
-Status: Proposed
+Status: Landed
 short_description: Unwired deterministic slug-carried registration path
 ---
 
@@ -74,17 +74,21 @@ row, and m1's Inherited Contract](../README.md).)
 Both tasks were skeleton-seeded when this milestone passed its
 `In draft` → `Proposed` promotion gate (per
 [`shared.md`](../../../../spec/planning/shared.md) "Parent-doc
-child contracts → Parent-promotion stub seeding"). **t1 has
-landed** — scoped (decisions SD1–SD7), drafted to a full task
-plan, and its doc-only contract expression merged at
-`Status: Landed`. **t2** has been scoped (SD1–SD6) and drafted
-to a full task plan, promoted to `Status: Proposed` and ready
-for its implementing PR.
+child contracts → Parent-promotion stub seeding"). **Both tasks
+have landed.** t1 — scoped (decisions SD1–SD7), drafted to a
+full task plan, and its doc-only contract expression merged at
+`Status: Landed` (PR [#47](https://github.com/kcrobinson-1/workstream-tracker/pull/47)).
+t2 — scoped (SD1–SD6), drafted to a full task plan, and its
+determinism proof harness merged at `Status: Landed` (PR
+[#55](https://github.com/kcrobinson-1/workstream-tracker/pull/55)).
+This dedicated PR performs the milestone-terminal close-out:
+the `m1/scoping/` docs are batch-deleted and the parent epic's
+milestone bullet is advanced.
 
 | Task | Slug | Skeleton | Status |
 |---|---|---|---|
 | t1 | `tool-originated-task-sessions-m1-t1` | [`t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md) | Landed (doc-only contract expression merged; scoping SD1–SD7 resolved) |
-| t2 | `tool-originated-task-sessions-m1-t2` | [`t2-determinism-proof-harness.md`](./t2-determinism-proof-harness.md) | In progress (implementing PR open; task plan drafted; scoping SD1–SD6 resolved) |
+| t2 | `tool-originated-task-sessions-m1-t2` | [`t2-determinism-proof-harness.md`](./t2-determinism-proof-harness.md) | Landed (determinism proof harness merged; scoping SD1–SD6 resolved) |
 
 Task count is this milestone-planning session's output and is an
 **estimate of scope shape**, not an epic-level commitment;
@@ -244,8 +248,9 @@ brushes against them.
   **answer (b) — no retire** (new failure class), leaving the
   interactive-only "Scope and residual" determinism clause
   unchanged. Detail and rejected alternatives in
-  [`t1`'s scoping doc](./scoping/t1-deterministic-path-contract.md)
-  (SD1–SD4); durable contract in
+  `t1`'s scoping doc (`scoping/t1-deterministic-path-contract.md`,
+  SD1–SD4; deleted at this milestone-terminal close-out, in git
+  history); durable contract in
   [`t1`'s plan](./t1-deterministic-path-contract.md) (C1–C4).
 
 ## Cross-Task Risks

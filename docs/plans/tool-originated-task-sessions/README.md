@@ -253,7 +253,11 @@ commitments.
 
 **Milestones (child set locked at two):**
 
-- `tool-originated-task-sessions-m1` (contract locked).
+- `tool-originated-task-sessions-m1` (Landed — both tasks
+  shipped: t1's doc-only contract expression in PR
+  [#47](https://github.com/kcrobinson-1/workstream-tracker/pull/47);
+  t2's determinism proof harness in PR
+  [#55](https://github.com/kcrobinson-1/workstream-tracker/pull/55)).
   **Unwired deterministic slug-carried registration path.** A
   registration entrypoint that, given a construction-known
   canonical slug, registers a work-instance deterministically —
