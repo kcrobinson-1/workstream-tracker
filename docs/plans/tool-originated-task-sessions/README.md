@@ -58,10 +58,11 @@ tool moving from observe-only to launching agents is the
 largest posture change in the product's history. Those
 scope-locking vision/technical-direction questions are now
 resolved (see "Open Questions Resolved By This Epic"), so the
-child set is locked at two milestones and m1's WHAT contract is
-locked; the UX milestone is named with its vision inputs
-resolved but its WHAT sealed at its own milestone-planning
-session. Remaining Open Questions are milestone-time or
+child set is locked at two milestones; **both** milestones'
+WHAT contracts are now locked — m1's at the epic-promotion
+PR, m2's at its own milestone-planning session (PR
+[#58](https://github.com/kcrobinson-1/workstream-tracker/pull/58)).
+Remaining Open Questions are milestone-time or
 conscious-tracking, not scope-locking.
 
 ## Why This Epic
@@ -268,18 +269,17 @@ commitments.
   tool-acting posture shift.
 
 - `tool-originated-task-sessions-m2` — **Tool-originated
-  session UX milestone** (directional stub seeded; WHAT sealed
-  at its own milestone planning). The plan-tree-node affordance
-  that spawns the agent session and becomes the *real*
-  construction-time slug producer feeding m1's path. This is the
-  actual
+  session UX milestone** (Proposed; WHAT locked at its own
+  milestone-planning session against merged m1 code — child
+  set of four tasks with Mermaid sequencing converging on a
+  dedicated validation-and-land node, Cross-Task Decisions
+  D1–D5 resolved against Claude Code's actual launcher
+  surface, child skeletons seeded). The plan-tree-node
+  affordance that spawns the agent session and becomes the
+  *real* construction-time slug producer feeding m1's path.
+  This is the actual
   [`tool-originated-task-sessions`](../../backlog.md#tool-originated-task-sessions)
-  capability and the determinism-resolution home. Its vision
-  inputs are resolved (spawn shape, one-way reconciliation,
-  workspace origin, level/mode — see Open Questions Resolved By
-  This Epic); its WHAT contract and task breakdown are its own
-  milestone-planning session's output against merged m1 code,
-  not pre-sealed here.
+  capability and the determinism-resolution home.
 
 ## Milestone Contracts
 
@@ -288,19 +288,15 @@ milestone lives in the milestone doc when it drafts. Required
 section per [`epic.md`](../../../spec/planning/epic.md)
 "Required and optional sections" and
 [`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts." The child set is locked at two milestones.
-**m1's WHAT contract is locked** (row below). The **UX
-milestone is explicitly scope-not-yet-locked** — its vision
-inputs are resolved but its WHAT is sealed at its own
-milestone-planning session per
-[`shared.md`](../../../spec/planning/shared.md) "Parent-doc
-child contracts," which permits a named child carrying its
-WHAT without final sealing until that session runs.
+child contracts." The child set is locked at two milestones,
+and **both rows are now Locked**: m1's at the epic-promotion
+PR, m2's at its own milestone-planning session (PR
+[#58](https://github.com/kcrobinson-1/workstream-tracker/pull/58)).
 
 | Milestone | Short description | End result and what it preserves (WHAT) | Sibling interface |
 |---|---|---|---|
 | `tool-originated-task-sessions-m1` | Unwired deterministic slug-carried registration path | **Locked.** Given a construction-known canonical slug, a work-instance registers deterministically with no resolution and no narration handshake; exercised via an explicit slug argument. Preserves the existing interactive best-effort registration path unchanged (this is an additional path, not a replacement) and the spec's existing exact-slug create-or-attach posture. | Produces the slug-carried registration entrypoint the UX milestone's spawn wires into as the construction-time slug producer. |
-| `tool-originated-task-sessions-m2` | The node affordance that spawns a session and carries its slug by construction | *Scope-not-yet-locked (directional stub seeded; vision inputs resolved; WHAT sealed at its own milestone planning).* Directional: an explicit contributor action on a node spawns a real local interactive session, handed the mode-appropriate prompt, carrying the node's slug out-of-band; a session-start hook registers it deterministically via m1's path; the agent self-provisions its worktree and reports it as best-effort enrichment. Preserves observe-only for all sessions the tool did not originate. | Consumes m1's slug-carried registration entrypoint as the real construction-time slug producer. |
+| `tool-originated-task-sessions-m2` | The node affordance that spawns a session and carries its slug by construction | **Locked.** An explicit contributor action on a plan-tree node submits a small HTML form to a new `POST /spawn` endpoint on the local server; the endpoint fire-and-forget execs Claude Code as a background session (`claude --bg --worktree <name> --append-system-prompt-file <prompt-file>`) with the node's slug carried out-of-band via `WST_SLUG`; a committed `.claude/settings.json` SessionStart hook runs the deterministic register CLI before the model reasons (m1's path); the contributor's takeable session is `claude attach <id>` in their own terminal. Preserves observe-only for every session the tool did not originate, the unchanged interactive best-effort handshake, and the m1-sanctioned register CLI consumed verbatim with no new registration surface. | Consumes m1's slug-carried registration entrypoint as the real construction-time slug producer. |
 
 ## Open Questions Resolved By This Epic
 
@@ -586,11 +582,15 @@ commitments).*
   milestone-planning session's output. A slug-carried
   deterministic registration entrypoint plus a manual slug
   producer to exercise it.
-- **`tool-originated-task-sessions-m2`** (directional stub
-  seeded; WHAT sealed at its own milestone planning): task count
-  and any internal split are that session's output. All scope-locking vision
-  questions (spawn shape, one-way reconciliation, workspace
-  origin, level/mode) are resolved.
+- **`tool-originated-task-sessions-m2`** (Proposed): **four
+  tasks** — t1 affordance render, t2 spawn endpoint
+  (`POST /spawn` + `claude --bg` exec), t3 SessionStart hook
+  (committed `.claude/settings.json` entry running the
+  deterministic register CLI), t4 end-to-end product
+  validation + milestone-terminal close-out, with t1/t2/t3 as
+  three independent surfaces converging on t4 per the
+  milestone's Sequencing. Per-task PR counts are re-derived at
+  each task's planning session.
 
 ## Related Docs
 
