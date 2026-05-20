@@ -258,14 +258,16 @@ func renderLongDescBody(s string) template.HTML {
 	return template.HTML(buf.String())
 }
 
-// formatEventTime formats a Unix-epoch second timestamp for the
-// F9 K3 known-facts header. Zero (no event observed) renders as
-// the em-dash placeholder. Otherwise UTC, RFC3339-shaped without
-// the T separator so it reads cleanly to a human at a glance:
-// "2026-05-20 14:33:21 UTC".
+// formatEventTime formats a Unix-epoch nanosecond timestamp for
+// the F9 K3 known-facts header — the storage shape every event
+// write in internal/api/handlers.go writes (now.UnixNano()),
+// matching events.received_at's column. Zero (no event observed)
+// renders as the em-dash placeholder. Otherwise UTC,
+// RFC3339-shaped without the T separator so it reads cleanly to
+// a human at a glance: "2026-05-20 14:33:21 UTC".
 func formatEventTime(t int64) string {
 	if t == 0 {
 		return "—"
 	}
-	return time.Unix(t, 0).UTC().Format("2006-01-02 15:04:05 UTC")
+	return time.Unix(0, t).UTC().Format("2006-01-02 15:04:05 UTC")
 }

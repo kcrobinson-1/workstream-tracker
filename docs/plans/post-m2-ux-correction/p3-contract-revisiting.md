@@ -581,10 +581,12 @@ precedent.
   `received_at` already tracked) are discarded today; the K3
   header consumes them. The extension shape: extend
   `sessionMeta` with `RegisteredAt int64` and
-  `LastEventAt int64` (Unix-epoch seconds, the same storage
+  `LastEventAt int64` (Unix-epoch nanoseconds, the same storage
   shape
   [`schema.go`](../../../internal/db/schema.go)
-  `events.received_at` carries), populate inside the existing
+  `events.received_at` carries — every event write in
+  [`api/handlers.go`](../../../internal/api/handlers.go) uses
+  `now.UnixNano()`), populate inside the existing
   loader loop from values already in scope, propagate to
   `RosterEntry` through `buildRoster`'s already-existing
   per-entry metadata read, and read from the roster template.

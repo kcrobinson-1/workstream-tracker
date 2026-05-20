@@ -257,9 +257,9 @@ func TestRenderRosterEveryEntryOpensToK3Disclosure(t *testing.T) {
 	html := renderRoster(t, roots, []RosterEntry{
 		{Slug: "alpha", Actor: "wst-a", Bound: true, Name: "Has detail",
 			Detail:       `{"name":"Has detail","pr":"#42"}`,
-			RegisteredAt: 1700000000, LastEventAt: 1700000600},
+			RegisteredAt: 1700000000 * 1e9, LastEventAt: 1700000600 * 1e9},
 		{Slug: "bare-slug", Actor: "wst-b", Bound: false,
-			RegisteredAt: 1700000100},
+			RegisteredAt: 1700000100 * 1e9},
 	})
 	rosterStart := strings.Index(html, `<aside class="roster">`)
 	rosterHTML := html[rosterStart:]
@@ -317,13 +317,13 @@ func TestRenderRosterFourObservableStatesAllOpen(t *testing.T) {
 	roots := buildTree([]parsedDoc{{Slug: "alpha"}}, nil)
 	html := renderRoster(t, roots, []RosterEntry{
 		{Slug: "alpha", Actor: "wst-aaaa", Bound: true, Name: "DemoBoundNamed",
-			Detail: `{"name":"DemoBoundNamed"}`, RegisteredAt: 1700000000, LastEventAt: 1700000600},
+			Detail: `{"name":"DemoBoundNamed"}`, RegisteredAt: 1700000000 * 1e9, LastEventAt: 1700000600 * 1e9},
 		{Slug: "alpha", Actor: "wst-bbbb", Bound: true,
-			RegisteredAt: 1700000100},
+			RegisteredAt: 1700000100 * 1e9},
 		{Slug: "unbound-named", Actor: "wst-cccc", Bound: false, Name: "DemoUnboundNamed",
-			Detail: `{"name":"DemoUnboundNamed"}`, RegisteredAt: 1700000200, LastEventAt: 1700000700},
+			Detail: `{"name":"DemoUnboundNamed"}`, RegisteredAt: 1700000200 * 1e9, LastEventAt: 1700000700 * 1e9},
 		{Slug: "unbound-bare", Actor: "wst-dddd", Bound: false,
-			RegisteredAt: 1700000300},
+			RegisteredAt: 1700000300 * 1e9},
 	})
 	rosterStart := strings.Index(html, `<aside class="roster">`)
 	rosterHTML := html[rosterStart:]
@@ -369,13 +369,17 @@ func TestRenderRosterFourObservableStatesAllOpen(t *testing.T) {
 func TestRenderRosterK3TimestampsRender(t *testing.T) {
 	roots := buildTree([]parsedDoc{{Slug: "alpha"}}, nil)
 	html := renderRoster(t, roots, []RosterEntry{
-		// Has both timestamps — both render.
+		// Has both timestamps — both render. Values are
+		// Unix-epoch nanoseconds matching events.received_at's
+		// storage shape (now.UnixNano() in handlers.go); the
+		// seconds-shaped epoch numbers are scaled by 1e9 here
+		// so the expected formatted strings stay readable.
 		{Slug: "alpha", Actor: "wst-1", Bound: true, Name: "Both",
-			RegisteredAt: 1700000000, LastEventAt: 1700000600},
+			RegisteredAt: 1700000000 * 1e9, LastEventAt: 1700000600 * 1e9},
 		// Only register seen (LastEventAt == 0) — last-event
 		// falls back to registered-at.
 		{Slug: "alpha", Actor: "wst-2", Bound: true, Name: "RegisterOnly",
-			RegisteredAt: 1700000100},
+			RegisteredAt: 1700000100 * 1e9},
 		// Neither (both zero) — placeholder for both.
 		{Slug: "alpha", Actor: "wst-3", Bound: true, Name: "NoTimestamps"},
 	})

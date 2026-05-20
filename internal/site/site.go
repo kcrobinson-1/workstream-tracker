@@ -132,9 +132,11 @@ func loadActiveWorkInstances(ctx context.Context, db *sql.DB) (map[string][]*Act
 // resolved reported metadata (empty when the session reported
 // nothing — under p3 the K3 header still renders, with a
 // no-metadata sentinel in place of the raw-JSON block). The two
-// timestamp fields carry Unix-epoch seconds matching
-// events.received_at's storage shape; zero means "no register
-// event seen" / "no later event seen" respectively. K3's
+// timestamp fields carry Unix-epoch nanoseconds matching
+// events.received_at's storage shape (every event write in
+// internal/api/handlers.go writes now.UnixNano()); zero means
+// "no register event seen" / "no later event seen" respectively.
+// K3's
 // "registered-at" reads RegisteredAt; "last event" reads
 // LastEventAt (falling back to RegisteredAt when no later event
 // has been seen).
@@ -339,7 +341,9 @@ func asObject(raw json.RawMessage) map[string]json.RawMessage {
 // event's received_at) and LastEventAt (the latest later
 // event's received_at; zero when no later event has been seen,
 // in which case the K3 header falls back to RegisteredAt for
-// the "last event" facts-block field).
+// the "last event" facts-block field). Both timestamp fields
+// carry Unix-epoch nanoseconds matching events.received_at's
+// storage shape.
 type RosterEntry struct {
 	ID           string
 	Slug         string
