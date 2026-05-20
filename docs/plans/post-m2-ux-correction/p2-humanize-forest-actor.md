@@ -18,8 +18,8 @@ the Files-to-touch, the per-phase Validation Gate
 walkthrough lives at p3), Out of Scope, and the Risk Register.
 Five open decisions were surfaced for the OD walk preceding the
 `` `In draft` → `Proposed` `` promotion gate. OD-walk
-resolutions are folded inline below as they land; OD2 and OD4
-remain open at this revision.
+resolutions are folded inline below as they land; OD2 remains
+open at this revision.
 
 ### Open decisions
 
@@ -197,25 +197,40 @@ README precedent).
       renders attached); would require new render plumbing
       past F4 and contradicts the vision-level split.
 
-- **OD4 — Test-coverage posture for the F4 contract.** The
-  forest-region test surface
-  ([`internal/site/forest_test.go`](../../../internal/site/forest_test.go))
-  gains coverage for C1. Two shapes:
-  - **OD4.a — Assert presence-and-absence semantically: the
-    rendered `actor-marker` text contains the reported `name`
-    (or the slug fallback when no `name` was reported) **and**
-    does not contain the `wst-` actor prefix.** Same posture as
-    m2 t3 C7's semantic-not-byte-exact assertions
-    ([`t3-doc-declared-stages.md` Contracts](../workstream-tracker-1-0/m2/t3-doc-declared-stages.md)).
-  - **OD4.b — Assert presence only** — the rendered
-    `actor-marker` text contains the reported `name` (or the
-    slug fallback). Smaller assertion surface; a regression that
-    re-introduced the uuid alongside the name in the same span
-    would not be caught.
+- **OD4 — Test-coverage posture for the F4 contract. Resolved
+  = OD4.a** (assert presence-and-absence semantically; the
+  rendered `actor-marker` text contains the reported `name`
+  (or the slug fallback when no `name` was reported) *and*
+  does not contain the `wst-` actor prefix). *Rationale.* The
+  `wst-<uuid>` actor is **not** being deprecated — it remains
+  live, present on every `ActiveWorkInstance.Actor` field
+  ([`loadActiveWorkInstances` in
+  site.go](../../../internal/site/site.go)) and on every
+  `work_instances.actor` schema column, used as the
+  registration idempotency key on `(slug, actor)` (parent task
+  plan `## Out of Scope` "no actor-generator change"). The
+  absence assertion is therefore testing against **current
+  live data**, not a deprecated relic pattern. It catches the
+  specific silent-regression mode the
+  [`vision.md` §9](../../../design/vision.md) feature risk
+  names ("sessions go untracked ... without an obvious
+  symptom") in this surface: a future template "tidy" like
+  `{{.Name}} ({{.Actor}})` would pass OD4.b (the name is
+  present) while re-introducing the uuid leak F4 corrects.
+  OD4.a fails that case via the absence side. Posture matches
+  m2 t3 C7's semantic-not-byte-exact assertions
+  ([`t3-doc-declared-stages.md` Contracts](../workstream-tracker-1-0/m2/t3-doc-declared-stages.md));
+  cost is one additional `NotContains(rendered, "wst-")` per
+  case.
 
-  Tradeoff lens: OD4.a is the t3 C7 precedent and catches the
-  regression OD4.b misses. Recommend OD4.a; the gate-walk
-  confirms.
+  - **OD4 (original framing, retained as scoping record).**
+    The forest-region test surface
+    ([`internal/site/forest_test.go`](../../../internal/site/forest_test.go))
+    gains coverage for C1. Two shapes were decomposed:
+    - **OD4.a — Presence-and-absence semantically.** Assert
+      `name`/slug present and `wst-` absent.
+    - **OD4.b — Presence only.** Assert `name`/slug present;
+      uuid-alongside-name regression not caught.
 
 - **OD5 — Pre-flag the `tree.go` / `site.go` Estimate
   Deviation. Resolved = dissolved by OD1.a.** Under OD1.a,
@@ -429,12 +444,14 @@ asks whether the phase plan pre-flags it explicitly).*
 
 - **Modify (tests):**
   - [`internal/site/forest_test.go`](../../../internal/site/forest_test.go)
-    — semantic coverage for C1 per OD4: a node carrying a
-    work-instance with a reported `name` renders the name inside
-    the `actor-marker` span; a node carrying a work-instance
-    whose session reported no `name` renders the slug fallback;
-    in neither case does the rendered `actor-marker` text
-    contain the `wst-` prefix (OD4.a — recommended). The
+    — semantic coverage for C1 per **OD4.a**: a node carrying
+    a work-instance with a reported `name` renders the name
+    inside the `actor-marker` span; a node carrying a
+    work-instance whose session reported no `name` renders the
+    slug fallback; in neither case does the rendered
+    `actor-marker` text contain the `wst-` prefix (the absence
+    side catches the silent-regression mode where a future
+    template change surfaces both `Name` and `Actor`). The
     semantic-not-byte-exact posture m2 t3 established
     ([`t3-doc-declared-stages.md` Contracts](../workstream-tracker-1-0/m2/t3-doc-declared-stages.md))
     is preserved.
@@ -542,7 +559,8 @@ session" for each `work_instance_id` receipt.
 [`docs/dev.md`](../../dev.md) "Local Workflow." New / extended
 test coverage in
 [`internal/site/forest_test.go`](../../../internal/site/forest_test.go)
-includes the C1 semantic assertions per OD4.
+includes the C1 semantic assertions per OD4.a (presence of
+`Name`/slug fallback **and** absence of the `wst-` prefix).
 
 ## Self-Review Audits
 
