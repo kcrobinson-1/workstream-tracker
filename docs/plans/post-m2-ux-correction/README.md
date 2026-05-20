@@ -745,33 +745,38 @@ head: start the server against the dogfood plan-tree per
 (`PORT=8080`, `DB_PATH=./workstream-tracker.db`; the SQLite file
 seeds itself on first run).
 
-**Seed sessions.** From a separate shell, using the module-path
-form per
+**Observable conditions.** The demo exercises four
+work-instance states; the reviewer arranges for each to hold at
+some point during the walkthrough. **How those states are
+produced is the reviewer's choice** — naturally-active sessions
+against the dogfood tree, the CLI's `register` / `complete`
+subcommands per
 [`docs/dev.md`](../../dev.md) "Registering and completing a
-session":
+session," or direct database fixturing all qualify. Constraints
+of any particular seeding path (e.g. the slug-grammar
+limitation in
+[`internal/slugs/slugs.go`](../../../internal/slugs/slugs.go)
+`IsWellFormed` that rejects certain root-substring patterns,
+which makes `post-m2-ux-correction-*` slugs unregistrable via
+the CLI today) are **not** constraints of this gate; the gate
+is about the rendered output given the states, not the path
+that produced them. The four states the F4 / F9 acceptance
+bullets reference (`<DemoName>` is a reviewer-chosen name):
 
-1. A **bound session with a `--name`** (metadata-bearing,
-   forest-attached): register against any walked plan-tree
-   slug present in `docs/plans/` (e.g.
-   `post-m2-ux-correction`) with `--name "Demo bound"` so the
-   reported metadata carries a name. Use the `register`
-   subcommand per
-   [`docs/dev.md`](../../dev.md); the receipt names the
-   `work_instance_id`.
-2. A **bound session with no `--name`** (no reported metadata):
-   register against a *different* walked plan-tree slug
-   without `--name`. The session reports no metadata; the
-   roster entry will have no `.Detail`.
-3. An **unbound session with a `--name`**: register against a
-   *typoed-or-non-existent* slug (e.g.
-   `post-m2-ux-correction-typo`) with `--name "Demo unbound"`.
-4. An **unbound session with no `--name`**: register against a
-   *different* typoed slug without `--name`.
+- **(a) Name-bearing bound session.** Active work-instance
+  attached to a plan-tree node; reported metadata carries
+  `<DemoName>`.
+- **(b) No-name bound session.** Active work-instance attached
+  to a plan-tree node; session reported no metadata.
+- **(c) Name-bearing unbound session.** Active work-instance
+  whose slug is not in the walked plan-tree; reported metadata
+  carries `<DemoUnboundName>`.
+- **(d) No-name unbound session.** Active work-instance whose
+  slug is not in the walked plan-tree; session reported no
+  metadata.
 
-Each session stays active (the `register` subcommand exits 0
-without holding state; no `complete`/`abandon` is issued during
-the walkthrough). The roster reads each as active in the
-walk-on-every-request render.
+The roster reads each as active in the walk-on-every-request
+render.
 
 **Open the page in OS dark mode** at `http://localhost:8080/`.
 Observe:
@@ -820,35 +825,32 @@ Observe:
 - **F4 acceptance.** Every node box that carries a registered
   session shows the **reported session `name`** inside its
   `actor-marker` span (or the slug fallback when no `name` was
-  reported), never the raw `wst-<uuid>` actor. The bound
-  metadata-bearing seeded session above renders `Demo bound`
-  in the forest; the bound no-`name` session renders its slug
-  in the forest; **the forest and roster display the same
+  reported), never the raw `wst-<uuid>` actor. State (a)
+  renders `<DemoName>` in the forest; state (b) renders its
+  slug in the forest; **the forest and roster display the same
   identity** for the same session.
-- **F9 acceptance.** Every roster entry — including the
-  metadata-bearing bound session, the no-metadata bound
-  session, the metadata-bearing unbound session, and the
-  no-metadata unbound session — is **openable** to the
-  same **K3-shape disclosure** (OD5 = K3): a known-facts
-  header (slug, actor id, bound / unbound, registered-at,
-  last event) above a raw-JSON block. The metadata-bearing
-  entries' raw-JSON block carries the deliberately-
-  unstructured reported metadata t4 shipped; the no-metadata
-  entries show "(no reported metadata)" in place of the
-  block. The same disclosure structure across every entry
-  is the K3 visual goal.
+- **F9 acceptance.** Every roster entry — across states (a)
+  through (d) — is **openable** to the same **K3-shape
+  disclosure** (OD5 = K3): a known-facts header (slug, actor
+  id, bound / unbound, registered-at, last event) above a
+  raw-JSON block. Entries with reported metadata ((a), (c))
+  show the deliberately-unstructured reported metadata t4
+  shipped in the raw-JSON block; entries without reported
+  metadata ((b), (d)) show "(no reported metadata)" in place
+  of the block. The same disclosure structure across every
+  entry is the K3 visual goal.
 
 **Open the page in OS light mode** at the same URL. Observe each
 acceptance above; F1 specifically must demonstrate **no
 regression** in light mode (the shell's light-context declaration
 does not break the page chrome in OS light mode).
 
-**Tear down.** Close the four seeded sessions:
-`workstream-tracker complete --id <work_instance_id>` (or
-`abandon`) per
+**Tear down.** Restore the pre-demo state via whatever path
+produced the observable conditions; the CLI's `complete --id
+<id>` / `abandon` subcommands per
 [`docs/dev.md`](../../dev.md) "Registering and completing a
-session," for each of the four `work_instance_id` receipts. The
-roster returns to its prior state on the next page reload.
+session" are one such path. The roster returns to its prior
+state on the next page reload.
 
 ### Approval recording
 

@@ -271,9 +271,9 @@ README precedent).
   question; OD3.a doesn't close that door — a future bound
   transition flows through `buildTree`'s existing join
   automatically. Recorded in `## Out of Scope` and observed in
-  the Validation Gate's "Observe" step (seeded session 3, an
-  unbound entry that appears in the roster but not in the
-  forest).
+  the Validation Gate's "Observe" step (observable condition
+  (c), an unbound work-instance that appears in the roster but
+  not in the forest).
 
   - **OD3 (original framing, retained as scoping record).** A
     work-instance registered against a slug not present in the
@@ -603,59 +603,66 @@ the server against the dogfood plan-tree per
 (`PORT=8080`, `DB_PATH=./workstream-tracker.db`; the SQLite file
 seeds itself on first run).
 
-### Seed sessions
+### Observable conditions
 
-From a separate shell, using the module-path form per
+The demo exercises three work-instance states; the reviewer
+arranges for each to hold at some point during the walkthrough.
+**How those states are produced is the reviewer's choice** —
+naturally-active sessions against the dogfood tree, the CLI's
+`register` / `complete` subcommands per
 [`docs/dev.md`](../../dev.md) "Registering and completing a
-session":
+session," or direct database fixturing all qualify. Constraints
+of any particular seeding path (e.g. the slug-grammar
+limitation in
+[`internal/slugs/slugs.go`](../../../internal/slugs/slugs.go)
+`IsWellFormed` that rejects certain root-substring patterns,
+which makes `post-m2-ux-correction-*` slugs unregistrable via
+the CLI today) are **not** constraints of this gate; the gate
+is about the rendered output given the states, not the path
+that produced them.
 
-1. A **bound session with a `--name`**: register against any
-   walked plan-tree slug present in `docs/plans/` (e.g.
-   `post-m2-ux-correction`) with `--name "Demo bound"` so the
-   reported metadata carries a name.
-2. A **bound session with no `--name`**: register against a
-   *different* walked plan-tree slug without `--name`. The
-   session reports no name; the work-instance attaches to the
-   node by exact slug match but renders the slug fallback in
-   the forest.
-3. An **unbound session** (any name): register against a typoed
-   slug (e.g. `post-m2-ux-correction-typo`). This session
-   appears in the roster but not in the forest; included to
-   observe the OD3.a no-change behavior.
-
-Each session stays active (the `register` subcommand exits 0
-without holding state).
+- **(a) Name-bearing bound session.** An active work-instance
+  attached to a plan-tree node, whose reported metadata
+  carries a `name` chosen by the reviewer (called `<DemoName>`
+  in the acceptance bullets below).
+- **(b) No-name bound session.** An active work-instance
+  attached to a plan-tree node, whose session reported no
+  `name`.
+- **(c) Unbound session.** An active work-instance whose slug
+  is not in the walked plan-tree.
 
 ### Observe
 
 Open `http://localhost:8080/` and observe:
 
-- **C1 acceptance — name-bearing session.** The forest node
-  attached to seeded session 1 renders `Demo bound` inside its
-  `actor-marker` span. The roster shows the same session with
-  the same label `Demo bound`. The forest and roster identify
-  the same work-instance identically.
-- **C1 acceptance — no-name session.** The forest node attached
-  to seeded session 2 renders the slug fallback inside its
-  `actor-marker` span — the same value the roster renders as
-  that entry's label. No `wst-<uuid>` text appears in the
-  forest's `actor-marker` span for either bound session.
+- **C1 acceptance — name-bearing.** The forest node attached
+  to (a) renders `<DemoName>` inside its `actor-marker` span.
+  The roster shows the same session with the same label
+  `<DemoName>`. Forest and roster identify the same
+  work-instance identically.
+- **C1 acceptance — no-name.** The forest node attached to (b)
+  renders the slug fallback inside its `actor-marker` span —
+  the same value the roster renders as that entry's label. No
+  `wst-<uuid>` text appears in the `actor-marker` span for
+  either bound session.
 - **C-INV-3 acceptance — no-regress on attachment.** Each
   node's `actor-marker` span is still present and still placed
   inside `label-group`; a node with multiple active
   work-instances renders one `actor-marker` per work-instance
   (the per-node `range .WorkInstances` attachment is intact).
-- **OD3.a acceptance — unbound stays roster-only.** Seeded
-  session 3 appears in the roster (as an unbound entry) but
-  **not** in the forest. The pre-existing `buildTree`
-  join-side drop is preserved; p2 does not regress it and does
-  not extend the forest to surface unbound sessions.
+- **OD3.a acceptance — unbound stays roster-only.** (c) appears
+  in the roster as an unbound entry but **not** in the forest.
+  The pre-existing `buildTree` join-side drop is preserved; p2
+  does not regress it and does not extend the forest to surface
+  unbound sessions.
 
 ### Tear down
 
-Close the seeded sessions per
+Restore the pre-demo state via whatever path produced the
+observable conditions; the CLI's `complete --id <id>` /
+`abandon` subcommands per
 [`docs/dev.md`](../../dev.md) "Registering and completing a
-session" for each `work_instance_id` receipt.
+session" are one such path.
 
 ### Toolchain gate
 
@@ -676,7 +683,8 @@ between `loadSessionMetadata` and `buildTree`:
 
 - **validation-honesty** — the C1 acceptance is observed
   against a real `go run` rendering with both name-bearing and
-  no-name seeded sessions, not asserted from the diff or from
+  no-name work-instance states (observable conditions (a) and
+  (b)) actually present, not asserted from the diff or from
   the template source alone.
 - **rename-aware-diff-classification** — the additive `Name`
   field on `ActiveWorkInstance` (OD1.a) and the new
