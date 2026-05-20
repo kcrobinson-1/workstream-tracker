@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m1-t2
-Status: Proposed
+Status: In progress
 short_description: Determinism proof harness
 ---
 

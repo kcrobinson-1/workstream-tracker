@@ -84,7 +84,7 @@ for its implementing PR.
 | Task | Slug | Skeleton | Status |
 |---|---|---|---|
 | t1 | `tool-originated-task-sessions-m1-t1` | [`t1-deterministic-path-contract.md`](./t1-deterministic-path-contract.md) | Landed (doc-only contract expression merged; scoping SD1–SD7 resolved) |
-| t2 | `tool-originated-task-sessions-m1-t2` | [`t2-determinism-proof-harness.md`](./t2-determinism-proof-harness.md) | Proposed (task plan drafted; scoping SD1–SD6 resolved) |
+| t2 | `tool-originated-task-sessions-m1-t2` | [`t2-determinism-proof-harness.md`](./t2-determinism-proof-harness.md) | In progress (implementing PR open; task plan drafted; scoping SD1–SD6 resolved) |
 
 Task count is this milestone-planning session's output and is an
 **estimate of scope shape**, not an epic-level commitment;
