@@ -44,16 +44,16 @@ acknowledges it back to the page; the contributor's takeable
 session is `claude attach <id>` in their own terminal.
 
 **The same change that mounts `/spawn` also constrains the
-server binding to a loopback address** (per the Cross-Task
-Invariant "Local server binds loopback-only at the same
-change that mounts `/spawn`"), so the localhost-only trust
-boundary D4 / the `/spawn`-write-surface risk lean on is
-load-bearing rather than incidental. The current
+server binding to a loopback address.** The current
 `addr := ":" + port` in
 [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go)
-`runServer` becomes a loopback `Addr` (typically
-`127.0.0.1:<port>`; the exact `Addr` spelling is HOW for
-this task's planning).
+`runServer` binds all interfaces; t2 changes it to a loopback
+`Addr` (typically `127.0.0.1:<port>`; exact `Addr` spelling
+HOW for this task's planning). The loopback binding is the
+load-bearing security premise that D4 and the
+`/spawn`-write-surface Cross-Task Risk both rest on; without
+it at `/spawn`-mount, anyone reaching the host on the LAN
+could fire `POST /spawn`.
 
 The spawn **assumes t3's SessionStart hook is in place**: with
 the hook present, the spawned session auto-registers via m1's

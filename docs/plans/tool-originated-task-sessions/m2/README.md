@@ -181,8 +181,8 @@ contracts" and [`milestone.md`](../../../../spec/planning/milestone.md)
 | Task | Short description | End result and what it preserves (WHAT) | Sibling interface | Product acceptance |
 |---|---|---|---|---|
 | `tool-originated-task-sessions-m2-t1` | Mode-affordance render on plan-tree nodes | The plan-tree forest renders a **mode-affordance** on each node — either **Begin planning**, **Begin implementation**, or neither — driven by the locked static map (D3) over the node's already-rendered facts (node-type + Status + has-children). The affordance is a **plain HTML `<form method="POST" action="/spawn">`** carrying the node's slug and the chosen mode in hidden inputs and a submit button labeled per the mode; clicking it POSTs to t2's spawn endpoint (D4). A node that offers no mode renders no form. **Preserves**: every node still renders its existing label, Status badge, work-instance markers, progress-cell row, long description, and related-PR list — none of those are modified. The forest's expand/collapse default, the **no-JavaScript** posture (the page stays pure server-rendered HTML+CSS with native `<details>`/`<summary>`; a `<form>` submit needs no script), and the **walk-on-every-request** invariant for the GET render are unchanged. No new DB read, no new walk. | Produces the **affordance form surface** t2's `/spawn` endpoint consumes. The render side and the launch side are coupled by D1 (slug-via-`WST_SLUG`) and D4 (the form's `action`, method, and field names); both are locked here at milestone level. | A product reviewer opens the page and observes that every leaf-shape task and phase node renders the correct affordance per the locked mode map (Begin planning on `In draft` / no-doc; Begin implementation on `Proposed`; neither on `In progress`/`Validating`/`Landed`/`Deferred`); parent-shape nodes (epic/milestone, and tasks with phase children) render no affordance; the affordance is visible without expanding the node. |
-| `tool-originated-task-sessions-m2-t2` | Spawn integration: `/spawn` endpoint + `claude --bg` exec + loopback-only binding | A new `POST /spawn` endpoint on the workstream-tracker local server accepts the slug + mode submitted by t1's affordance form and **fire-and-forget execs the Claude Code launcher in background-session mode** with the slug carried out-of-band via `WST_SLUG` (D1) and a mode-appropriate prompt body handed in via `--append-system-prompt-file`. The launcher invocation uses Claude Code's `--bg` (background session — supervisor process owns the agent's process lifetime; the workstream-tracker does **not** become a process manager) and `--worktree <name>` (Claude Code provisions a fresh worktree at `<repo>/.claude/worktrees/<name>` automatically — D5). The endpoint captures the printed session id from stdout and acknowledges it back to the page; the contributor's takeable session is `claude attach <id>` in their own terminal. The **same change that mounts `/spawn` also constrains the server binding to a loopback address** (per the Cross-Task Invariant "Local server binds loopback-only at the same change that mounts `/spawn`"), so the localhost-only trust boundary D4 leans on is load-bearing rather than incidental — the current `addr := ":" + port` in [`main.go`](../../../../cmd/workstream-tracker/main.go) `runServer` becomes a loopback `Addr` (typically `127.0.0.1:<port>`; the exact `Addr` spelling is HOW for t2's planning). The spawn **assumes t3's SessionStart hook is in place**: with the hook present, the spawned session auto-registers via m1's deterministic path before the model reasons; without it, the spawn still launches `claude` but no work-instance attaches — observable by the tree's emptiness for the launched slug. t2 does not commit the hook entry itself (that is t3's surface). **Preserves**: the deterministic register CLI is **unmodified** (the existing `--slug` argument and `WST_SLUG` env var are honored verbatim); the interactive best-effort handshake for natural-language sessions is **unmodified**; observe-only is preserved for every session the tool did not originate; no new endpoint is added to the **registration** surface (the new `/spawn` endpoint is the *launcher* surface — orthogonal to registration; the registration path is the unchanged exact-slug create-or-attach flow). The fencing properties (human-initiated, one-shot at birth, identity-not-correction, running session stays observe-only) hold at every site t2 touches: the form submit is the human-initiated trigger; the spawn is one-shot at session birth; the slug carried is identity-not-correction; the *running* session stays file-driven and observe-only — `/spawn` is a one-shot launch surface, not an in-session steering channel. The agent-adapter seam stays additive: an alternative agent launcher is a new exec shape inside the handler, not a rewrite. | Consumes t1's mode-affordance form submission as the launch trigger; consumes t3's SessionStart hook as the deterministic-register integration moment; produces the **real construction-time slug producer** that drives m1's slug-carried registration path end-to-end. | Closes on technical gate; the milestone's product validation lives on t4. (Interior node — not a Mermaid-graph leaf.) |
-| `tool-originated-task-sessions-m2-t3` | SessionStart hook: `.claude/settings.json` entry running the deterministic register CLI | A **Claude Code `SessionStart` hook** (matcher `startup`, `type: "command"`) is committed to a **project-scoped** `.claude/settings.json` at the repo root with a command that invokes the deterministic `workstream-tracker register` subcommand (**no `--slug` flag** — env-only slug carry via the CLI's existing `WST_SLUG` reading; see D2 for why the no-flag form is load-bearing rather than stylistic) via the agent rule's full module-path form (so the hook resolves regardless of the contributor's working directory). The hook fires at every Claude Code session start in this repo. **When `WST_SLUG` is set in the spawned session's environment** (the case t2's spawn produces), the register CLI attaches a work-instance to the carried slug by construction before the model reasons — m1's deterministic path runs by hook, not by agent narration. **When `WST_SLUG` is unset** (the case for a contributor opening Claude Code in this repo through any path other than t2's spawn), the register CLI **short-circuits to a no-op** per `runRegister`'s existing "no slug supplied … skipping registration, session proceeds" branch — reached because `flag.Parse` succeeds (no `--slug` flag to argument-error against) and the resolved slug is empty. So existing interactive natural-language sessions, the m1-landed best-effort grounded narration handshake, and any contributor's per-`.claude/settings.local.json` overlay all see **byte-unchanged session-start behavior**. The hook is the determinism-relevant integration moment t2's spawn relies on. **Preserves**: the m1-landed [`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md) deterministic-path rule is *consumed*, not edited; the existing register CLI is consumed verbatim; the existing interactive handshake is unaffected; no new registration code path, endpoint, schema change, or CLI flag. Whether the agent rule needs a small additive clarification — that for tool-originated sessions the *hook* runs the deterministic-path "Invoke" step (in its env-only-carry form, no `--slug` flag) and the agent's first interaction is the "Echo real output" step — is HOW for t3's planning session against then-merged rule wording. | Produces the deterministic-register integration moment t2's spawn relies on (without this hook in place, t2's spawn still launches `claude` but no work-instance attaches — the slug-by-construction contract is half-wired). Consumes m1's deterministic register CLI verbatim. | Closes on technical gate; the milestone's product validation lives on t4. (Interior node — not a Mermaid-graph leaf.) |
+| `tool-originated-task-sessions-m2-t2` | Spawn integration: `/spawn` endpoint + `claude --bg` exec + loopback-only binding | A new `POST /spawn` endpoint on the workstream-tracker local server accepts the slug + mode submitted by t1's affordance form and **fire-and-forget execs the Claude Code launcher in background-session mode** with the slug carried out-of-band via `WST_SLUG` (D1) and a mode-appropriate prompt body handed in via `--append-system-prompt-file`. The launcher invocation uses Claude Code's `--bg` (background session — supervisor process owns the agent's process lifetime; the workstream-tracker does **not** become a process manager) and `--worktree <name>` (Claude Code provisions a fresh worktree at `<repo>/.claude/worktrees/<name>` automatically — D5). The endpoint captures the printed session id from stdout and acknowledges it back to the page; the contributor's takeable session is `claude attach <id>` in their own terminal. **t2 ships the loopback-only server binding in the same change that mounts `/spawn`** — the canonical source for this commitment. The current `addr := ":" + port` in [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go) `runServer` binds all interfaces; t2 changes it to a loopback `Addr` (typically `127.0.0.1:<port>`; exact `Addr` spelling HOW for t2's planning). Without this constraint at `/spawn`-mount, anyone reaching the host on the LAN could fire `POST /spawn`, so the loopback binding is the load-bearing security premise D4 and the Cross-Task Risk "New `/spawn` endpoint expands the tool's write surface" both lean on. This makes the natural extension of the 1.0-epic single-contributor / single-local-environment invariant load-bearing rather than incidental — unchanged in spirit, explicit in enforcement. The spawn **assumes t3's SessionStart hook is in place**: with the hook present, the spawned session auto-registers via m1's deterministic path before the model reasons; without it, the spawn still launches `claude` but no work-instance attaches — observable by the tree's emptiness for the launched slug. t2 does not commit the hook entry itself (that is t3's surface). **Preserves**: the deterministic register CLI is **unmodified** (the existing `--slug` argument and `WST_SLUG` env var are honored verbatim); the interactive best-effort handshake for natural-language sessions is **unmodified**; observe-only is preserved for every session the tool did not originate; no new endpoint is added to the **registration** surface (the new `/spawn` endpoint is the *launcher* surface — orthogonal to registration; the registration path is the unchanged exact-slug create-or-attach flow). The fencing properties (human-initiated, one-shot at birth, identity-not-correction, running session stays observe-only) hold at every site t2 touches: the form submit is the human-initiated trigger; the spawn is one-shot at session birth; the slug carried is identity-not-correction; the *running* session stays file-driven and observe-only — `/spawn` is a one-shot launch surface, not an in-session steering channel. The agent-adapter seam stays additive: an alternative agent launcher is a new exec shape inside the handler, not a rewrite. | Consumes t1's mode-affordance form submission as the launch trigger; consumes t3's SessionStart hook as the deterministic-register integration moment; produces the **real construction-time slug producer** that drives m1's slug-carried registration path end-to-end. | Closes on technical gate; the milestone's product validation lives on t4. (Interior node — not a Mermaid-graph leaf.) |
+| `tool-originated-task-sessions-m2-t3` | SessionStart hook: `.claude/settings.json` entry running the deterministic register CLI | t3 implements D2: commits the project-scoped `.claude/settings.json` SessionStart hook entry that runs `workstream-tracker register` (no `--slug` flag — env-only slug carry per D2) at every Claude Code session start in this repo. D2 locks the canonical claim about behavior in both the `WST_SLUG`-set and `WST_SLUG`-unset cases (including the specific short-circuit branch); t3 is the task that ships the hook satisfying it. The hook is the determinism-relevant integration moment t2's spawn relies on. **Preserves**: the m1-landed [`docs/agents/local/session-registration.md`](../../../../docs/agents/local/session-registration.md) deterministic-path rule is *consumed*, not edited; the existing register CLI is consumed verbatim; the existing interactive handshake is unaffected; no new registration code path, endpoint, schema change, or CLI flag. Whether the agent rule needs a small additive clarification — that for tool-originated sessions the *hook* runs the deterministic-path "Invoke" step (in its env-only-carry form, no `--slug` flag) and the agent's first interaction is the "Echo real output" step — is HOW for t3's planning session against then-merged rule wording. | Produces the deterministic-register integration moment t2's spawn relies on (without this hook in place, t2's spawn still launches `claude` but no work-instance attaches — the slug-by-construction contract is half-wired). Consumes m1's deterministic register CLI verbatim. | Closes on technical gate; the milestone's product validation lives on t4. (Interior node — not a Mermaid-graph leaf.) |
 | `tool-originated-task-sessions-m2-t4` | End-to-end product validation + milestone-terminal close-out | A product reviewer performs the **full end-to-end walkthrough** against the local server with a real Claude Code launcher available: open the page, locate a `Proposed` task/phase node, click **Begin implementation**, observe a real Claude Code session start, observe the **real register receipt** echo with the clicked node's canonical slug (per the deterministic-path handshake rule), observe the work-instance appear on the clicked node in the rendered tree, observe the session run its initial prompt; symmetrically for **Begin planning** against an `In draft`/no-doc node; symmetrically observe that nodes offering no mode (epic/milestone parents, in-flight task/phase nodes) show no affordance. The walkthrough records approval in this plan; product-validation findings are routed per [`milestone.md`](../../../../spec/planning/milestone.md) "Product-validation findings: fix now or defer." The terminal PR then performs the **milestone-terminal close-out**: batch-deletes the m2 `scoping/` subfolder (every transient scoping doc t1's, t2's, and t3's planning sessions produced), de-links any inbound references to those scoping docs in any durable plan doc that survives the batch (the non-link inline-code form), flips this milestone doc's `Status` `Proposed` → `Landed`, advances the parent epic's m2 milestone row to `Landed` with its terminal PR link. **Preserves**: nothing about the production code path is touched at this stage; t4 is a validation + close-out node, not a code-producing task. The milestone retrospective (per `milestone.md` "Milestone retrospective") runs at the same boundary and routes any accumulated findings forward through the backlog — it does **not** gate t4's `Landed` flip. | Sole Mermaid-graph leaf — converges t1, t2, and t3 and is the milestone-terminal node. | The full walkthrough above runs to completion against a live local server + Claude Code launcher, with the real register receipt observed for both modes and parent-shape nodes verified to offer no affordance; approval is recorded in this plan before its `Landed` flip. |
 
 ## Cross-Task Invariants
@@ -255,33 +255,6 @@ brushes against them.
   native-`<details>` box;
   [`internal/site/site.go`](../../../../internal/site/site.go)
   single per-request walk + DB read.)
-- **Local server binds loopback-only at the same change that
-  mounts `/spawn`.** The current
-  [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go)
-  `runServer` sets the server `Addr` to `":" + port`, which
-  binds **all interfaces** (not loopback-only). For the
-  observe-only GET-only roster page this has been a low-impact
-  assumption; for `/spawn` (a POST that execs `claude` as a
-  local subprocess — D4) it would be a load-bearing exposure:
-  anyone reaching the host on the LAN could spawn agent
-  sessions on the contributor's machine. **t2's contract
-  therefore includes constraining the server binding to a
-  loopback address** (typically `127.0.0.1:<port>`, with the
-  exact `Addr` spelling HOW for t2's planning) **at the same
-  change that mounts the `/spawn` route** — without this, the
-  same-origin trust boundary D4 leans on and the Cross-Task
-  Risk "New `/spawn` endpoint expands the tool's write
-  surface" mitigation both rest on a false premise. This makes
-  the natural extension of the 1.0-epic single-contributor /
-  single-local-environment invariant load-bearing rather than
-  implicit; the invariant is unchanged in spirit, but its
-  enforcement was previously incidental and m2 makes it
-  explicit. (Verified by
-  [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go)
-  `runServer` current `addr := ":" + port` posture — the
-  premise this invariant exists to change; the corresponding
-  Documentation Currency clause adds `main.go` to t2's edit
-  list.)
 
 ## Cross-Task Decisions
 
@@ -429,12 +402,12 @@ brushes against them.
   JavaScript; `--bg` removes the lifetime-management surface;
   `claude attach` removes the new-terminal-window surface;
   the same-origin localhost-only trust boundary is **the
-  Cross-Task Invariant "Local server binds loopback-only at
-  the same change that mounts `/spawn`" t2 establishes** —
-  the natural extension of the 1.0-epic single-contributor /
-  single-local-environment invariant to a write surface,
-  load-bearing for the first time at m2 rather than incidental
-  as it was for the GET-only roster. **The four fencing
+  loopback-only binding t2 ships in the same change as `/spawn`
+  (see t2's Task Contract row)** — the natural extension of the
+  1.0-epic single-contributor / single-local-environment
+  invariant to a write surface, load-bearing for the first time
+  at m2 rather than incidental as it was for the GET-only
+  roster. **The four fencing
   properties survive on a careful read**: the form submit is
   *human-initiated* (the click is the contributor's explicit
   action); the spawn is *one-shot at session birth* (the
@@ -515,18 +488,17 @@ brushes against them.
   for the first time.** D4's resolved shape adds the
   workstream-tracker's first non-GET route — a POST that
   execs the local Claude Code launcher with caller-supplied
-  slug and mode. The trust boundary is **the loopback-only
-  binding the Cross-Task Invariant "Local server binds
-  loopback-only …" makes load-bearing**: anyone on the
-  loopback interface is by construction the contributor on
-  the same machine, so the endpoint adds no new authentication
-  posture once that binding holds. But it is the first
-  surface where a request causes a local subprocess to run,
-  and the binding-tightening is itself the security premise
-  the contract leans on — not a pre-existing fact about the
-  binary. Mitigation: t2 ships the loopback-only binding and
-  the `/spawn` mount in the same change (per the named
-  invariant); the endpoint's inputs (slug, mode) are
+  slug and mode. The trust boundary is **t2's loopback-only
+  binding (see t2's Task Contract row, the canonical
+  commitment)**: anyone on the loopback interface is by
+  construction the contributor on the same machine, so the
+  endpoint adds no new authentication posture once that
+  binding holds. But it is the first surface where a request
+  causes a local subprocess to run, and the binding-tightening
+  is itself the security premise the contract leans on — not
+  a pre-existing fact about the binary. Mitigation: t2 ships
+  the binding and the `/spawn` mount in one change; the
+  endpoint's inputs (slug, mode) are
   **defense-in-depth-validated** against the slug grammar and
   the D3 mode-offer map even though t1's render is the gating
   site (a hand-crafted POST cannot fire a mode the map
@@ -578,21 +550,15 @@ brushes against them.
   in this repo, including those that have nothing to do with
   m2's spawn.** A contributor running `claude` directly in
   this checkout (the existing interactive natural-language
-  path) gets the hook firing with `WST_SLUG` unset. Mitigation:
-  `runRegister`'s already-merged "no slug supplied … skipping
-  registration, session proceeds" branch makes the hook a fast
-  no-op in that case — **but reaching that branch requires the
-  no-flag command form locked in D2** (a `register --slug
-  $WST_SLUG` form would instead trigger the parse-error
-  short-circuit, which still exits 0 but is the wrong code
-  path to anchor the contract on); t3's technical gate must
-  include the no-op branch in its falsifiability check (the
-  hook is observably silent / fast / exit-0 when `WST_SLUG`
-  is empty, and the stderr line is specifically the "no slug
-  supplied" wording, not a `flag needs an argument` wording),
-  and the hook's command form is the agent rule's full
-  module-path invocation so a contributor running outside the
-  repo root still resolves it.
+  path) gets the hook firing with `WST_SLUG` unset. Mitigation
+  is the no-op behavior D2 locks for the unset case
+  (canonical claim and the specific short-circuit branch named
+  there); t3's technical gate must include the no-op branch in
+  its falsifiability check (observably silent / fast / exit-0
+  on unset; the stderr line matches the D2-specified branch,
+  not a parse-error wording), and the hook's command form is
+  the agent rule's full module-path invocation so a contributor
+  running outside the repo root still resolves it.
 - **Wrong-by-construction slug attaches an orphan
   work-instance.** Per the m1-accepted residual, a typoed or
   mis-derived slug still attaches under the
@@ -634,9 +600,8 @@ required "Documentation Currency"):
   [`internal/site/`](../../../../internal/site/) (the new
   `POST /spawn` chi handler beside the existing GET `/`);
   [`cmd/workstream-tracker/main.go`](../../../../cmd/workstream-tracker/main.go)
-  `runServer` (the loopback-only binding constraint per the
-  Cross-Task Invariant "Local server binds loopback-only at
-  the same change that mounts `/spawn`"); the per-mode prompt
+  `runServer` (loopback-only binding — see t2's Task Contract
+  row for the canonical commitment); the per-mode prompt
   files (the version-controlled bodies
   `--append-system-prompt-file` reads — file paths are HOW
   for t2's planning, but the existence and shape of those
