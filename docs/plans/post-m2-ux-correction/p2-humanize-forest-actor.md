@@ -1,6 +1,6 @@
 ---
 slug: post-m2-ux-correction-p2
-Status: Proposed
+Status: Landed
 short_description: Humanize the forest actor — reported name (slug fallback) in the per-node actor-marker (F4)
 ---
 
@@ -8,25 +8,31 @@ short_description: Humanize the forest actor — reported name (slug fallback) i
 
 ## Status
 
-`Proposed`. The OD walk resolved all five open decisions
-(**OD1 = OD1.a** — additive `Name` on `ActiveWorkInstance`
-populated in `Server.index` between `loadSessionMetadata` and
-`buildTree`; **OD2 = OD2.a** — additive `Slug` on
-`ActiveWorkInstance` alongside `Name`; **OD3 = OD3.a** —
-unbound stays roster-only; **OD4 = OD4.a** — semantic
-presence-and-absence test assertions; **OD5 dissolved** —
-subsumed by OD1.a) and the
-[`task-plan.md`](../../../spec/planning/task-plan.md)
-`` `In draft` → `Proposed` `` promotion gate was walked before
-the flip. Drafting, the OD walk, and the gate walk all ran in
-a single delegated drafting session; the gate-walk extended
-the session past the standing spawned-drafting "stop at `In
-draft`" bound at the contributor's explicit direction
-(matching the t3 precedent recorded in
-[`m2/README.md` Task Status](../workstream-tracker-1-0/m2/README.md)
-— "extending past the spawn's original 'stop at `In draft`'
-bound at the contributor's explicit direction"). Status flip
-co-locates with the gate-walk record below in this commit.
+`Landed`. p2 ships the F4 humanization of the forest's per-node
+actor display per the locked OD walk: additive `Name` and `Slug`
+fields on `ActiveWorkInstance` (OD1.a + OD2.a), populated in
+`Server.index` from the per-request session-metadata resolution,
+read by the forest's `node-header` template with a name-then-slug
+fallback (no `wst-<uuid>` actor surfaced in the rendered text).
+All five ODs (OD1 / OD2 / OD3 / OD4 / OD5) landed as specified;
+no estimate deviation, no render-altitude deferral to close.
+
+The [`task-plan.md`](../../../spec/planning/task-plan.md)
+Plan-to-PR Completion Gate was walked before this flip: every
+Goal item is satisfied by the new and updated `forest_test.go`
+semantic tests; every Validation Gate observation is exercised
+by those tests (the reviewer-facing per-phase walkthrough rides
+the same PR for product-side observation); every Self-Review
+Audit is satisfied (validation-honesty via the actual-template
+output assertions; rename-aware-diff-classification via the
+hand-classified struct additions + `Server.index` population
+pass + one-expression template substitution). The
+mandatory-`Validating` rule binds the task-terminal leaf only —
+`Proposed → Landed` is the direct transition for p2, matching
+[p1's precedent](p1-cosmetic-defects.md). p3 (contract-revisiting
++ task-terminal) remains pending; the parent task plan's own
+Status flip waits for p3's implementing PR per
+[`## Phase Contracts`](README.md#phase-contracts).
 
 ### Gate-walk history
 
@@ -96,6 +102,59 @@ co-locates with the gate-walk record below in this commit.
   p2 is a phase plan with no further phase children; the
   parent task plan is N = 3 (p1 / p2 / p3) and seeded its
   three phase skeletons when *it* was promoted.
+
+### Implementation history
+
+What shipped at the implementing PR. p2's ODs locked the
+implementation at WHAT altitude with no render-altitude
+deferrals to close, so this block is one-line confirmations
+rather than the rationale records p1's analogous block carries.
+
+- **Struct additions (OD1.a + OD2.a).** `Name string` and
+  `Slug string` added to `ActiveWorkInstance` in
+  [`tree.go`](../../../internal/site/tree.go) as additive
+  fields. The pre-existing `Actor` field gained its own
+  field-level comment for the first time, clarifying that it
+  is the loader-internal identity / idempotency key and is no
+  longer the forest's rendered label (the prior implicit
+  "the forest renders only Actor" framing on the `ID` field's
+  comment was retired by this phase).
+- **Population pass (OD1.a).** Added in `Server.index`
+  ([`site.go`](../../../internal/site/site.go)) between
+  `loadSessionMetadata` and `buildTree`: a single loop over
+  `active` writes each work-instance's `Slug` from the
+  active-map key in scope and `Name` from `meta[wi.ID].Name`.
+  No `loadActiveWorkInstances` change; no `buildTree`
+  signature change; no second resolution path. The
+  single-resolution invariant is structurally preserved
+  (both forest and roster read from the same per-request
+  `loadSessionMetadata` map).
+- **Template diff (C1).** One-expression substitution in
+  [`forest.go`](../../../internal/site/forest.go)
+  `node-header` template's `actor-marker` span: the
+  name-then-slug fallback ladder replaces the prior raw
+  `Actor` read. The span itself, its placement inside
+  `label-group`, and the per-node `range .WorkInstances`
+  attachment remain (C-INV-3).
+- **Test coverage (OD4.a).** Two new tests in
+  [`forest_test.go`](../../../internal/site/forest_test.go):
+  `TestRenderForestActorMarkerNameBearing` (name-bearing
+  session renders its reported name; the `wst-` prefix never
+  surfaces in the rendered text) and
+  `TestRenderForestActorMarkerSlugFallback` (no-name session
+  renders the slug fallback; same `wst-` absence assertion).
+  Two existing tests (`TestRenderActorMarkersOnBox`,
+  `TestRenderProgressRowCoexistsWithPreservedSurfaces`) were
+  updated to set `Name` / `Slug` on the test fixtures so the
+  rendered text matches the new template; the
+  `TestRenderActorMarkersOnBox` comment was updated to note
+  that the C-INV-3 invariant covers span presence + attachment,
+  not the rendered text source.
+- **No `## Estimate Deviations` callout.** The file inventory
+  shipped exactly as the parent task plan's Files-to-touch p2
+  row pre-flagged and the gate-walk locked: `forest.go` +
+  `tree.go` + `site.go` + `forest_test.go`. No additional
+  files touched.
 
 ### Open decisions
 
