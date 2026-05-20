@@ -8,93 +8,116 @@ short_description: Humanize the forest actor — reported name (slug fallback) i
 
 ## Status
 
-`In draft`. This drafting session captures the phase's Goal,
+`In draft`. This drafting session captured the phase's Goal,
 Contract clause **C1** (the WHAT this phase realizes for parent
 Contract **C6**), the Cross-Cutting Invariants the phase
 inherits from the parent task plan
 ([C-INV-2 / C-INV-3 / C-INV-4 / C-INV-5](README.md#cross-cutting-invariants)),
-the estimate-shaped Files-to-touch (pre-flagging the `tree.go` /
-`site.go` deviation path the parent task plan named), the
-per-phase Validation Gate (observation-only — the task-terminal
-full product-acceptance walkthrough lives at p3), Out of Scope,
-and the Risk Register. Five **open decisions** are surfaced
-below for the `` `In draft` → `Proposed` `` promotion-gate walk
-to drive to resolution; none are locked here.
+the Files-to-touch, the per-phase Validation Gate
+(observation-only — the task-terminal full product-acceptance
+walkthrough lives at p3), Out of Scope, and the Risk Register.
+Five open decisions were surfaced for the OD walk preceding the
+`` `In draft` → `Proposed` `` promotion gate. OD-walk
+resolutions are folded inline below as they land; OD2, OD3, and
+OD4 remain open at this revision.
 
 ### Open decisions
 
-Each is decomposed against merged code; resolutions fold into
+Each was decomposed against merged code; resolutions fold into
 Contract **C1**, Files-to-touch, the Validation Gate, and the
-implementing PR. None are locked in this drafting session.
+implementing PR. Resolved entries lead with **Resolved =** and
+fold the chosen shape into the durable plan; the original
+framing is retained underneath as the scoping record (parent
+README precedent).
 
-- **OD1 — Data-flow shape for the reported `name`.** The
-  forest's per-node `range .WorkInstances` iterates
-  `*ActiveWorkInstance` values that carry `ID` and `Actor` only
-  today ([`ActiveWorkInstance` in
-  tree.go](../../../internal/site/tree.go); the `ID` field
-  exists for the roster's event-log join, never rendered by the
-  forest). The reported `name` is already resolved per request
-  by [`loadSessionMetadata`](../../../internal/site/site.go) into
-  a `map[string]sessionMeta` keyed by `wi.ID`, and consumed by
-  `buildRoster` ([`buildRoster` in
-  site.go](../../../internal/site/site.go)). Threading the
-  resolved value to the forest's per-node template has three
-  plausible shapes:
-  - **OD1.a — Add an additive `Name` field (and a `Slug` field
-    if OD2 lands on OD2.a) to `ActiveWorkInstance`, populated in
-    `Server.index` between `loadSessionMetadata` and
-    `buildTree`.** No `buildTree` signature change. The forest
-    template reads `.Name` directly (no template function). The
-    roster continues to read from `RosterEntry` and ignores the
-    new field. *Touches:*
-    [`tree.go`](../../../internal/site/tree.go) (struct
-    additive),
-    [`site.go`](../../../internal/site/site.go)
-    (`Server.index` threading + `loadActiveWorkInstances` is
-    untouched — the field is populated post-load, not in the SQL
-    read), and
-    [`forest.go`](../../../internal/site/forest.go) (template
-    text).
-  - **OD1.b — Pass a parallel `map[string]string` (id → name)
-    into `buildTree`, look up in the template via a registered
-    template function.** `ActiveWorkInstance` stays loader-key
-    shape (no rendered fields). `buildTree`'s signature grows by
-    one map argument; the template grows a function call. *New
-    surface:* a render-time template function in the forest's
-    template set. *Touches:*
-    [`tree.go`](../../../internal/site/tree.go) (`buildTree`
-    signature),
-    [`site.go`](../../../internal/site/site.go) (call-site map
-    derivation from `meta`), and
-    [`forest.go`](../../../internal/site/forest.go) (template
-    function registration + template text).
-  - **OD1.c — Pass the full `meta map[string]sessionMeta`
-    through `buildTree` (or onto a render context), look up in
-    the template via a template function.** Same shape as OD1.b
-    but threads the full resolved-metadata blob rather than a
-    derived name-only map. Larger surface than C1 needs (the
-    forest reads only `Name`), but leaves room for a future
-    forest field to read further reported facts without a second
-    threading pass.
-
-  Tradeoff lens: OD1.a is the smallest reader-side change (the
-  template stays a plain field read), at the cost of an additive
-  field on `ActiveWorkInstance` that only the forest renders.
-  OD1.b / OD1.c keep `ActiveWorkInstance` as loader-key shape
-  but introduce a render-time template function the forest
-  template set does not use today. All three preserve C-INV-4
-  (single per-request resolution via `loadSessionMetadata`).
-  *Verified by:*
+- **OD1 — Data-flow shape for the reported `name`. Resolved =
+  OD1.a** (additive `Name` field on `ActiveWorkInstance`,
+  populated in `Server.index` between `loadSessionMetadata` and
+  `buildTree`; no `buildTree` signature change; the forest
+  template reads `.Name` directly). *Rationale (vision-grounded,
+  not precedent-grounded).* The vision-named forest extensions
+  ahead — F3b's per-cell `current_stage`
+  ([`progress-cell-active-state-and-actor`](../../backlog.md#progress-cell-active-state-and-actor)),
+  the work-instance state vocabulary
+  ([`vision.md` §3](../../../design/vision.md) `awaiting-user` /
+  `awaiting-external` / `backgrounded`), actor kind for
+  color/hover ([`vision.md` §3](../../../design/vision.md)),
+  actor lineage ([`vision.md` §3 / §4](../../../design/vision.md))
+  — are sourced from a *mix* of schema growth (additional
+  `work_instances` columns) and reported metadata. OD1.a is the
+  only shape that unifies both sources at one boundary:
+  `Server.index` populates `ActiveWorkInstance` from
+  `loadActiveWorkInstances` (schema-sourced fields) and from
+  `loadSessionMetadata` (metadata-sourced fields), both onto the
+  same value the forest renders. OD1.c's `sessionMeta`-only
+  routing reaches only the metadata-sourced half; OD1.b ages
+  worst as each new field needs another map on `indexData`.
+  Beyond the future-feature pipeline, **F4 itself is the cost of
+  having shipped with divergent forest/roster value-shapes** —
+  `RosterEntry` carried `Name`, `ActiveWorkInstance` did not;
+  that structural asymmetry is what allowed the rendering
+  divergence to ship. OD1.a closes the asymmetry structurally
+  (single mental model of "what the tool displays about a
+  work-instance"; a future field added to one surface naturally
+  pulls toward the other); OD1.b/c close the F4 rendering
+  symptom while preserving the conditions that allowed it.
+  Folded into Contract **C1** and the Files-to-touch certain set
+  below. *Verified by:*
   [`Server.index` order in
   site.go](../../../internal/site/site.go) (docs → active → meta
-  → buildTree(docs, active) → buildRoster(docs, active, meta) —
-  `meta` is already loaded before `buildTree` is called, so
-  OD1.a can populate the new field between those two steps with
-  no reordering);
-  [`buildRoster` in
+  → buildTree → buildRoster — `meta` is already loaded before
+  `buildTree` is called, so OD1.a populates the new field
+  between those two steps with no reordering); [`ActiveWorkInstance`
+  in tree.go](../../../internal/site/tree.go) (the existing `ID`
+  field, added in t4-p2 for the roster's event-log join even
+  though the forest doesn't render `ID`, sets the
+  additive-field-for-cross-region-needs precedent OD1.a
+  extends); [`buildRoster` in
   site.go](../../../internal/site/site.go) (the existing
-  "pure-function-over-already-loaded-values" precedent OD1.a/b/c
-  each match).
+  "pure-function-over-already-loaded-values" precedent OD1.a
+  matches symmetrically).
+
+  - **OD1 (original framing, retained as scoping record).** The
+    forest's per-node `range .WorkInstances` iterates
+    `*ActiveWorkInstance` values that carry `ID` and `Actor`
+    only today ([`ActiveWorkInstance` in
+    tree.go](../../../internal/site/tree.go); the `ID` field
+    exists for the roster's event-log join, never rendered by
+    the forest). The reported `name` is already resolved per
+    request by
+    [`loadSessionMetadata`](../../../internal/site/site.go) into
+    a `map[string]sessionMeta` keyed by `wi.ID`, and consumed by
+    `buildRoster` ([`buildRoster` in
+    site.go](../../../internal/site/site.go)). Threading the
+    resolved value to the forest's per-node template was
+    decomposed against three plausible shapes:
+    - **OD1.a — Additive `Name` field (and `Slug` if OD2 lands
+      on OD2.a) on `ActiveWorkInstance`, populated in
+      `Server.index` between `loadSessionMetadata` and
+      `buildTree`.** No `buildTree` signature change. Template
+      reads `{{.Name}}` directly.
+    - **OD1.b — Parallel `map[string]string` (id → name) on
+      `indexData`, looked up in the template via the `index`
+      builtin (`{{index $.Names .ID}}`).** `ActiveWorkInstance`
+      stays loader-key shape. New template surface (outer-scope
+      `$` + `index` builtin, neither used today).
+    - **OD1.c — Full `map[string]sessionMeta` through
+      `indexData`, lookup via `{{(index $.Meta .ID).Name}}`.**
+      Same template surface as OD1.b plus a `.Name` step. Routes
+      more data than C1 needs; future-extensibility for further
+      metadata-sourced reads.
+
+    Tradeoff lens at decision time: future forest fields will be
+    sourced from a *mix* of schema growth (state vocab, lineage,
+    F3b `current_stage`, possibly kind) and reported metadata;
+    (a)/(d-style) value-shape carries both at one boundary,
+    (c)'s metadata-only routing reaches only one half. Symmetry
+    with the roster's `RosterEntry.Name` is load-bearing because
+    F4 itself is the F4-shaped bug — the structural asymmetry
+    between `RosterEntry` (value-carries-display) and
+    `ActiveWorkInstance` (loader-key-shape) is what allowed the
+    forest/roster identity disagreement m2 shipped. All three
+    shapes preserve C-INV-4 single-resolution.
 
 - **OD2 — Slug fallback's source on the rendered value.** Parent
   Contract **C6** locks the rule as **name-then-slug**, the same
@@ -176,18 +199,16 @@ implementing PR. None are locked in this drafting session.
   confirms.
 
 - **OD5 — Pre-flag the `tree.go` / `site.go` Estimate
-  Deviation.** Parent task plan's `## Files to touch` names
-  `forest.go` as the certain p2 edit and `tree.go` / `site.go`
-  as estimated deviations "if the reported-`name` field needs an
-  additive passthrough" ([`README.md` Files to touch — p2](README.md#files-to-touch)).
-  All three OD1 shapes touch `tree.go` and `site.go` (additively
-  in OD1.a; signature-and-call-site in OD1.b/c), so the
-  deviation path is the **expected** shape, not the unexpected
-  one. The phase plan's Files-to-touch should pre-flag this so
-  the implementing PR can name it under `## Estimate Deviations`
-  as a structural-call confirmation rather than a re-litigation
-  of scope. This is a record-keeping decision (pre-flag yes/no),
-  not a behavior decision.
+  Deviation. Resolved = dissolved by OD1.a.** Under OD1.a,
+  `tree.go` (additive `Name` field) and `site.go`
+  (`Server.index` threading) are **certain** edits, not
+  estimate deviations. The `## Files to touch` section below
+  promotes them from "OD1-dependent — pre-flagged" to "Modify
+  (certain)." The implementing PR records the edits as the
+  planned scope, not as an `## Estimate Deviations` callout;
+  the parent task plan's `## Files to touch` p2 row already
+  named the path as expected so this isn't a re-litigation of
+  scope either way.
 
 ## Context
 
@@ -281,11 +302,13 @@ idempotency key keyed on `(slug, actor)`), never a label. The
 `actor-marker` span itself, its placement inside `label-group`,
 and the per-node `range .WorkInstances` attachment remain
 unchanged — this contract changes only the text rendered inside
-the span. The data-flow shape (OD1), the slug fallback's source
-on the rendered value (OD2), and any additive passthrough on
-`ActiveWorkInstance` or through `buildTree` are render-altitude
-/ data-plumbing decisions resolved at the gate-walk and the
-implementing PR per
+the span. The data-flow shape locks at **OD1.a** (additive
+`Name` field on `ActiveWorkInstance`, populated in
+`Server.index` between `loadSessionMetadata` and `buildTree`;
+see Status → Open decisions); the slug fallback's source on
+the rendered value (OD2) remains open at this drafting session.
+Remaining render-altitude details are resolved at the gate-walk
+and the implementing PR per
 [`shared.md`](../../../spec/planning/shared.md) "Plans describe
 contracts, not implementation." The per-request resolution of
 the reported `name` continues to live in the already-existing
@@ -366,19 +389,24 @@ asks whether the phase plan pre-flags it explicitly).*
     — the `node-header` template's `actor-marker` span's
     rendered text (**C1**). The `range .WorkInstances` and the
     span attachment stay; only the text inside the span changes.
-
-- **Modify (OD1-dependent — Estimate Deviation pre-flagged):**
   - [`internal/site/tree.go`](../../../internal/site/tree.go) —
-    additive `Name` (and `Slug` per OD2.a) field on
-    `ActiveWorkInstance` under OD1.a; or `buildTree` signature
-    growth under OD1.b / OD1.c. The parent task plan's `## Files
-    to touch` p2 row already names this deviation path; this
-    plan inherits the pre-flag (OD5 = pre-flag yes).
+    additive `Name string` field on `ActiveWorkInstance`. If
+    OD2 lands on OD2.a, a `Slug string` field is added in the
+    same edit; OD2.b leaves the struct with only the `Name`
+    addition and reads the slug fallback from outer-template
+    scope. The struct's existing `ID` field — added in t4-p2
+    for the roster's event-log join even though the forest
+    doesn't render `ID` — is the additive-field precedent OD1.a
+    extends.
   - [`internal/site/site.go`](../../../internal/site/site.go) —
-    `Server.index` threading to populate the new field from the
-    already-loaded `meta` map between `loadSessionMetadata` and
-    `buildTree` (OD1.a); or `buildTree` call-site map derivation
-    (OD1.b / OD1.c). Same Estimate Deviation pre-flag.
+    `Server.index` populates the new field(s) on each
+    `ActiveWorkInstance` from the already-loaded `meta` map
+    between `loadSessionMetadata` and `buildTree` (a single
+    short pass over `active`'s values, keyed by `wi.ID`). No
+    `loadActiveWorkInstances` change; no `buildTree` signature
+    change; no second resolution path. If OD2.a, the
+    population pass also assigns `wi.Slug` from the
+    `active`-map's slug key (in scope at that point).
 
 - **Modify (tests):**
   - [`internal/site/forest_test.go`](../../../internal/site/forest_test.go)
@@ -508,9 +536,9 @@ between `loadSessionMetadata` and `buildTree`:
   against a real `go run` rendering with both name-bearing and
   no-name seeded sessions, not asserted from the diff or from
   the template source alone.
-- **rename-aware-diff-classification** — additive struct field
-  on `ActiveWorkInstance` (OD1.a) or signature growth on
-  `buildTree` (OD1.b / OD1.c) must be hand-classified so the
+- **rename-aware-diff-classification** — the additive `Name`
+  field on `ActiveWorkInstance` (OD1.a) and the new
+  `Server.index` population pass must be hand-classified so the
   "actor-marker text changes only" and "C-INV-3 attachment
   preserved" claims are real, not tooling-fooled.
 
@@ -560,25 +588,28 @@ between `loadSessionMetadata` and `buildTree`:
   semantic test asserts the **absence** of the `wst-` prefix to
   catch a mis-wired ladder. Carried, not blocking.
 - **Per-work-instance `Name` resolution diverges from the
-  roster's.** If OD1's resolution introduces a second name-read
-  path (a second call to `resolveSessionMeta`, a second event-
-  log query, or a second key read on the metadata blob), the
-  forest could show a different name than the roster for the
-  same work-instance under heartbeat / state-transition
-  overlay races. Mitigation: OD1.a / OD1.b / OD1.c all consume
-  the **same** `loadSessionMetadata` result — the resolution
-  runs once per request in `Server.index`; both surfaces read
-  from the same `map[string]sessionMeta` keyed by `wi.ID`. The
-  OD1 resolution must preserve this single-resolution
-  invariant; reviewer-flag a second resolution path. Carried,
-  not blocking.
-- **Additive struct field is silently rendered elsewhere.** If
-  OD1.a adds `Name` to `ActiveWorkInstance`, an unrelated
-  consumer (e.g. a debug log or a `%+v` format) could pick it
-  up. Mitigation: the forest's `node-header` template is the
-  only intended reader; the roster does not iterate
-  `ActiveWorkInstance` values (it consumes `RosterEntry` from
-  `buildRoster`). Spot-check at implementing-PR review.
+  roster's.** A second name-read path (a second call to
+  `resolveSessionMeta`, a second event-log query, or a second
+  key read on the metadata blob) would let the forest show a
+  different name than the roster for the same work-instance
+  under heartbeat / state-transition overlay races.
+  Mitigation: under OD1.a the threading point is structurally
+  shared — `Server.index` populates `ActiveWorkInstance.Name`
+  from the same `map[string]sessionMeta` `buildRoster` reads to
+  populate `RosterEntry.Name`. The resolution runs once per
+  request in `loadSessionMetadata`; both surfaces consume the
+  same map keyed by `wi.ID`. Reviewer-flag any commit that
+  introduces a second `resolveSessionMeta` call, a second
+  event-log query, or a separate metadata-blob key read in the
+  forest's loader. Carried, not blocking.
+- **Additive struct field is silently rendered elsewhere.**
+  Under OD1.a, the additive `Name` field on
+  `ActiveWorkInstance` could be picked up by an unrelated
+  consumer (e.g. a debug log or a `%+v` format). Mitigation:
+  the forest's `node-header` template is the only intended
+  reader; the roster does not iterate `ActiveWorkInstance`
+  values (it consumes `RosterEntry` from `buildRoster`).
+  Spot-check at implementing-PR review.
 
 ## Related Docs
 
