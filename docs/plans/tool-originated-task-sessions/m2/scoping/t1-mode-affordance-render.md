@@ -387,8 +387,14 @@ test node's `Children`. Coverage: each NodeType the renderer
 can produce (`root`, `milestone`, `task`, `phase`) at the
 applicable Status values per D3, plus at least one unknown-Status
 row and at least one `Deferred — <reason>` row to pin canonical-
-prefix behavior. The `phase`-with-children case is not in the
-enumeration — per
+prefix behavior. D3's product-level **epic** category maps to
+`NodeType: "root"` at the renderer level — per
+[`internal/slugs/slugs.go`](../../../../../internal/slugs/slugs.go)
+`parseSegment` and `Slug.NodeType()`, the slug parser never
+assigns `NodeTypeEpic`; epic-rooted docs and standalone-task
+roots both render as `NodeType: "root"`, so the `root` row
+covers the epic case. The `phase`-with-children case is not in
+the enumeration — per
 [`internal/slugs/slugs.go`](../../../../../internal/slugs/slugs.go)
 `pN` is the terminal segment, so `buildTree` cannot construct a
 phase with children from well-formed slugs and that branch of

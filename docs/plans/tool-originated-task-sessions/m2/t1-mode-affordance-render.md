@@ -288,6 +288,16 @@ walkthrough lives on the t4 leaf and is not duplicated here.
    NodeType, plus at least one unknown-Status row and at least
    one `Deferred — <reason>` row to pin canonical-prefix
    behavior, plus the task-with-children case (no affordance).
+   D3's product-level **epic** category maps to `NodeType:
+   "root"` at the renderer level — per
+   [`internal/slugs/slugs.go`](../../../../internal/slugs/slugs.go)
+   `parseSegment` and `Slug.NodeType()`, the slug parser never
+   assigns `NodeTypeEpic`; epic-rooted docs and standalone-task
+   roots both render as `NodeType: "root"`, so the `root` test
+   row covers the epic case and no separate `epic` row is
+   required (the unreachable case is documented in the
+   coverage list above for the same structural reason as
+   phase-with-children).
    Per-row fixture shape is implementation choice: cases whose
    test node is a structural root need only their own
    `parsedDoc`; deeper cases need the parsedDoc chain of
