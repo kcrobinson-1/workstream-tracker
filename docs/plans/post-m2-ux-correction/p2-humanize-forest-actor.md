@@ -170,17 +170,19 @@ README precedent).
     - **OD1.a — Additive `Name` field (and `Slug` if OD2 lands
       on OD2.a) on `ActiveWorkInstance`, populated in
       `Server.index` between `loadSessionMetadata` and
-      `buildTree`.** No `buildTree` signature change. Template
-      reads `{{.Name}}` directly.
-    - **OD1.b — Parallel `map[string]string` (id → name) on
-      `indexData`, looked up in the template via the `index`
-      builtin (`{{index $.Names .ID}}`).** `ActiveWorkInstance`
-      stays loader-key shape. New template surface (outer-scope
-      `$` + `index` builtin, neither used today).
-    - **OD1.c — Full `map[string]sessionMeta` through
-      `indexData`, lookup via `{{(index $.Meta .ID).Name}}`.**
-      Same template surface as OD1.b plus a `.Name` step. Routes
-      more data than C1 needs; future-extensibility for further
+      `buildTree`.** No `buildTree` signature change. The
+      template reads the new field on the per-iteration
+      work-instance value directly.
+    - **OD1.b — Parallel id-to-name map on `indexData`, looked
+      up at render time by work-instance ID.**
+      `ActiveWorkInstance` stays loader-key shape. Adds a new
+      template surface (root-data reference + map-by-key
+      lookup, neither used in the forest template today).
+    - **OD1.c — Full id-to-metadata map on `indexData`, looked
+      up at render time by work-instance ID and read for its
+      name field.** Same template surface as OD1.b plus a
+      field-access step on the looked-up value. Routes more
+      data than C1 needs; buys future-extensibility for further
       metadata-sourced reads.
 
     Tradeoff lens at decision time: future forest fields will be
@@ -204,7 +206,8 @@ README precedent).
   reads display fields off the work-instance value; OD2.a
   continues that convention for the slug fallback rather than
   splitting it across two scopes (`Name` on the value, `Slug`
-  via outer-template `$node.Slug`). The rendered output is
+  via an outer-template reference to the enclosing node).
+  The rendered output is
   identical to OD2.b for every attached work-instance —
   `buildTree`'s exact-slug join
   ([`tree.go:148`](../../../internal/site/tree.go)
@@ -308,10 +311,11 @@ README precedent).
   specific silent-regression mode the
   [`vision.md` §9](../../../design/vision.md) feature risk
   names ("sessions go untracked ... without an obvious
-  symptom") in this surface: a future template "tidy" like
-  `{{.Name}} ({{.Actor}})` would pass OD4.b (the name is
-  present) while re-introducing the uuid leak F4 corrects.
-  OD4.a fails that case via the absence side. Posture matches
+  symptom") in this surface: a future template tidy that
+  surfaces both the `Name` and the `Actor` field in the same
+  span would pass OD4.b (the name is present) while
+  re-introducing the uuid leak F4 corrects. OD4.a fails that
+  case via the absence side. Posture matches
   m2 t3 C7's semantic-not-byte-exact assertions
   ([`t3-doc-declared-stages.md` Contracts](../workstream-tracker-1-0/m2/t3-doc-declared-stages.md));
   cost is one additional `NotContains(rendered, "wst-")` per
@@ -576,14 +580,19 @@ shipped.*
 
 ## Validation Gate
 
-This is the **per-phase** Validation Gate (observation-only).
-The task-terminal full product-acceptance walkthrough across all
-six findings lives at p3's implementing PR per the parent task
-plan's [`## Phase Contracts`](README.md#phase-contracts). p2's
-gate observes the F4 corrected behavior in isolation; the phase
-plan's Status flips `In progress → Validating → Landed` per
-[`task-plan.md`](../../../spec/planning/task-plan.md); the
-parent task plan's own Status flip waits for p3.
+p2's per-phase Validation Gate. The full product-acceptance
+walkthrough across all six F-findings runs at p3 (task-terminal)
+per the parent task plan's
+[`## Phase Contracts`](README.md#phase-contracts); this gate
+covers F4 only. Approval at this gate is observation-only — the
+post-merge approval-recording step that closes
+`Validating → Landed` for a product-facing leaf binds the
+task-terminal phase (p3), not earlier phases per
+[`shared.md`](../../../spec/planning/shared.md) "Plan-doc
+Status" (the mandatory-`Validating` rule binds the leaf, and
+p2 is not the leaf — p3 is). p2 closes on its technical gate +
+this observation; the parent task plan's own Status flip waits
+for p3.
 
 ### Setup
 
