@@ -381,32 +381,51 @@ table-driven render assertions); m2's Risk Register entry
 "Mode-affordance map drift" naming the enumerated-map test as
 the falsifier.
 
+### SD9 — Click bubbling inside `<summary>`: accept the navigation-supersedes posture, no contract added
+
+When the contributor clicks the submit button inside the node's
+`<summary>`, the browser may *also* toggle the parent `<details>`
+open/closed state on the same click before the form's POST
+navigates the page. The HTML spec leaves the bubbling behavior
+implementation-defined for nested interactive elements; in
+practice the visible toggle either does not happen
+(Chromium/Firefox stop the bubbling for activated inner
+interactive elements) or happens but is immediately superseded
+by the page navigation. Neither outcome violates D4 or the no-JS
+posture.
+
+**Shapes considered:**
+
+- **(a) Leave the side-effect unstated.** The plan adds no
+  contract on bubbling. If the visible toggle ever happens, the
+  POST navigation supersedes any local visible change before the
+  user perceives it.
+- **(b) Explicitly contract "no observable side-effect on the
+  box's open state."** Would require either a vendor-doc citation
+  pinning the no-bubble guarantee for the relevant browsers, or
+  a browser-behavior test harness outside the Go test surface.
+
+**Chosen: (a).** Consistent with the project's standing
+accepted-failure-with-visibility posture: a harmless visible
+flicker that resolves itself before the user perceives it is not
+a contract surface worth a test harness. (b) buys a contract
+whose observable difference the navigation-supersedes behavior
+already erases. *Verified by:*
+[HTML Living Standard, "The summary
+element"](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-summary-element)
+(activation behaviour of `summary` toggles `details` only when
+no inner interactive element handled the activation; form-submit
+is an activation behaviour of the submit button); the
+reality-check input above carrying the same citation as the
+upstream framing.
+
 ## Open decisions to make at plan-drafting
 
-Carried forward to the plan as numbered Open Questions for the
-user. None block the plan from drafting to `Status: In draft`;
-each is a discriminator the plan surfaces explicitly rather than
-silently resolving.
-
-- **OQ1 — Visible toggle effect on submit-click inside
-  `<summary>`.** When the contributor clicks the submit button
-  inside the summary, browsers may *also* toggle the `<details>`
-  open/closed state on the same click before the form's POST
-  navigates the page. The HTML spec leaves the bubbling behavior
-  implementation-defined for nested interactive elements; in
-  practice the visible toggle either does not happen
-  (Chromium/Firefox stop the bubbling) or happens but is
-  immediately superseded by the page navigation. Neither
-  violates D4 or the no-JS posture. The open question is whether
-  the plan should explicitly contract on "no observable
-  side-effect on the box's open state" (which would require a
-  test harness that observes browser behavior, outside the Go
-  test scope), or accept that the side-effect is harmless under
-  the navigation-supersedes-toggle posture and leave it
-  unstated. The plan's default: leave unstated, treat as
-  navigation-supersedes (consistent with the project's overall
-  posture on accepted-failure-with-visibility). User confirmation
-  recorded as OQ1's resolution before promotion.
+None remaining. SD9 above resolves the only open question the
+scoping surfaced (the click-bubbling discriminator carried as
+OQ1 into the plan's first In-draft pass; the user resolved (A)
+at the promotion gate, folded into SD9 here and reflected in the
+plan's Risk Register entry).
 
 ## Plan structure handoff
 

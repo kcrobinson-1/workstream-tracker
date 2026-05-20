@@ -1,6 +1,6 @@
 ---
 slug: tool-originated-task-sessions-m2-t1
-Status: In draft
+Status: Proposed
 short_description: Mode-affordance render on plan-tree nodes
 ---
 
@@ -413,18 +413,20 @@ risks plus any t1-specific residuals.
   prefix single-source audit in Self-Review explicitly searches
   the diff for a parallel inline strip.
 - **Browser-default click bubbling from the submit button to
-  the parent `<summary>` (OQ1).** When the contributor clicks
-  the button, the browser may also toggle the `<details>` open
+  the parent `<summary>`.** When the contributor clicks the
+  button, the browser may also toggle the `<details>` open
   state before the form's POST navigates. Under merged-code
   behavior the toggle effect is harmless because the navigation
   supersedes any local visible change; no D4 or no-JS posture
-  constraint is violated either way. Mitigation: surfaced as
-  **Open Question OQ1** below for explicit resolution; if the
-  user resolves OQ1 to "leave unstated and accept the
-  navigation-supersedes posture," no further mitigation is
-  needed; if to "explicitly constrain the absence of side-
-  effects," the plan grows a contract on the bubbling behavior
-  with a test or vendor-doc citation to back it.
+  constraint is violated either way. Mitigation: **accepted
+  under the project's standing accepted-failure-with-visibility
+  posture** — the plan adds no contract on bubbling, per the
+  paired scoping doc's
+  [SD9](./scoping/t1-mode-affordance-render.md). The HTML spec's
+  activation-behaviour clause for `<summary>` already covers the
+  no-bubble case for modern Chromium/Firefox; when the rare
+  bubble does happen, the form's POST navigation supersedes any
+  visible toggle before the user perceives it.
 - **CSS regression on the narrow-window degrade.** The added
   flex child in `.box-header` could regress the post-m2-ux-
   correction-p1 stacked-left intent
@@ -434,37 +436,6 @@ risks plus any t1-specific residuals.
   narrow degrade; the manual single-node render check in
   the Validation Gate exercises the rendered header at both
   default and narrow widths.
-
-## Open Questions
-
-For the user to resolve before walking the
-[`In draft` → `Proposed` promotion gate](../../../../spec/planning/task-plan.md).
-
-- **OQ1 — Click bubbling from the in-summary submit button to
-  the `<details>` toggle.** When the contributor clicks the
-  affordance's submit button inside the `<summary>`, the
-  browser may *also* toggle the parent `<details>` open/closed
-  state on the same click before the form's POST navigates the
-  page. Modern Chromium/Firefox stop the bubbling for activated
-  inner interactive elements; the HTML spec leaves the precise
-  behavior for nested interactives implementation-defined. Two
-  resolutions:
-  - **(A) Leave unstated; accept the navigation-supersedes
-    posture.** The plan adds no contract on bubbling. If the
-    visible toggle ever happens, it is immediately superseded by
-    the page's POST navigation, so the contributor never sees
-    a half-toggled box.
-  - **(B) Explicitly contract on "no observable side-effect on
-    the box's open state."** Adds a Contract requiring the
-    bubbling not to fire, plus a Validation Gate item that
-    either cites the HTML spec's relevant clause or adds a
-    browser-behavior test outside the Go suite.
-
-  Default: (A). The accepted-failure-with-visibility posture
-  the project carries in user memory accepts harmless variability
-  here; (B) buys a contract that the navigation-supersedes
-  behavior already makes invisible. User confirmation recorded
-  as OQ1's resolution.
 
 ## Related Docs
 
